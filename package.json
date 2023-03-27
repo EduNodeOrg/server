@@ -1,0 +1,45 @@
+{
+  "name": "apiedu",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "engines": {
+    "node": "12.13.0"
+  },
+  "scripts": {
+    "dev": "nodemon server.js",
+    "deployHeroku": "git add . && git commit -am 'commit' && git push heroku master"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "concurrently": "^5.3.0",
+    "morgan": "^1.10.0",
+    "nodemon": "^2.0.15"
+  },
+  "dependencies": {
+    "axios": "^0.19.2",
+    "bcryptjs": "^2.4.3",
+    "cors": "^2.8.5",
+    "dotenv": "^8.6.0",
+    "express": "^4.17.2",
+    "express-session": "^1.17.2",
+    "jimp": "^0.16.1",
+    "jsonwebtoken": "^8.5.1",
+    "mailgun-js": "^0.22.0",
+    "mongoose": "^5.13.14",
+    "needle": "^3.0.0",
+    "node-mailjet": "^3.3.4",
+    "nodemailer": "^6.7.2",
+    "passport": "^0.4.1",
+    "passport-google-oauth20": "^2.0.0",
+    "passport-twitter": "^1.0.4",
+    "path": "^0.12.7",
+    "socket.io": "^4.4.1",
+    "stellar-sdk": "^5.0.4",
+    "twit": "^2.2.11",
+    "twitter": "^1.7.1",
+    "web3.storage": "^4.2.0"
+  }
+}

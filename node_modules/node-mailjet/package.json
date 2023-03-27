@@ -1,0 +1,48 @@
+{
+  "name": "node-mailjet",
+  "version": "3.3.4",
+  "description": "Mailjet NodeJS API client",
+  "main": "index.js",
+  "directories": {
+    "test": "test"
+  },
+  "dependencies": {
+    "bluebird": "^3.5.0",
+    "json-bigint": "^1.0.0",
+    "qs": "^6.5.0",
+    "superagent": "^6.1.0",
+    "superagent-proxy": "^2.1.0"
+  },
+  "devDependencies": {
+    "@segment/to-iso-string": "^1.0.1",
+    "chai": "^4.1.0",
+    "eslint": "^4.2.0",
+    "mocha": "^8.4.0",
+    "nock": "^9.0.14"
+  },
+  "scripts": {
+    "test": "mocha"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mailjet/mailjet-apiv3-nodejs.git"
+  },
+  "keywords": [
+    "email",
+    "sms",
+    "node",
+    "mail",
+    "mailjet"
+  ],
+  "author": "Guillaume Badi <gbadi@mailjet.com> (https://github.com/GuillaumeBadi)",
+  "contributors": [
+    "Arnaud Breton <arnaud@mailjet.com> (https://github.com/arnaudbreton)",
+    "Nicholas Smith <nicksmith.biz@gmail.com> (https://github.com/safani)",
+    "Jérémie Parker <jeremie@vizeat.com> (https://github.com/p-j)"
+  ],
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/mailjet/mailjet-apiv3-nodejs/issues"
+  },
+  "homepage": "https://github.com/mailjet/mailjet-apiv3-nodejs#readme"
+}
