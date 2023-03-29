@@ -15,7 +15,7 @@ console.log(email)
 User.findOne({ email })
 .then((user) => {
 if (user) return res.status(400).json({ user, msg: "User already exists, please log in" });
-    
+if(!user){
          //     // validation 1
 const confirmationCode = JSON.stringify(Math.floor(Math.random() * 90000) + 10000)
 const password = req.body.password
@@ -54,7 +54,7 @@ User.create(newUser).then(console.log("saved to mongodb"))
           );
         })})
         })
-
+      }
 }).catch((err) => {console.log(err)});
 })
 
