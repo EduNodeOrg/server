@@ -37,6 +37,7 @@ const connectDB = async () => {
 }
 
 connectDB();
+
 app.get('/', (req, res) => {
   res.send('Welcome to the edunode API!');
 });
@@ -87,8 +88,6 @@ app.use("/api/mozart", mozart);
 app.use("/api/execute", execute);
 app.use("/api/post", post);
 
-app.get("/", (res) => {
-    res.json("welcome to EduNode`s API!")
-})
+
 
 app.listen(PORT, () => console.log(`server started at ${PORT}`))
