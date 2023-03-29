@@ -37,7 +37,9 @@ const connectDB = async () => {
 }
 
 connectDB();
-
+app.get('/', (req, res) => {
+  res.send('Welcome to the edunode API!');
+});
 const confirm = require('./routes/confirm');
 const users = require('./routes/users');
 const auth = require('./routes/auth');
