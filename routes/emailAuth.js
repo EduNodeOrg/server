@@ -14,7 +14,7 @@ const email = req.body.email
 console.log(email)
 User.findOne({ email })
 .then((user) => {
-if (user) return res.status(400).json({ user, msg: "User already exists, welcome back" });
+if (user) return res.status(400).json({ user, msg: "User already exists, please log in" });
     
          //     // validation 1
 const confirmationCode = JSON.stringify(Math.floor(Math.random() * 90000) + 10000)
