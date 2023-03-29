@@ -46,6 +46,7 @@ User.create(newUser).then(console.log("saved to mongodb"))
                 },
              
               });
+             // localStorage.setItem('token',token);
               // res.redirect('http://localhost:3000/dashboard');
     
             }
