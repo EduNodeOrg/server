@@ -26,6 +26,12 @@ const PostSchema = new mongoose.Schema({
     ref: "User",
     required: false,
   },
+  date: {
+    type: Date,
+    default: Date.now,
+    required: false
+  },
+  
   
 },
 
