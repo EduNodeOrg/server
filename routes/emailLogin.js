@@ -21,39 +21,33 @@ if (user) return res.status(200).json({ user, msg: "User already exists, welcome
 const password = req.body.password
 const email = req.body.email
       
-const newUser = {email, password, confirmationCode,};
-       // create salt and hash
-
-bcrypt.genSalt(10, (err, salt) => {
-bcrypt.hash(newUser.password, salt, (err, hash) => {
-// if (err) throw err;
-newUser.password = hash;
-// store to mongodb .then(console.log("saved to mongodb"))
-User.create(newUser).then(console.log("saved to mongodb"))
-.then((user) => {
-            jwt.sign(
-            { id: user.id }, process.env.JWT_SECRET,
-            { expiresIn: 3600 },
-            (err, token) => {
-               if (err) throw err;
-              res.json({
-                token,
-                // confirmationCode,
-                user: {
-                  id: user._id,
-                  email: user.email,
-                  confirmationCode: user.confirmationCode
-                },
-             
-              });
-             // localStorage.setItem('token',token);
-              // res.redirect('http://localhost:3000/dashboard');
-    
-            }
-            
-          );
-        })})
-        })
+User.findOne({ email })
+  .then((user) => {
+    if (!user) return res.status(401).json({ msg: "Invalid email or password" });
+    bcrypt.compare(password, user.password, (err, isMatch) => {
+      if (err) throw err;
+      if (isMatch) {
+        jwt.sign(
+          { id: user.id }, process.env.JWT_SECRET,
+          { expiresIn: 3600 },
+          (err, token) => {
+            if (err) throw err;
+            res.json({
+              token,
+              user: {
+                id: user._id,
+                email: user.email,
+                confirmationCode: user.confirmationCode
+              },
+            });
+          }
+        );
+      } else {
+        return res.status(401).json({ msg: "Invalid email or password" });
+      }
+    });
+  })
+  .catch((err) => {console.log(err)});
 
 }).catch((err) => {console.log(err)});
 })
