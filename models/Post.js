@@ -26,12 +26,16 @@ const PostSchema = new mongoose.Schema({
     ref: "User",
     required: false,
   },
+  authorEmail: {
+    type: String,
+    required: true,
+  },
   date: {
     type: Date,
     default: Date.now,
     required: false
   },
-  
+
   
 },
 
