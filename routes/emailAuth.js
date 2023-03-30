@@ -17,33 +17,8 @@ router.post('/', function (req, res) {
   User.findOne({ email })
     .then((user) => {
       if (user) {
-        // If the user exists, check if the password is correct
-        bcrypt.compare(password, user.password, (err, isMatch) => {
-          if (err) throw err;
-          if (isMatch) {
-            // If the password is correct, generate a JWT and send it back to the client
-            jwt.sign(
-              { id: user.id },
-              process.env.JWT_SECRET,
-              { expiresIn: 3600 },
-              (err, token) => {
-                if (err) throw err;
-                res.json({
-                  token,
-                  user: {
-                    id: user._id,
-                    email: user.email,
-                    confirmationCode: user.confirmationCode
-                  },
-                  msg: "User already exists, welcome back"
-                });
-              }
-            );
-          } else {
-            // If the password is incorrect, send an error message to the client
-            res.status(401).json({ msg: "Invalid credentials" });
-          }
-        });
+        // If the user exists, throw an error
+        res.status(400).json({ msg: "Email already exists, please log in" });
       } else {
         // If the user doesn't exist, create a new user
         const confirmationCode = JSON.stringify(Math.floor(Math.random() * 90000) + 10000)
