@@ -63,7 +63,7 @@ const mozart = require("./routes/mozart");
 const search = require("./routes/search");
 const execute = require("./routes/execute");
 const post = require("./routes/post");
-
+const certificateRoutes = require("./routes/certificates");
 
 app.use('/api/gcallback', gcallback);
 app.use('/api/search', search);
@@ -87,7 +87,7 @@ app.use("/api/freighternft", freighternft);
 app.use("/api/mozart", mozart);
 app.use("/api/execute", execute);
 app.use("/api/post", post);
-
+app.use("/api/certificates", certificateRoutes);
 
 
 app.listen(PORT, () => console.log(`server started at ${PORT}`))
