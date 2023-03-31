@@ -28,19 +28,20 @@ const PostSchema = new mongoose.Schema({
   },
   authorEmail: {
     type: String,
-    required: true,
+    required: false,
   },
   date: {
     type: Date,
     default: Date.now,
     required: false
   },
-
+  
   
 },
 
 );
 
 const Post = mongoose.model("Post", PostSchema);
+
 
 module.exports = Post;

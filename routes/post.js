@@ -1,26 +1,20 @@
 const express = require("express");
 const router = express.Router();
-const jwt = require("jsonwebtoken");
+const auth =require('../middleware/auth')
 const Post = require("../models/Post");
 
-const extractEmailFromToken = (req, res, next) => {
-  const token = req.header("Authorization").replace("Bearer ", "");
-  const decoded = jwt.verify(token, process.env.JWT_SECRET);
-  req.body.authorEmail = decoded.email;
-  next();
-};
 // Create a new post
-router.post("/", extractEmailFromToken,async (req, res) => {
+router.post("/", async (req, res) => {
     try {
-      const { title, description, link, date, tags,authorEmail } = req.body;
-  
+      const { title, description, link, date, tags } = req.body;
+      //const authorEmail= req.user.auth.email;
       const post = new Post({
         title,
         description,
         date,
         link,
         tags,
-        authorEmail,
+        //authorEmail,
         // assuming you have a middleware that sets req.user to the currently logged in user
       });
   
