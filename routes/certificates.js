@@ -4,7 +4,7 @@ const cors = require('cors');
 const Certificate = require("../models/Certificate");
 const app = express();
 app.use(cors());
-router.post("/saveImage", async (req, res) => {
+router.post("/", async (req, res) => {
   try {
     const newCertificate = new Certificate({
       image: req.body.image,
