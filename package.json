@@ -25,6 +25,7 @@
     "dotenv": "^8.6.0",
     "express": "^4.17.2",
     "express-session": "^1.17.2",
+    "ipfs-core": "^0.18.0",
     "jimp": "^0.16.1",
     "jsonwebtoken": "^8.5.1",
     "mailgun-js": "^0.22.0",
@@ -40,6 +41,6 @@
     "stellar-sdk": "^5.0.4",
     "twit": "^2.2.11",
     "twitter": "^1.7.1",
-    "web3.storage": "^4.2.0"
+    "web3.storage": "^4.5.4"
   }
 }

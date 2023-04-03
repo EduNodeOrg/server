@@ -2,8 +2,8 @@ import { Networking } from "react-native";
 import pDefer from "p-defer";
 import Request from "./Request";
 import Response from "./Response";
-import StreamBlobResponse from "./StreamBlobResponse";
-import StreamArrayBufferResponse from "./StreamArrayBufferResponse";
+import BlobResponse from "./BlobResponse";
+import ArrayBufferResponse from "./ArrayBufferResponse";
 
 class AbortError extends Error {
     constructor() {
@@ -232,24 +232,19 @@ class Fetch {
         let ResponseClass;
 
         if (this._nativeResponseType === "blob") {
-            ResponseClass = StreamBlobResponse;
+            ResponseClass = BlobResponse;
         }
 
         if (this._nativeResponseType === "base64") {
-            ResponseClass = StreamArrayBufferResponse;
+            ResponseClass = ArrayBufferResponse;
         }
 
         try {
-            this._response = await new ResponseClass(
-                this._nativeResponse,
-                this._stream,
-                this._streamController,
-                {
-                    status: this._responseStatus,
-                    url: this._responseUrl,
-                    headers: this._nativeResponseHeaders,
-                }
-            );
+            this._response = new ResponseClass(this._nativeResponse, {
+                status: this._responseStatus,
+                url: this._responseUrl,
+                headers: this._nativeResponseHeaders,
+            });
             this._deferredPromise.resolve(this._response);
         } catch (error) {
             this._deferredPromise.reject(error);

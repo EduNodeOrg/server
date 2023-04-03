@@ -38,9 +38,21 @@ const UserSchema = new mongoose.Schema({
     type: Boolean,
     default: false
   },
+  bio: {
+    type: String,
+    required: false
+  },
+  age: {
+    type: Number,
+    required: false
+  },
   date: {
     type: Date,
     default: Date.now
+  },
+  location: {
+    type: String,
+    required: false
   },
   confirmationCode: {
     type: String,

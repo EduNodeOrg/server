@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [3.0.0](https://github.com/react-native-community/fetch/compare/v2.0.0...v3.0.0) (2021-08-02)
+
+
+### ⚠ BREAKING CHANGES
+
+* Response returns the instance rather than a promise in all cases
+
+### Bug Fixes
+
+* response correctly returns instance instead of promise ([8b6c3d3](https://github.com/react-native-community/fetch/commit/8b6c3d3ee97ba142c2bd1d341e2c072bac6262f8))
+
 ## [2.0.0](https://github.com/react-native-community/fetch/compare/v1.0.2...v2.0.0) (2021-06-28)
 
 ### [1.0.2](https://github.com/react-native-community/fetch/compare/v1.0.1...v1.0.2) (2021-01-31)

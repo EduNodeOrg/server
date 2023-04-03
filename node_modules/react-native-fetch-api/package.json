@@ -1,7 +1,7 @@
 {
   "name": "react-native-fetch-api",
   "description": "A fetch API polyfill for React Native with text streaming support.",
-  "version": "2.0.0",
+  "version": "3.0.0",
   "main": "fetch.js",
   "author": {
     "name": "André Costa Lima",
