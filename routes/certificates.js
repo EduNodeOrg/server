@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const cors = require('cors');
-const Certificate = require("../models/Certificate");
+const Certificate = require("../models/certificates");
 const app = express();
 app.use(cors());
 router.post("/", async (req, res) => {
