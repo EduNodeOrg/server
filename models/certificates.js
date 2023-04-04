@@ -9,4 +9,4 @@ const CertificateSchema = new Schema({
   },
 });
 
-module.exports = Certificate = mongoose.model("certificates", CertificateSchema);
+module.exports = Certificates = mongoose.model("Certificates", CertificateSchema);
