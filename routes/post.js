@@ -14,7 +14,7 @@ router.post("/", async (req, res) => {
         date,
         link,
         tags,
-        //authorEmail,
+        email,
         // assuming you have a middleware that sets req.user to the currently logged in user
       });
   
@@ -28,7 +28,7 @@ router.post("/", async (req, res) => {
   
   
 // Get all posts
-router.get("/posts", async (req, res) => {
+router.get("/post", async (req, res) => {
     try {
       const posts = await Post.find().populate("author", "_id name email");
       res.send(posts);

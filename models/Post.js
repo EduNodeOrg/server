@@ -26,7 +26,7 @@ const PostSchema = new mongoose.Schema({
     ref: "User",
     required: false,
   },
-  authorEmail: {
+  email: {
     type: String,
     required: false,
   },

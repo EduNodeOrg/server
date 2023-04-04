@@ -9,6 +9,7 @@ var Jimp = require('jimp');
 app.use(cors());
 
 router.post("/", async (req, res) => {
+  console.log("test")
   try {
     const newCertificate = new Certificate({
       image: req.body.image,
@@ -26,7 +27,7 @@ router.post("/", async (req, res) => {
   const files = await getFilesFromPath('newdiploma3.jpg')
   const cid = await client.put(files)
   console.log(cid)
-    res.json(savedCertificate);
+    res.status(200).json(savedCertificate);
   } catch (error) {
     console.error(error);
     res.status(500).send("Server Error");
