@@ -63,7 +63,7 @@ const mozart = require("./routes/mozart");
 const search = require("./routes/search");
 const execute = require("./routes/execute");
 const post = require("./routes/post");
-const certificateRoutes = require("./routes/Certificates");
+const certificateRoutes = require("./routes/certificates");
 
 app.use('/api/gcallback', gcallback);
 app.use('/api/search', search);

@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const cors = require('cors');
-const Certificate = require("../models/Certificates");
+const Certificate = require("../models/certificates");
 const app = express();
 const { Web3Storage, getFilesFromPath } = require('web3.storage') 
 var Jimp = require('jimp');
