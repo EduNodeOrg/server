@@ -6,7 +6,7 @@ const Post = require("../models/Post");
 // Create a new post
 router.post("/", async (req, res) => {
     try {
-      const { title, description, link, date, tags } = req.body;
+      const { title, description, link, date, tags,email } = req.body;
       //const authorEmail= req.user.auth.email;
       const post = new Post({
         title,
