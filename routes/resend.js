@@ -1,12 +1,7 @@
-const express = require('express');
+const express = require("express");
 const router = express.Router();
 const nodemailer = require("nodemailer");
 const User = require('../models/User');
-const mailjet = require("node-mailjet").connect(
-  process.env.MJ_APIKEY_PUBLIC,
-  process.env.MJ_APIKEY_PRIVATE
-);
-
 
 router.post("/", async (req, res) => {
   res.header("Access-Control-Allow-Origin", '*');
@@ -28,10 +23,35 @@ router.post("/", async (req, res) => {
   }
 });
 
-  
+async function main(confirmationCode) {
+  let testAccount = await nodemailer.createTestAccount();
+  let transporter = nodemailer.createTransport({
+    host: "smtp.ethereal.email",
+    port: 587,
+    secure: false,
+    auth: {
+      user: testAccount.user,
+      pass: testAccount.pass,
+    },
+  });
 
- async function main(confirmationCode, req) {
-  const mailjet = require("node-mailjet").connect(
+  let info = await transporter.sendMail({
+    from: '"Fred Foo 👻" <foo@example.com>',
+    to: "sarah@ogtechnologies.co, baz@example.com",
+    subject: "Hello ✔",
+    text: "Hello world?",
+    html: "<b>Hello world?</b>",
+  });
+
+  console.log("Message sent: %s", info.messageId);
+  console.log("Preview URL: %s", nodemailer.getTestMessageUrl(info));
+}
+
+module.exports = router;
+
+
+{/*async function main(confirmationCode, req) {
+  mailjet = require("node-mailjet").connect(
     process.env.MJ_APIKEY_PUBLIC,
     process.env.MJ_APIKEY_PRIVATE
   );
@@ -85,26 +105,11 @@ router.post("/", async (req, res) => {
     console.log(err.statusCode);
   }
 }
+*/}
 
-router.post("/", async (req, res) => {
-  res.header("Access-Control-Allow-Origin", "*");
-  res.header("Access-Control-Allow-Credentials", true);
-  res.header("Access-Control-Allow-Methods", "GET,PUT,POST,DELETE,OPTIONS");
-  res.header(
-    "Access-Control-Allow-Headers",
-    "Origin,X-Requested-With,Content-Type,Accept,content-type,application/json"
-  );
-  res.header("Content-Type", "application/json");
-  try {
-    const user = await User.findOne({ email: req.body.email });
-    const confirmationCode = user.confirmationCode;
-    if (user) {
-      await main(confirmationCode, req);
-    }
-  } catch (err) {
-    console.log(err);
-  }
-});
+
+
+
 
       // const confirmationCode = user.confirmationCode;
 
@@ -158,4 +163,4 @@ router.post("/", async (req, res) => {
       // console.log("Message sent: %s", info.messageId);
 
 
-module.exports = router;
+     

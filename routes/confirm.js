@@ -1,7 +1,7 @@
-const express = require('express');
+{/*const express = require('express');
 const router = express.Router();
 const User = require('../models/User');
-const mailjet = require("node-mailjet").connect(
+{/*const mailjet = require("node-mailjet").connect(
   process.env.MJ_APIKEY_PUBLIC,
   process.env.MJ_APIKEY_PRIVATE
 );
@@ -17,7 +17,7 @@ router.post("/", async (req, res, next) => {
     .then(async (user) => {
       if (user) {
 
-    function main(confirmationCode) {
+ {/*function main(confirmationCode) {
           const emailUser = req.body.email
           const request = mailjet.post("send", { version: "v3.1" }).request({
               Messages: [
@@ -53,7 +53,7 @@ router.post("/", async (req, res, next) => {
           main(user.confirmationCode);
         console.log("email sent");
 
-
+        
 
       } else (err) => {
         console.log(err)
@@ -77,5 +77,5 @@ res.json(user)
 ); 
 
   module.exports = router;
-
+*/}
 

@@ -42,7 +42,7 @@ connectDB();
 app.get('/', (req, res) => {
   res.send('Welcome to the edunode API!');
 });
-const confirm = require('./routes/confirm');
+//const confirm = require('./routes/confirm');
 const users = require('./routes/users');
 const auth = require('./routes/auth');
 const emailAuth = require('./routes/emailAuth');
@@ -75,7 +75,7 @@ app.use('/api/auth', auth);
 app.use('/api/emailauth', emailAuth);
 app.use('/api/emaillogin', emailLogin);
 app.use('/api/metamasklogin', metamaskLogin);
-app.use('/api/confirm', confirm);
+//app.use('/api/confirm', confirm);
 app.use('/api/resend', resend);
 app.use('/api/verifycode', verifyCode);
 app.use('/api/forgot', forgot);
