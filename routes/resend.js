@@ -28,44 +28,83 @@ router.post("/", async (req, res) => {
   }
 });
 
-  async function main(confirmationCode) {
   
-// const mailjet = require("node-mailjet").connect(
-//   process.env.MJ_APIKEY_PUBLIC,
-//   process.env.MJ_APIKEY_PRIVATE
-// );
-  let emailUser = req.body.email;
-    const request = mailjet.post("send", { version: "v3.1" }).request({
-      Messages: [
-        {
-          From: {
-            Email: "hi@edunode.org",
-            Name: "EduNode Team",
+
+ async function main(confirmationCode, req) {
+  const mailjet = require("node-mailjet").connect(
+    process.env.MJ_APIKEY_PUBLIC,
+    process.env.MJ_APIKEY_PRIVATE
+  );
+  const emailUser = req.body.email;
+  const request = mailjet.post("send", { version: "v3.1" }).request({
+    "Messages":[
+      {
+        "From": {
+          "Email": "hi@edunode.org",
+          "Name": "EduNode Team",
+        },
+        "To": [
+          {
+            "Email": emailUser,
+            "Name": "ogTechnologies",
           },
-          To: [
-            {
-              Email: emailUser,
-              Name: "name",
-            },
-          ],
-          Subject: "Your confirmation code",
-          TextPart:
-            "Dear passenger 1, welcome to Mailjet! May the delivery force be with you!",
-            HTMLPart: `Hello ${emailUser}, ${confirmationCode ? `this is your confirmation code: ${confirmationCode}` : 'an error occurred while retrieving your confirmation code'}`,
-    }],
-    });
-    
-request
+        ],
+        "Subject": "Your confirmation code",
+        "TextPart":
+          "Dear passenger 1, welcome to Mailjet! May the delivery force be with you!",
+          "HTMLPart": `
+          <html>
+            <body>
+              Hello ${emailUser}, ${
+          confirmationCode
+            ? `this is your confirmation code: ${confirmationCode}`
+            : "an error occurred while retrieving your confirmation code"
+        }
+            </body>
+          </html>
+        `,
+        "CustomID": "AppGettingStartedTest"
+      },
+    ],
+  })
+  request
   .then((result) => {
-    console.log(result.body);
-    // console.log(result.statusCode);
-    res.json({  
-      msg: "email sent",
-    });
+    console.log(result.body)
   })
   .catch((err) => {
+    console.log(err.statusCode)
+  })
+
+  try {
+    const result = await request;
+    console.log(result.body);
+    res.json({
+      msg: "email sent",
+    });
+  } catch (err) {
     console.log(err.statusCode);
-  });
+  }
+}
+
+router.post("/", async (req, res) => {
+  res.header("Access-Control-Allow-Origin", "*");
+  res.header("Access-Control-Allow-Credentials", true);
+  res.header("Access-Control-Allow-Methods", "GET,PUT,POST,DELETE,OPTIONS");
+  res.header(
+    "Access-Control-Allow-Headers",
+    "Origin,X-Requested-With,Content-Type,Accept,content-type,application/json"
+  );
+  res.header("Content-Type", "application/json");
+  try {
+    const user = await User.findOne({ email: req.body.email });
+    const confirmationCode = user.confirmationCode;
+    if (user) {
+      await main(confirmationCode, req);
+    }
+  } catch (err) {
+    console.log(err);
+  }
+});
 
       // const confirmationCode = user.confirmationCode;
 
@@ -117,21 +156,6 @@ request
       
       
       // console.log("Message sent: %s", info.messageId);
-
-      
-      res.json({  
-        msg: "email sent",
-      })
-
-       
-    }
-  
- 
- 
-
-
-
-
 
 
 module.exports = router;
