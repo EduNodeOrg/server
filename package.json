@@ -34,7 +34,7 @@
     "multer": "^1.4.5-lts.1",
     "needle": "^3.0.0",
     "node": "^19.8.1",
-    "node-mailjet": "^3.3.4",
+    "node-mailjet": "^6.0.2",
     "nodemailer": "^6.7.2",
     "passport": "^0.4.1",
     "passport-google-oauth20": "^2.0.0",

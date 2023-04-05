@@ -8,17 +8,20 @@ const mailjet = require("node-mailjet").connect(
 );
 
 
-router.post("/", (req, res) => {
-
-User.findOne({email: req.body.email})
-  .then(user => {
-   const confirmationCode = user.confirmationCode;
-  if(user) {
-    main(confirmationCode);
-  }}).catch(err => {
-  console.log(err)
-})
-  
+router.post("/", async (req, res) => {
+  try {
+    const user = await User.findOne({email: req.body.email});
+    const confirmationCode = user.confirmationCode;
+    if (user) {
+      await main(confirmationCode);
+      res.json({  
+        msg: "email sent",
+      })
+    }
+  } catch (err) {
+    console.log(err);
+  }
+});
 
   async function main(confirmationCode) {
   
@@ -43,15 +46,17 @@ User.findOne({email: req.body.email})
           Subject: "Your confirmation code",
           TextPart:
             "Dear passenger 1, welcome to Mailjet! May the delivery force be with you!",
-          HTMLPart: `Hello ${emailUser}, this is your confirmation code: ${confirmationCode}`,
-        },
-      ],
+            HTMLPart: `Hello ${emailUser}, ${confirmationCode ? `this is your confirmation code: ${confirmationCode}` : 'an error occurred while retrieving your confirmation code'}`,
+    }],
     });
     
 request
   .then((result) => {
     console.log(result.body);
     // console.log(result.statusCode);
+    res.json({  
+      msg: "email sent",
+    });
   })
   .catch((err) => {
     console.log(err.statusCode);
@@ -117,9 +122,7 @@ request
     }
   
  
-}
-
- ); 
+ 
 
 
 
