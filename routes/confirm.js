@@ -1,81 +1,53 @@
-{/*const express = require('express');
+const express = require("express");
 const router = express.Router();
+const nodemailer = require("nodemailer");
 const User = require('../models/User');
-{/*const mailjet = require("node-mailjet").connect(
-  process.env.MJ_APIKEY_PUBLIC,
-  process.env.MJ_APIKEY_PRIVATE
-);
+const formData = require('form-data');
+const Mailgun = require('mailgun.js');
+const mailgun = new Mailgun(formData);
+const domain = "edunode.org"
 
 
-router.post("/", async (req, res, next) => {
-  res.header('Access-Control-Allow-Origin', '*');
-  res.header('Content-Type', 'application/json');
+const mg = mailgun.client({username: 'api', key: "key-c8d12b7428fbe666e074108aaa0820bc" || 'key-yourkeyhere', url: 'https://api.eu.mailgun.net'});
 
-  const email = {email: req.body.email}
+
+
+
+router.post("/", async (req, res) => {
+  res.header("Access-Control-Allow-Origin", '*');
+  res.header("Access-Control-Allow-Credentials", true);
+
   try {
-    await User.findOne(email)
-    .then(async (user) => {
-      if (user) {
-
- {/*function main(confirmationCode) {
-          const emailUser = req.body.email
-          const request = mailjet.post("send", { version: "v3.1" }).request({
-              Messages: [
-                {
-                  From: {
-                    Email: "hi@edunode.org",
-                    Name: "EduNode Team",
-                  },
-                  To: [
-                    {
-                      Email: emailUser,
-                      Name: "name",
-                    },
-                  ],
-                  Subject: "Your confirmation code",
-                  TextPart:
-                    "Welcome to EduNode! May the learning force be with you!",
-                  HTMLPart: `Hello ${emailUser}, this is your confirmation code: ${confirmationCode}`,
-                },
-              ],
-            });
-            request
-              .then((result) => {
-               
-                // console.log(result.body);
-                console.log(result.body);
-              })
-              .catch((err) => {
-                console.log(err);
-              });
-             
-          }
-          main(user.confirmationCode);
-        console.log("email sent");
-
-        
-
-      } else (err) => {
-        console.log(err)
-     
-      }
-res.json(user)
-    })
-    .catch((err) => {
-      console.log(err);
-    });
-
- 
-    
-  } catch (error) {
-    console.log(error)
+    const user = await User.findOne({email: req.body.email});
+    const confirmationCode = user.confirmationCode;
+    if (user) {
+      const data = {
+        from: 'hi@edunode.org',
+        to: req.body.email ,
+        subject: 'Edunode Confirmation Code',
+        text: `Hello! Your confirmation code is: ${confirmationCode}`
+      };
+      
+      mg.messages.create(domain, data);
+      mg.messages.create(data, function (error, body) {
+        if (error) {
+          console.log('Error sending email:', error);
+          res.status(500).json({ error: 'Error sending email' });
+        } else {
+          console.log('Email sent successfully:', body);
+          res.json({ msg: 'Email sent' });
+        }
+      });
+    } else {
+      res.status(404).json({ error: 'User not found' });
+    }
+  } catch (err) {
+    console.log(err);
   }
+});
 
 
-  next()
-}
-); 
 
-  module.exports = router;
-*/}
+module.exports = router;
+
 
