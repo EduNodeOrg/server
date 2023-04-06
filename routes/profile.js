@@ -1,6 +1,12 @@
 const express = require('express');
 const router = express.Router();
 const User = require('../models/User');
+const mongoose = require('mongoose');
+
+mongoose.connect(process.env.MONGO_URI, 
+  { useNewUrlParser: true, 
+    useUnifiedTopology: true, 
+    useFindAndModify: false });
 
 // Route to handle updating the user's profile information
 router.post('/', async (req, res) => {
@@ -11,12 +17,12 @@ router.post('/', async (req, res) => {
     res.header('Content-Type', 'application/json');
   try {
     const { name, age, bio, location } = req.body;
-    const user = await User.findOneAndUpdate({ email: req.user.email }, { name, age, bio, location }, { new: true });
+    const user = await User.findOneAndUpdate({ email: req.email }, { name, age, bio, location }, { new: true });
     res.json(user);
   } catch (err) {
     console.error(err.message);
-    res.status(500).send('Server error');
+    res.status(500).send('Server error'); 
   }
-});
+}); 
 
 module.exports = router;
