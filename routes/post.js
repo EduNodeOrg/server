@@ -4,7 +4,7 @@ const auth =require('../middleware/auth')
 const Post = require("../models/Post");
 
 // Create a new post
-router.post("/", auth, async (req, res) => {
+router.post("/", async (req, res) => {
     try {
       const { title, description, link, date, tags,email } = req.body;
       //const authorEmail= req.user.auth.email;
