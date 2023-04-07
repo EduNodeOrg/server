@@ -4,7 +4,7 @@ const auth =require('../middleware/auth')
 const Post = require("../models/Post");
 
 // Create a new post
-router.post("/", async (req, res) => {
+router.post("/", auth, async (req, res) => {
     try {
       const { title, description, link, date, tags,email } = req.body;
       //const authorEmail= req.user.auth.email;
@@ -28,7 +28,7 @@ router.post("/", async (req, res) => {
   
   
 // Get all posts
-router.get("/post", async (req, res) => {
+router.get("/posts", async (req, res) => {
     try {
       const posts = await Post.find().populate("author", "_id name email");
       res.send(posts);
