@@ -15,6 +15,10 @@ const CertificateSchema = new Schema({
     type: String,
     required: true,
   },
+  cid: {
+    type: String,
+    required: false,
+  },
 });
 
 module.exports = certificates = mongoose.model("certificates", CertificateSchema);

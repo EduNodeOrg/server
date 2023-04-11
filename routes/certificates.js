@@ -11,6 +11,39 @@ const fs = require('fs');
 
 app.use(cors());
 
+
+const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkaWQ6ZXRocjoweDlhYjlGNDI0Mzk2OGVEOTVmYThCYTVEMDEwQjU0YzE4N2M3ZWZlZjMiLCJpc3MiOiJ3ZWIzLXN0b3JhZ2UiLCJpYXQiOjE2ODEyMDY5MDQyNDMsIm5hbWUiOiJlZHVub2RlIn0.oVxeBO1VhEXwYvU5CnNUs5tYnx4lVm55oLkweDX7kJQ";
+
+const client = new Web3Storage({ token })
+const img =  await Jimp.read('newediploma.png')
+const font =  await Jimp.loadFont(Jimp.FONT_SANS_32_BLACK)
+img.print(font, 150, 350,  req.body.name);
+img.write('newdiplomav2.jpg'); // save
+
+const putFilesToWeb3Storage = async () => {
+  const files = await getFilesFromPath('newdiplomav2.jpg')
+  const cid = await client.put(files)
+  console.log('stored files with cid:', cid)
+  return cid;
+}
+
+const cid = await retry(
+  async (bail, attempt) => {
+    console.log(`Attempt ${attempt} putting files to web3.storage...`);
+    const result = await putFilesToWeb3Storage();
+    return result;
+  },
+  {
+    retries: 3, // number of retries
+    minTimeout: 1000, // minimum delay in ms between retries
+    maxTimeout: 5000, // maximum delay in ms between retries
+    onRetry: (error, attempt) => {
+      console.log(`Attempt ${attempt} failed: ${error}`);
+    },
+  }
+);
+
+
 router.post("/diploma", async (req, res) => {
   console.log("test")
   try {
@@ -18,40 +51,12 @@ router.post("/diploma", async (req, res) => {
       image: req.body.image,
       name: req.body.name,
       email: req.body.email,
+      cid: cid,
     });
     const savedCertificate = await newCertificate.save();
    
     // Replace the token with your own API key
-    const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkaWQ6ZXRocjoweDlhYjlGNDI0Mzk2OGVEOTVmYThCYTVEMDEwQjU0YzE4N2M3ZWZlZjMiLCJpc3MiOiJ3ZWIzLXN0b3JhZ2UiLCJpYXQiOjE2ODEyMDY5MDQyNDMsIm5hbWUiOiJlZHVub2RlIn0.oVxeBO1VhEXwYvU5CnNUs5tYnx4lVm55oLkweDX7kJQ";
-
-    const client = new Web3Storage({ token })
-    const img =  await Jimp.read('newediploma.png')
-    const font =  await Jimp.loadFont(Jimp.FONT_SANS_32_BLACK)
-    img.print(font, 150, 350,  req.body.name);
-    img.write('newdiplomav2.jpg'); // save
-
-    const putFilesToWeb3Storage = async () => {
-      const files = await getFilesFromPath('newdiplomav2.jpg')
-      const cid = await client.put(files)
-      console.log('stored files with cid:', cid)
-      return cid;
-    }
-
-    const cid = await retry(
-      async (bail, attempt) => {
-        console.log(`Attempt ${attempt} putting files to web3.storage...`);
-        const result = await putFilesToWeb3Storage();
-        return result;
-      },
-      {
-        retries: 3, // number of retries
-        minTimeout: 1000, // minimum delay in ms between retries
-        maxTimeout: 5000, // maximum delay in ms between retries
-        onRetry: (error, attempt) => {
-          console.log(`Attempt ${attempt} failed: ${error}`);
-        },
-      }
-    );
+   
 
  {/* 
     // Create an IPFS client instance
