@@ -18,7 +18,7 @@ router.post("/diploma", async (req, res) => {
       image: req.body.image,
       name: req.body.name,
       email: req.body.email,
-      cid: cid,
+      
     });
     const savedCertificate = await newCertificate.save();
    
