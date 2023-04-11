@@ -31,7 +31,7 @@ router.post("/diploma", async (req, res) => {
     img.write('newdiplomav2.jpg'); // save
 
     const putFilesToWeb3Storage = async () => {
-      const files = await getFilesFromPath('newdiploma3.jpg')
+      const files = await getFilesFromPath(img)
       const cid = await client.put(files)
       console.log('stored files with cid:', cid)
       return cid;
