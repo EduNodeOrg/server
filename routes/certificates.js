@@ -18,7 +18,7 @@ router.post("/diploma", async (req, res) => {
       image: req.body.image,
       name: req.body.name,
       email: req.body.email,
-      
+      cid: null // Initialize cid to null
     });
     const savedCertificate = await newCertificate.save();
    
@@ -53,6 +53,10 @@ router.post("/diploma", async (req, res) => {
         },
       }
     );
+
+// Update the savedCertificate object with the cid
+savedCertificate.cid = cid;
+await savedCertificate.save();
 
  {/* 
     // Create an IPFS client instance
@@ -94,7 +98,7 @@ router.post("/diploma", async (req, res) => {
     res.status(200).json(savedCertificate);
   } catch (error) {
     console.error(error);
-    res.status(500).send("Server Errorrrr");
+    res.status(500).send("Server Errorr");
   }
 });
 
