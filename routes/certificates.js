@@ -95,6 +95,7 @@ await savedCertificate.save();
       }
     );
 */}
+
     res.status(200).json(savedCertificate);
   } catch (error) {
     console.error(error);
@@ -102,4 +103,30 @@ await savedCertificate.save();
   }
 });
 
+
+router.get("/:email", async (req, res) => {
+  try {
+    const certificates = await Certificate.find({ email: req.params.email }).select('cid');
+    const cids = certificates.map(cert => `https://${cert.cid}.ipfs.w3s.link/`);
+    res.status(200).json(cids);
+  } catch (error) {
+    console.error(error);
+    res.status(500).send("Server Error");
+  }
+});
+
+router.get("/count/:email", async (req, res) => {
+  try {
+    const { email } = req.params;
+    const certificateCount = await Certificate.aggregate([
+      { $match: { email } },
+      { $group: { _id: "$email", count: { $sum: 1 } } },
+      { $project: { _id: 0, email: "$_id", count: 1 } }
+    ]);
+    res.json(certificateCount);
+  } catch (error) {
+    console.error(error);
+    res.status(500).send("Server Error");
+  }
+});
 module.exports = router;
