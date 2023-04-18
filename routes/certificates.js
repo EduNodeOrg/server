@@ -111,7 +111,7 @@ router.get("/:email", async (req, res) => {
     const data = certificates.map(cert => ({
       cid: cert.cid,
       certificateNumber: cert.certificateNumber,
-      imageUrl: `https://${cert.cid}.ipfs.w3s.link/newdiplomav2.jpg`,
+      cids: `https://${cert.cid}.ipfs.w3s.link/newdiplomav2.jpg`,
     }));
     res.status(200).json(data);
   
