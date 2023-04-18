@@ -25,5 +25,11 @@ const CertificateSchema = new Schema({
     unique: true
   }
 });
-
+{/*CertificateSchema.pre('save', function (next) {
+  const certificate = this;
+  if (!certificate.certificateNumber) {
+    certificate.certificateNumber = Math.floor(Math.random() * 1000000);
+  }
+  next();
+});*/}
 module.exports = certificates = mongoose.model("certificates", CertificateSchema);

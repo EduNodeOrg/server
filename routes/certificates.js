@@ -18,7 +18,8 @@ router.post("/diploma", async (req, res) => {
       image: req.body.image,
       name: req.body.name,
       email: req.body.email,
-      cid: null // Initialize cid to null
+      cid: null ,// Initialize cid to null,
+      certificateNumber : Math.floor(Math.random() * 1000000)
     });
     const savedCertificate = await newCertificate.save();
    
@@ -106,9 +107,14 @@ await savedCertificate.save();
 
 router.get("/:email", async (req, res) => {
   try {
-    const certificates = await Certificate.find({ email: req.params.email }).select('cid');
-    const cids = certificates.map(cert => `https://${cert.cid}.ipfs.w3s.link/newdiplomav2.jpg`);
-    res.status(200).json(cids);
+    const certificates = await Certificate.find({ email: req.params.email }).select('cid certificateNumber');
+    const data = certificates.map(cert => ({
+      cid: cert.cid,
+      certificateNumber: cert.certificateNumber,
+      imageUrl: `https://${cert.cid}.ipfs.w3s.link/newdiplomav2.jpg`,
+    }));
+    res.status(200).json(data);
+  
   } catch (error) {
     console.error(error);
     res.status(500).send("Server Error");
