@@ -103,7 +103,12 @@ await savedCertificate.save();
     res.status(500).send("Server Errorr");
   }
 });
-
+router.get('/certificateNumber/:email', async (req, res) => {
+  const email = req.params.email;
+  const certificates = await Certificate.find({ email }, 'certificateNumber');
+  const certificateNumbers = certificates.map(certificate => certificate.certificateNumber);
+  res.json(certificateNumbers);
+});
 
 router.get("/:email", async (req, res) => {
   try {
@@ -115,6 +120,12 @@ router.get("/:email", async (req, res) => {
     console.error(error);
     res.status(500).send("Server Error");
   }
+});
+
+router.get('/:certificateNumber', (req, res) => {
+  const certificateNumber = req.params.certificateNumber;
+  // Fetch the certificate image data based on the certificateNumber
+  // Send the image data back to the client as a response
 });
 
 router.get("/count/:email", async (req, res) => {
