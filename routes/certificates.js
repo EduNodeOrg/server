@@ -115,7 +115,8 @@ router.get("/:email", async (req, res) => {
     const certificateNumber = await Certificate.find({ email: req.params.email }).select('certificateNumber');
     const certificates = await Certificate.find({ email: req.params.email }).select('cid');
     const cids = certificates.map(cert => `https://${cert.cid}.ipfs.w3s.link/newdiplomav2.jpg`);
-    res.status(200).json(cids,certificateNumber);
+    const responseData = { certificateNumber, cids };
+    res.status(200).json(responseData);
   
   } catch (error) {
     console.error(error);
