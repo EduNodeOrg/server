@@ -7,14 +7,30 @@ const Certificate = require("../models/certificates");
 const app = express();
 const { Web3Storage, getFilesFromPath } = require('web3.storage') 
 const { create } = require('ipfs-http-client')
-var Jimp = require('jimp');
+const Jimp = require('jimp');
 const retry = require('async-retry');
 const fs = require('fs');
 const bcrypt = require('bcryptjs');
 
+
+
 app.use(cors());
 
 router.post("/diploma", async (req, res) => {
+
+
+// Issuer
+// const issuerKeyPair = SorobanClient.Keypair.random();
+// const issuerSecretKey = issuerKeyPair.secret();
+// const issuerPublicKey = issuerKeyPair.publicKey();
+
+// Distributor
+// const distributorKeyPair = SorobanClient.Keypair.random();
+// const distributorSecretKey = distributorKeyPair.secret();
+// const distributorPublicKey = distributorKeyPair.publicKey();
+
+// Store the issuer and distributor key to mongoDB
+
   console.log("test")
   const saltRounds = 10; // Number of salt rounds for bcrypt to use
   // Issuer
@@ -81,44 +97,6 @@ router.post("/diploma", async (req, res) => {
 savedCertificate.cid = cid;
 await savedCertificate.save();
 
- {/* 
-    // Create an IPFS client instance
-    const ipfs = create({ host: 'ipfs.infuro.io', port: '5001', protocol: 'http' })
-
-    const img = await Jimp.read('newediploma.png')
-    const font = await Jimp.loadFont(Jimp.FONT_SANS_32_BLACK)
-    img.print(font, 150, 350, 'Leonardo');
-    img.write('newdiplomav2.jpg'); // save
-
-    const putFileToIPFS = async () => {
-      const stream = fs.createReadStream('newdiploma3.jpg')
-      const cid = await ipfs.add(stream, { 
-        progress: (prog) => console.log(`received: ${prog}`),
-        wrapWithDirectory: true, // wrap the file with a directory object
-        pin: true, // pin the file in IPFS
-        duplex: true 
-     })
-      console.log('stored file with cid:', cid.path)
-      return cid.path;
-    }
-
-    const cid = await retry(
-      async (bail, attempt) => {
-        console.log(`Attempt ${attempt} putting file to IPFS...`);
-        const result = await putFileToIPFS();
-        return result;
-      },
-      {
-        retries: 3, // number of retries
-        minTimeout: 1000, // minimum delay in ms between retries
-        maxTimeout: 5000, // maximum delay in ms between retries
-        onRetry: (error, attempt) => {
-          console.log(`Attempt ${attempt} failed: ${error}`);
-        },
-      }
-    );
-*/}
-
     res.status(200).json(savedCertificate);
   } catch (error) {
     console.error(error);
@@ -176,20 +154,6 @@ router.get("/count/:email", async (req, res) => {
       { $match: { email } },
       { $group: { _id: "$email", count: { $sum: 1 } } },
       { $project: { _id: 0, email: "$_id", count: 1 } }
-    ]);
-    res.json(certificateCount);
-  } catch (error) {
-    console.error(error);
-    res.status(500).send("Server Error");
-  }
-});
-router.get("/count/pkey/:pkey", async (req, res) => {
-  try {
-    const { pkey } = req.params;
-    const certificateCount = await Certificate.aggregate([
-      { $match: { pkey } },
-      { $group: { _id: "$pkey", count: { $sum: 1 } } },
-      { $project: { _id: 0, pkey: "$_id", count: 1 } }
     ]);
     res.json(certificateCount);
   } catch (error) {
