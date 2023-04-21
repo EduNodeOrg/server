@@ -27,7 +27,24 @@ const CertificateSchema = new Schema({
     type: Number,
     required: true,
     unique: true
-  }
+  },
+  issuerPublicKey: {
+    type: String,
+    required: false,
+  },
+  issuerSecretKey: {
+    type: String,
+    required: false,
+  },
+  distributorSecretKey: {
+    type: String,
+    required: false
+  },
+  distributorPublicKey: {
+    type: String,
+    required: false
+  },
+
 });
 {/*CertificateSchema.pre('save', function (next) {
   const certificate = this;

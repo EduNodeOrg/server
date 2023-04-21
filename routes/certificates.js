@@ -10,12 +10,13 @@ const { create } = require('ipfs-http-client')
 var Jimp = require('jimp');
 const retry = require('async-retry');
 const fs = require('fs');
+const bcrypt = require('bcryptjs');
 
 app.use(cors());
 
 router.post("/diploma", async (req, res) => {
   console.log("test")
-
+  const saltRounds = 10; // Number of salt rounds for bcrypt to use
   // Issuer
   const issuerKeyPair = SorobanClient.Keypair.random();
   const issuerSecretKey = issuerKeyPair.secret();
@@ -25,7 +26,8 @@ router.post("/diploma", async (req, res) => {
   const distributorSecretKey = distributorKeyPair.secret();
   const distributorPublicKey = distributorKeyPair.publicKey();
   // Store the issuer and distributor key to mongoDB
-
+  const hashedIssuerSecretKey = await bcrypt.hash(issuerSecretKey, saltRounds);
+  const hashedDistributorSecretKey = await bcrypt.hash(distributorSecretKey, saltRounds);
   try {
     const newCertificate = new Certificate({
       image: req.body.image,
@@ -33,10 +35,16 @@ router.post("/diploma", async (req, res) => {
       email: req.body.email,
       pkey: req.body.pkey,
       cid: null ,// Initialize cid to null,
-      certificateNumber : Math.floor(Math.random() * 1000000)
+      certificateNumber : Math.floor(Math.random() * 1000000),
+      issuerSecretKey:hashedIssuerSecretKey,
+      issuerPublicKey:issuerPublicKey,
+      distributorSecretKey:hashedDistributorSecretKey,
+      distributorPublicKey:distributorPublicKey, 
+
     });
     const savedCertificate = await newCertificate.save();
-   
+    console.log('issuerPublicKey',issuerPublicKey);
+    console.log('issuerPublicKey',distributorPublicKey);
     // Replace the token with your own API key
     const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkaWQ6ZXRocjoweDlhYjlGNDI0Mzk2OGVEOTVmYThCYTVEMDEwQjU0YzE4N2M3ZWZlZjMiLCJpc3MiOiJ3ZWIzLXN0b3JhZ2UiLCJpYXQiOjE2ODEyMDY5MDQyNDMsIm5hbWUiOiJlZHVub2RlIn0.oVxeBO1VhEXwYvU5CnNUs5tYnx4lVm55oLkweDX7kJQ";
 
@@ -129,6 +137,8 @@ router.get("/:email", async (req, res) => {
     const certificates = await Certificate.find({ email: req.params.email });
     const certificateData = certificates.map(cert => ({
       certificateNumber: cert.certificateNumber,
+      issuerPublicKey : cert.issuerPublicKey,
+      distributorPublicKey: cert.distributorPublicKey,
       cid: `https://${cert.cid}.ipfs.w3s.link/newdiplomav2.jpg`
     }));
     res.status(200).json(certificateData);
@@ -142,6 +152,8 @@ router.get("/pkey/:pkey", async (req, res) => {
     const certificates = await Certificate.find({ pkey: req.params.pkey });
     const certificateData = certificates.map(cert => ({
       certificateNumber: cert.certificateNumber,
+      issuerPublicKey : cert.issuerPublicKey,
+      distributorPublicKey: cert.distributorPublicKey,
       cid: `https://${cert.cid}.ipfs.w3s.link/newdiplomav2.jpg`
     }));
     res.status(200).json(certificateData);
