@@ -18,7 +18,6 @@ router.post("/diploma", async (req, res) => {
       image: req.body.image,
       name: req.body.name,
       email: req.body.email,
-      pkey: req.body.pkey,
       cid: null ,// Initialize cid to null,
       certificateNumber : Math.floor(Math.random() * 1000000)
     });

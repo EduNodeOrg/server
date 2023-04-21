@@ -23,7 +23,7 @@ const UserSchema = new mongoose.Schema({
   },
   email: {
     type: String,
-    required: false,
+    required: true,
     unique: true
   },
   courses: {
@@ -32,7 +32,7 @@ const UserSchema = new mongoose.Schema({
   },
   password: {
     type: String,
-    required: false
+    required: true
   },
   isVerified: {
     type: Boolean,

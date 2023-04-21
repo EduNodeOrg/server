@@ -13,7 +13,7 @@ const CertificateSchema = new Schema({
   },
   email: {
     type: String,
-    required: flase,
+    required: true,
   },
   cid: {
     type: String,
@@ -23,12 +23,7 @@ const CertificateSchema = new Schema({
     type: Number,
     required: true,
     unique: true
-  },
-  pkey: {
-    type: String,
-    required: false,
-    
-  },
+  }
 });
 {/*CertificateSchema.pre('save', function (next) {
   const certificate = this;
