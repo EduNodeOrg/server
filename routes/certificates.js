@@ -1,8 +1,8 @@
 const express = require("express");
 const router = express.Router();
 const cors = require('cors');
-const SorobanClient = require("soroban-client");
-const server = new SorobanClient.Server("https://rpc-futurenet.stellar.org:443/");
+const SorobanClient = require('soroban-client');
+const server = new SorobanClient.Server('https://rpc-futurenet.stellar.org:443/');
 const Certificate = require("../models/certificates");
 const app = express();
 const { Web3Storage, getFilesFromPath } = require('web3.storage') 
@@ -15,21 +15,18 @@ app.use(cors());
 
 router.post("/diploma", async (req, res) => {
   console.log("test")
-  
-// Issuer
-const issuerKeyPair = SorobanClient.Keypair.random();
-const issuerSecretKey = issuerKeyPair.secret();
-const issuerPublicKey = issuerKeyPair.publicKey();
 
-// Distributor
-const distributorKeyPair = SorobanClient.Keypair.random();
-const distributorSecretKey = distributorKeyPair.secret();
-const distributorPublicKey = distributorKeyPair.publicKey();
+  // Issuer
+  const issuerKeyPair = SorobanClient.Keypair.random();
+  const issuerSecretKey = issuerKeyPair.secret();
+  const issuerPublicKey = issuerKeyPair.publicKey();
+  // Distributor
+  const distributorKeyPair = SorobanClient.Keypair.random();
+  const distributorSecretKey = distributorKeyPair.secret();
+  const distributorPublicKey = distributorKeyPair.publicKey();
+  // Store the issuer and distributor key to mongoDB
 
-// Store the issuer and distributor key to mongoDB
-  
-  if (req.body.pkey) {
-     try {
+  try {
     const newCertificate = new Certificate({
       image: req.body.image,
       name: req.body.name,
@@ -39,23 +36,6 @@ const distributorPublicKey = distributorKeyPair.publicKey();
       certificateNumber : Math.floor(Math.random() * 1000000)
     });
     const savedCertificate = await newCertificate.save();
-    
-  }
-    if (req.body.email) {
-           try {
-    const newCertificate = new Certificate({
-      image: req.body.image,
-      name: req.body.name,
-      email: req.body.email,
-      pkey: req.body.pkey,
-      cid: null ,// Initialize cid to null,
-      certificateNumber : Math.floor(Math.random() * 1000000)
-    });
-    const savedCertificate = await newCertificate.save();
-      
-    }
-
- 
    
     // Replace the token with your own API key
     const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkaWQ6ZXRocjoweDlhYjlGNDI0Mzk2OGVEOTVmYThCYTVEMDEwQjU0YzE4N2M3ZWZlZjMiLCJpc3MiOiJ3ZWIzLXN0b3JhZ2UiLCJpYXQiOjE2ODEyMDY5MDQyNDMsIm5hbWUiOiJlZHVub2RlIn0.oVxeBO1VhEXwYvU5CnNUs5tYnx4lVm55oLkweDX7kJQ";
