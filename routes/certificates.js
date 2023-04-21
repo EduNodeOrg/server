@@ -19,14 +19,14 @@ router.post("/diploma", async (req, res) => {
 
 
 // Issuer
-const issuerKeyPair = SorobanClient.Keypair.random();
-const issuerSecretKey = issuerKeyPair.secret();
-const issuerPublicKey = issuerKeyPair.publicKey();
+// const issuerKeyPair = SorobanClient.Keypair.random();
+// const issuerSecretKey = issuerKeyPair.secret();
+// const issuerPublicKey = issuerKeyPair.publicKey();
 
 // Distributor
-const distributorKeyPair = SorobanClient.Keypair.random();
-const distributorSecretKey = distributorKeyPair.secret();
-const distributorPublicKey = distributorKeyPair.publicKey();
+// const distributorKeyPair = SorobanClient.Keypair.random();
+// const distributorSecretKey = distributorKeyPair.secret();
+// const distributorPublicKey = distributorKeyPair.publicKey();
 
 // Store the issuer and distributor key to mongoDB
 
@@ -149,22 +149,4 @@ router.get("/count/:email", async (req, res) => {
     res.status(500).send("Server Error");
   }
 });
-<<<<<<< HEAD
-router.get("/count/pkey/:pkey", async (req, res) => {
-  try {
-    const { pkey } = req.params;
-    const certificateCount = await Certificate.aggregate([
-      { $match: { pkey } },
-      { $group: { _id: "$pkey", count: { $sum: 1 } } },
-      { $project: { _id: 0, pkey: "$_id", count: 1 } }
-    ]);
-    res.json(certificateCount);
-  } catch (error) {
-    console.error(error);
-    res.status(500).send("Server Error");
-  }
-});
-=======
-
->>>>>>> 3a65d66e (fix)
 module.exports = router;
