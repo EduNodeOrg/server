@@ -18,6 +18,7 @@ router.post("/diploma", async (req, res) => {
       image: req.body.image,
       name: req.body.name,
       email: req.body.email,
+      pkey: req.body.pkey,
       cid: null ,// Initialize cid to null,
       certificateNumber : Math.floor(Math.random() * 1000000)
     });
@@ -110,6 +111,7 @@ router.get('/certificateNumber/:email', async (req, res) => {
   res.json(certificateNumbers);
 });
 
+
 router.get("/:email", async (req, res) => {
   try {
     const certificates = await Certificate.find({ email: req.params.email });
@@ -123,12 +125,27 @@ router.get("/:email", async (req, res) => {
     res.status(500).send("Server Error");
   }
 });
+router.get("/pkey/:pkey", async (req, res) => {
+  try {
+    const certificates = await Certificate.find({ pkey: req.params.pkey });
+    const certificateData = certificates.map(cert => ({
+      certificateNumber: cert.certificateNumber,
+      cid: `https://${cert.cid}.ipfs.w3s.link/newdiplomav2.jpg`
+    }));
+    res.status(200).json(certificateData);
+  } catch (error) {
+    console.error(error);
+    res.status(500).send("Server Error");
+  }
+});
+
 
 router.get('/:certificateNumber', (req, res) => {
   const certificateNumber = req.params.certificateNumber;
   // Fetch the certificate image data based on the certificateNumber
   // Send the image data back to the client as a response
 });
+
 
 router.get("/count/:email", async (req, res) => {
   try {
@@ -137,6 +154,20 @@ router.get("/count/:email", async (req, res) => {
       { $match: { email } },
       { $group: { _id: "$email", count: { $sum: 1 } } },
       { $project: { _id: 0, email: "$_id", count: 1 } }
+    ]);
+    res.json(certificateCount);
+  } catch (error) {
+    console.error(error);
+    res.status(500).send("Server Error");
+  }
+});
+router.get("/count/pkey/:pkey", async (req, res) => {
+  try {
+    const { pkey } = req.params;
+    const certificateCount = await Certificate.aggregate([
+      { $match: { pkey } },
+      { $group: { _id: "$pkey", count: { $sum: 1 } } },
+      { $project: { _id: 0, pkey: "$_id", count: 1 } }
     ]);
     res.json(certificateCount);
   } catch (error) {

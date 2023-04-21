@@ -13,9 +13,13 @@ const CertificateSchema = new Schema({
   },
   email: {
     type: String,
-    required: true,
+    required: false,
   },
   cid: {
+    type: String,
+    required: false,
+  },
+  pkey: {
     type: String,
     required: false,
   },
