@@ -1,7 +1,8 @@
 const express = require("express");
 const router = express.Router();
+const cors = require('cors');
 const FreighterUser = require('../models/FreighterUser');
-
+app.use(cors());
 router.post("/", async (req, res, next) => {
 
   // console.log("newUser")
