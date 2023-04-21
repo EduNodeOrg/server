@@ -1,14 +1,11 @@
 const express = require("express");
 const router = express.Router();
-const User = require('../models/User');
+const FreighterUser = require('../models/FreighterUser');
 
 router.post("/", async (req, res, next) => {
 
   // console.log("newUser")
-  res.header("Access-Control-Allow-Origin", '*');
-  res.header("Access-Control-Allow-Credentials", true);
-  res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS');
-  res.header("Access-Control-Allow-Headers", 'Origin,X-Requested-With,Authorization,Content-Type,Accept,content-type,application/json');
+
     res.setHeader('Access-Control-Allow-Origin', '*');
     // validation 1
    const { pkey } = req.body;
@@ -18,7 +15,7 @@ router.post("/", async (req, res, next) => {
     }
   
     try {
-      let user = await User.findOne({ pkey: pkey })
+      let user = await FreighterUser.findOne({ pkey: pkey })
       if (user) {
   
         res.send({
@@ -29,7 +26,7 @@ router.post("/", async (req, res, next) => {
           }
         });
       } else {
-        user = await User.create(newUser)
+        user = await FreighterUser.create(newUser)
 
         res.send({
           user: {
