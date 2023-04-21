@@ -111,7 +111,6 @@ router.get('/certificateNumber/:email', async (req, res) => {
   res.json(certificateNumbers);
 });
 
-
 router.get("/:email", async (req, res) => {
   try {
     const certificates = await Certificate.find({ email: req.params.email });
@@ -139,13 +138,11 @@ router.get("/pkey/:pkey", async (req, res) => {
   }
 });
 
-
 router.get('/:certificateNumber', (req, res) => {
   const certificateNumber = req.params.certificateNumber;
   // Fetch the certificate image data based on the certificateNumber
   // Send the image data back to the client as a response
 });
-
 
 router.get("/count/:email", async (req, res) => {
   try {
