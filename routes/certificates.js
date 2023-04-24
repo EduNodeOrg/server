@@ -13,7 +13,6 @@ const fs = require('fs');
 const bcrypt = require('bcryptjs');
 
 
-
 app.use(cors());
 
 router.post("/diploma", async (req, res) => {
