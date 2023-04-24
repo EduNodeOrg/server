@@ -160,4 +160,20 @@ router.get("/count/:email", async (req, res) => {
     res.status(500).send("Server Error");
   }
 });
+
+router.get("/count/pkey/:pkey", async (req, res) => {
+  try {
+    const { pkey } = req.params;
+    const certificateCount = await Certificate.aggregate([
+      { $match: { pkey } },
+      { $group: { _id: "$pkey", count: { $sum: 1 } } },
+      { $project: { _id: 0, pkey: "$_id", count: 1 } }
+    ]);
+    res.json(certificateCount);
+  } catch (error) {
+    console.error(error);
+    res.status(500).send("Server Error");
+  }
+});
+
 module.exports = router;
