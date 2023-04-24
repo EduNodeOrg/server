@@ -162,10 +162,6 @@ router.get("/count/:email", async (req, res) => {
     res.status(500).send("Server Error");
   }
 });
-<<<<<<< HEAD
-
-=======
->>>>>>> ae2621ea (FIX)
 router.get("/count/pkey/:pkey", async (req, res) => {
   try {
     const { pkey } = req.params;
