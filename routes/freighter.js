@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const FreighterUser = require('../models/FreighterUser');
+const User = require('../models/User');
 
 router.post("/", async (req, res, next) => {
 
@@ -15,7 +15,7 @@ router.post("/", async (req, res, next) => {
     }
   
     try {
-      let user = await FreighterUser.findOne({ pkey: pkey })
+      let user = await User.findOne({ pkey: pkey })
       if (user) {
   
         res.send({
@@ -26,7 +26,7 @@ router.post("/", async (req, res, next) => {
           }
         });
       } else {
-        user = await FreighterUser.create(newUser)
+        user = await User.create(newUser)
 
         res.send({
           user: {
