@@ -8,7 +8,8 @@
   },
   "scripts": {
     "dev": "nodemon server.js",
-    "deployHeroku": "git add . && git commit -am 'commit' && git push heroku master"
+    "deployHeroku": "git add . && git commit -am 'commit' && git push heroku master",
+    "git pull":"git status && git add . && git commit -am 'commit' && git pull"
   },
   "keywords": [],
   "author": "",
