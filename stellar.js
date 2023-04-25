@@ -10,7 +10,7 @@ var receivingKeys = StellarSdk.Keypair.fromSecret(
 );
 
 // Create an object to represent the new asset
-var astroDollar = new StellarSdk.Asset("AstroDollar", issuingKeys.publicKey());
+var astroDollar = new StellarSdk.Asset("EduCert", issuingKeys.publicKey());
 
 // First, the receiving account must trust the asset
 server
