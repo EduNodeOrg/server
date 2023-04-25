@@ -104,7 +104,8 @@ EmailUser.create(newUser).then(console.log("saved to mongodb"))
 // get users
 router.get("/user",(req, res) => {
   res.setHeader('Access-Control-Allow-Origin', '*');
-  User.find()
+  const email = req.body.email;
+  User.findOne({ email })
     .then(users => res.json(users))
     .catch(err => res.status(400).json("Error: " + err));
 

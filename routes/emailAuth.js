@@ -18,7 +18,7 @@ router.post('/', function (req, res) {
     .then((user) => {
       if (user) {
         // If the user exists, throw an error
-        res.status(400).json({ msg: "Email already exists, please log in" });
+        res.status(403).json({ msg: "Email already exists, please log in" });
       } else {
         // If the user doesn't exist, create a new user
         const confirmationCode = JSON.stringify(Math.floor(Math.random() * 90000) + 10000)

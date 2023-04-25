@@ -1,17 +1,21 @@
 const express = require("express");
 const router = express.Router();
 const User = require('../models/User');
-
+const crypto = require('crypto');
 router.post("/", async (req, res, next) => {
 
-  // console.log("newUser")
+   console.log("newUser")
 
     res.setHeader('Access-Control-Allow-Origin', '*');
     // validation 1
    const { pkey } = req.body;
 
+   // Generate a random email using crypto module
+  const randomEmail = crypto.randomBytes(20).toString('hex') + '@example.com'
+
     const newUser = {
-       pkey
+       pkey,
+       email: randomEmail
     }
   
     try {
@@ -22,7 +26,7 @@ router.post("/", async (req, res, next) => {
           user: {
             // granted: true,
             pkey: user.pkey,
-            
+            email: user.email,
           }
         });
       } else {
@@ -31,7 +35,7 @@ router.post("/", async (req, res, next) => {
         res.send({
           user: {
             pkey: user.pkey,
-
+            email: user.email,
 
           }
         });
