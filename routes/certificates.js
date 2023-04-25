@@ -96,6 +96,8 @@ router.post("/diploma", async (req, res) => {
 savedCertificate.cid = cid;
 await savedCertificate.save();
 
+
+
     res.status(200).json(savedCertificate);
   } catch (error) {
     console.error(error);
@@ -160,7 +162,6 @@ router.get("/count/:email", async (req, res) => {
     res.status(500).send("Server Error");
   }
 });
-
 router.get("/count/pkey/:pkey", async (req, res) => {
   try {
     const { pkey } = req.params;
