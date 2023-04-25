@@ -100,7 +100,6 @@ EmailUser.create(newUser).then(console.log("saved to mongodb"))
 });
 
 
-
 // get users
 router.get("/user",(req, res) => {
   res.setHeader('Access-Control-Allow-Origin', '*');
