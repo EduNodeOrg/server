@@ -67,6 +67,10 @@ const post = require("./routes/post");
 const certificateRoutes = require("./routes/certificates");
 const profile = require("./routes/profile");
 const project = require("./routes/project");
+const cours = require("./routes/cours");
+
+
+
 
 app.use('/api/gcallback', gcallback);
 app.use('/api/search', search);
@@ -93,6 +97,6 @@ app.use("/api/post", post);
 app.use("/api/certificates", certificateRoutes);
 app.use("/api/profile", profile);
 app.use("/api/project", project);
-
+app.use("/api/cours", cours);
 
 app.listen(PORT, () => console.log(`server started at ${PORT}`))
