@@ -5,7 +5,7 @@ const Schema = mongoose.Schema;
 const CertificateSchema = new Schema({
   image: {
     type: String,
-    required: true,
+    required: false,
   },
   name: {
     type: String,

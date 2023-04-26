@@ -5,7 +5,7 @@ const SorobanClient = require('soroban-client');
 const server = new SorobanClient.Server('https://rpc-futurenet.stellar.org:443/');
 const Certificate = require("../models/certificates");
 const app = express();
-const { Web3Storage, getFilesFromPath } = require('web3.storage') 
+const { Web3Storage, getFilesFromPath } = require('web3.storage')
 const { create } = require('ipfs-http-client')
 const Jimp = require('jimp');
 const retry = require('async-retry');
@@ -18,17 +18,17 @@ app.use(cors());
 router.post("/diploma", async (req, res) => {
 
 
-// Issuer
-// const issuerKeyPair = SorobanClient.Keypair.random();
-// const issuerSecretKey = issuerKeyPair.secret();
-// const issuerPublicKey = issuerKeyPair.publicKey();
+  // Issuer
+  // const issuerKeyPair = SorobanClient.Keypair.random();
+  // const issuerSecretKey = issuerKeyPair.secret();
+  // const issuerPublicKey = issuerKeyPair.publicKey();
 
-// Distributor
-// const distributorKeyPair = SorobanClient.Keypair.random();
-// const distributorSecretKey = distributorKeyPair.secret();
-// const distributorPublicKey = distributorKeyPair.publicKey();
+  // Distributor
+  // const distributorKeyPair = SorobanClient.Keypair.random();
+  // const distributorSecretKey = distributorKeyPair.secret();
+  // const distributorPublicKey = distributorKeyPair.publicKey();
 
-// Store the issuer and distributor key to mongoDB
+  // Store the issuer and distributor key to mongoDB
 
   console.log("test")
   const saltRounds = 10; // Number of salt rounds for bcrypt to use
@@ -45,28 +45,28 @@ router.post("/diploma", async (req, res) => {
   const hashedDistributorSecretKey = await bcrypt.hash(distributorSecretKey, saltRounds);
   try {
     const newCertificate = new Certificate({
-      image: req.body.image,
+
       name: req.body.name,
       email: req.body.email,
       pkey: req.body.pkey,
-      cid: null ,// Initialize cid to null,
-      certificateNumber : Math.floor(Math.random() * 1000000),
-      issuerSecretKey:hashedIssuerSecretKey,
-      issuerPublicKey:issuerPublicKey,
-      distributorSecretKey:hashedDistributorSecretKey,
-      distributorPublicKey:distributorPublicKey, 
+      cid: null,// Initialize cid to null,
+      certificateNumber: Math.floor(Math.random() * 1000000),
+      issuerSecretKey: hashedIssuerSecretKey,
+      issuerPublicKey: issuerPublicKey,
+      distributorSecretKey: hashedDistributorSecretKey,
+      distributorPublicKey: distributorPublicKey,
 
     });
     const savedCertificate = await newCertificate.save();
-    console.log('issuerPublicKey',issuerPublicKey);
-    console.log('issuerPublicKey',distributorPublicKey);
+    console.log('issuerPublicKey', issuerPublicKey);
+    console.log('issuerPublicKey', distributorPublicKey);
     // Replace the token with your own API key
     const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkaWQ6ZXRocjoweDlhYjlGNDI0Mzk2OGVEOTVmYThCYTVEMDEwQjU0YzE4N2M3ZWZlZjMiLCJpc3MiOiJ3ZWIzLXN0b3JhZ2UiLCJpYXQiOjE2ODEyMDY5MDQyNDMsIm5hbWUiOiJlZHVub2RlIn0.oVxeBO1VhEXwYvU5CnNUs5tYnx4lVm55oLkweDX7kJQ";
 
     const client = new Web3Storage({ token })
-    const img =  await Jimp.read('newediploma.png')
-    const font =  await Jimp.loadFont(Jimp.FONT_SANS_32_BLACK)
-    img.print(font, 150, 350,  req.body.name);
+    const img = await Jimp.read('newediploma.png')
+    const font = await Jimp.loadFont(Jimp.FONT_SANS_32_BLACK)
+    img.print(font, 150, 350, req.body.name);
     img.write('newdiplomav2.jpg'); // save
 
     const putFilesToWeb3Storage = async () => {
@@ -92,9 +92,9 @@ router.post("/diploma", async (req, res) => {
       }
     );
 
-// Update the savedCertificate object with the cid
-savedCertificate.cid = cid;
-await savedCertificate.save();
+    // Update the savedCertificate object with the cid
+    savedCertificate.cid = cid;
+    await savedCertificate.save();
 
 
 
@@ -104,6 +104,368 @@ await savedCertificate.save();
     res.status(500).send("Server Errorr");
   }
 });
+
+
+router.post("/diploma1", async (req, res) => {
+
+
+  // Issuer
+  // const issuerKeyPair = SorobanClient.Keypair.random();
+  // const issuerSecretKey = issuerKeyPair.secret();
+  // const issuerPublicKey = issuerKeyPair.publicKey();
+
+  // Distributor
+  // const distributorKeyPair = SorobanClient.Keypair.random();
+  // const distributorSecretKey = distributorKeyPair.secret();
+  // const distributorPublicKey = distributorKeyPair.publicKey();
+
+  // Store the issuer and distributor key to mongoDB
+
+  console.log("test")
+  const saltRounds = 10; // Number of salt rounds for bcrypt to use
+  // Issuer
+  const issuerKeyPair = SorobanClient.Keypair.random();
+  const issuerSecretKey = issuerKeyPair.secret();
+  const issuerPublicKey = issuerKeyPair.publicKey();
+  // Distributor
+  const distributorKeyPair = SorobanClient.Keypair.random();
+  const distributorSecretKey = distributorKeyPair.secret();
+  const distributorPublicKey = distributorKeyPair.publicKey();
+  // Store the issuer and distributor key to mongoDB
+  const hashedIssuerSecretKey = await bcrypt.hash(issuerSecretKey, saltRounds);
+  const hashedDistributorSecretKey = await bcrypt.hash(distributorSecretKey, saltRounds);
+  try {
+    const newCertificate = new Certificate({
+
+      name: req.body.name,
+      email: req.body.email,
+      pkey: req.body.pkey,
+      cid: null,// Initialize cid to null,
+      certificateNumber: Math.floor(Math.random() * 1000000),
+      issuerSecretKey: hashedIssuerSecretKey,
+      issuerPublicKey: issuerPublicKey,
+      distributorSecretKey: hashedDistributorSecretKey,
+      distributorPublicKey: distributorPublicKey,
+
+    });
+    const savedCertificate = await newCertificate.save();
+    console.log('issuerPublicKey', issuerPublicKey);
+    console.log('issuerPublicKey', distributorPublicKey);
+    // Replace the token with your own API key
+    const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkaWQ6ZXRocjoweDlhYjlGNDI0Mzk2OGVEOTVmYThCYTVEMDEwQjU0YzE4N2M3ZWZlZjMiLCJpc3MiOiJ3ZWIzLXN0b3JhZ2UiLCJpYXQiOjE2ODEyMDY5MDQyNDMsIm5hbWUiOiJlZHVub2RlIn0.oVxeBO1VhEXwYvU5CnNUs5tYnx4lVm55oLkweDX7kJQ";
+
+    const client = new Web3Storage({ token })
+    const img = await Jimp.read('operation.png')
+    const font = await Jimp.loadFont(Jimp.FONT_SANS_32_BLACK)
+    img.print(font, 150, 350, req.body.name);
+    img.write('newdiplomav2.jpg'); // save
+
+    const putFilesToWeb3Storage = async () => {
+      const files = await getFilesFromPath('newdiplomav2.jpg')
+      const cid = await client.put(files)
+      console.log('stored files with cid:', cid)
+      return cid;
+    }
+
+    const cid = await retry(
+      async (bail, attempt) => {
+        console.log(`Attempt ${attempt} putting files to web3.storage...`);
+        const result = await putFilesToWeb3Storage();
+        return result;
+      },
+      {
+        retries: 3, // number of retries
+        minTimeout: 1000, // minimum delay in ms between retries
+        maxTimeout: 5000, // maximum delay in ms between retries
+        onRetry: (error, attempt) => {
+          console.log(`Attempt ${attempt} failed: ${error}`);
+        },
+      }
+    );
+
+    // Update the savedCertificate object with the cid
+    savedCertificate.cid = cid;
+    await savedCertificate.save();
+
+
+
+    res.status(200).json(savedCertificate);
+  } catch (error) {
+    console.error(error);
+    res.status(500).send("Server Errorr");
+  }
+});
+
+router.post("/diploma2", async (req, res) => {
+
+
+  // Issuer
+  // const issuerKeyPair = SorobanClient.Keypair.random();
+  // const issuerSecretKey = issuerKeyPair.secret();
+  // const issuerPublicKey = issuerKeyPair.publicKey();
+
+  // Distributor
+  // const distributorKeyPair = SorobanClient.Keypair.random();
+  // const distributorSecretKey = distributorKeyPair.secret();
+  // const distributorPublicKey = distributorKeyPair.publicKey();
+
+  // Store the issuer and distributor key to mongoDB
+
+  console.log("test")
+  const saltRounds = 10; // Number of salt rounds for bcrypt to use
+  // Issuer
+  const issuerKeyPair = SorobanClient.Keypair.random();
+  const issuerSecretKey = issuerKeyPair.secret();
+  const issuerPublicKey = issuerKeyPair.publicKey();
+  // Distributor
+  const distributorKeyPair = SorobanClient.Keypair.random();
+  const distributorSecretKey = distributorKeyPair.secret();
+  const distributorPublicKey = distributorKeyPair.publicKey();
+  // Store the issuer and distributor key to mongoDB
+  const hashedIssuerSecretKey = await bcrypt.hash(issuerSecretKey, saltRounds);
+  const hashedDistributorSecretKey = await bcrypt.hash(distributorSecretKey, saltRounds);
+  try {
+    const newCertificate = new Certificate({
+
+      name: req.body.name,
+      email: req.body.email,
+      pkey: req.body.pkey,
+      cid: null,// Initialize cid to null,
+      certificateNumber: Math.floor(Math.random() * 1000000),
+      issuerSecretKey: hashedIssuerSecretKey,
+      issuerPublicKey: issuerPublicKey,
+      distributorSecretKey: hashedDistributorSecretKey,
+      distributorPublicKey: distributorPublicKey,
+
+    });
+    const savedCertificate = await newCertificate.save();
+    console.log('issuerPublicKey', issuerPublicKey);
+    console.log('issuerPublicKey', distributorPublicKey);
+    // Replace the token with your own API key
+    const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkaWQ6ZXRocjoweDlhYjlGNDI0Mzk2OGVEOTVmYThCYTVEMDEwQjU0YzE4N2M3ZWZlZjMiLCJpc3MiOiJ3ZWIzLXN0b3JhZ2UiLCJpYXQiOjE2ODEyMDY5MDQyNDMsIm5hbWUiOiJlZHVub2RlIn0.oVxeBO1VhEXwYvU5CnNUs5tYnx4lVm55oLkweDX7kJQ";
+
+    const client = new Web3Storage({ token })
+    const img = await Jimp.read('anchors.png')
+    const font = await Jimp.loadFont(Jimp.FONT_SANS_32_BLACK)
+    img.print(font, 150, 350, req.body.name);
+    img.write('newdiplomav2.jpg'); // save
+
+    const putFilesToWeb3Storage = async () => {
+      const files = await getFilesFromPath('newdiplomav2.jpg')
+      const cid = await client.put(files)
+      console.log('stored files with cid:', cid)
+      return cid;
+    }
+
+    const cid = await retry(
+      async (bail, attempt) => {
+        console.log(`Attempt ${attempt} putting files to web3.storage...`);
+        const result = await putFilesToWeb3Storage();
+        return result;
+      },
+      {
+        retries: 3, // number of retries
+        minTimeout: 1000, // minimum delay in ms between retries
+        maxTimeout: 5000, // maximum delay in ms between retries
+        onRetry: (error, attempt) => {
+          console.log(`Attempt ${attempt} failed: ${error}`);
+        },
+      }
+    );
+
+    // Update the savedCertificate object with the cid
+    savedCertificate.cid = cid;
+    await savedCertificate.save();
+
+
+
+    res.status(200).json(savedCertificate);
+  } catch (error) {
+    console.error(error);
+    res.status(500).send("Server Errorr");
+  }
+});
+
+router.post("/diploma3", async (req, res) => {
+
+
+  // Issuer
+  // const issuerKeyPair = SorobanClient.Keypair.random();
+  // const issuerSecretKey = issuerKeyPair.secret();
+  // const issuerPublicKey = issuerKeyPair.publicKey();
+
+  // Distributor
+  // const distributorKeyPair = SorobanClient.Keypair.random();
+  // const distributorSecretKey = distributorKeyPair.secret();
+  // const distributorPublicKey = distributorKeyPair.publicKey();
+
+  // Store the issuer and distributor key to mongoDB
+
+  console.log("test")
+  const saltRounds = 10; // Number of salt rounds for bcrypt to use
+  // Issuer
+  const issuerKeyPair = SorobanClient.Keypair.random();
+  const issuerSecretKey = issuerKeyPair.secret();
+  const issuerPublicKey = issuerKeyPair.publicKey();
+  // Distributor
+  const distributorKeyPair = SorobanClient.Keypair.random();
+  const distributorSecretKey = distributorKeyPair.secret();
+  const distributorPublicKey = distributorKeyPair.publicKey();
+  // Store the issuer and distributor key to mongoDB
+  const hashedIssuerSecretKey = await bcrypt.hash(issuerSecretKey, saltRounds);
+  const hashedDistributorSecretKey = await bcrypt.hash(distributorSecretKey, saltRounds);
+  try {
+    const newCertificate = new Certificate({
+
+      name: req.body.name,
+      email: req.body.email,
+      pkey: req.body.pkey,
+      cid: null,// Initialize cid to null,
+      certificateNumber: Math.floor(Math.random() * 1000000),
+      issuerSecretKey: hashedIssuerSecretKey,
+      issuerPublicKey: issuerPublicKey,
+      distributorSecretKey: hashedDistributorSecretKey,
+      distributorPublicKey: distributorPublicKey,
+
+    });
+    const savedCertificate = await newCertificate.save();
+    console.log('issuerPublicKey', issuerPublicKey);
+    console.log('issuerPublicKey', distributorPublicKey);
+    // Replace the token with your own API key
+    const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkaWQ6ZXRocjoweDlhYjlGNDI0Mzk2OGVEOTVmYThCYTVEMDEwQjU0YzE4N2M3ZWZlZjMiLCJpc3MiOiJ3ZWIzLXN0b3JhZ2UiLCJpYXQiOjE2ODEyMDY5MDQyNDMsIm5hbWUiOiJlZHVub2RlIn0.oVxeBO1VhEXwYvU5CnNUs5tYnx4lVm55oLkweDX7kJQ";
+
+    const client = new Web3Storage({ token })
+    const img = await Jimp.read('sep.png')
+    const font = await Jimp.loadFont(Jimp.FONT_SANS_32_BLACK)
+    img.print(font, 150, 350, req.body.name);
+    img.write('newdiplomav2.jpg'); // save
+
+    const putFilesToWeb3Storage = async () => {
+      const files = await getFilesFromPath('newdiplomav2.jpg')
+      const cid = await client.put(files)
+      console.log('stored files with cid:', cid)
+      return cid;
+    }
+
+    const cid = await retry(
+      async (bail, attempt) => {
+        console.log(`Attempt ${attempt} putting files to web3.storage...`);
+        const result = await putFilesToWeb3Storage();
+        return result;
+      },
+      {
+        retries: 3, // number of retries
+        minTimeout: 1000, // minimum delay in ms between retries
+        maxTimeout: 5000, // maximum delay in ms between retries
+        onRetry: (error, attempt) => {
+          console.log(`Attempt ${attempt} failed: ${error}`);
+        },
+      }
+    );
+
+    // Update the savedCertificate object with the cid
+    savedCertificate.cid = cid;
+    await savedCertificate.save();
+
+
+
+    res.status(200).json(savedCertificate);
+  } catch (error) {
+    console.error(error);
+    res.status(500).send("Server Errorr");
+  }
+});
+
+router.post("/diploma4", async (req, res) => {
+
+
+  // Issuer
+  // const issuerKeyPair = SorobanClient.Keypair.random();
+  // const issuerSecretKey = issuerKeyPair.secret();
+  // const issuerPublicKey = issuerKeyPair.publicKey();
+
+  // Distributor
+  // const distributorKeyPair = SorobanClient.Keypair.random();
+  // const distributorSecretKey = distributorKeyPair.secret();
+  // const distributorPublicKey = distributorKeyPair.publicKey();
+
+  // Store the issuer and distributor key to mongoDB
+
+  console.log("test")
+  const saltRounds = 10; // Number of salt rounds for bcrypt to use
+  // Issuer
+  const issuerKeyPair = SorobanClient.Keypair.random();
+  const issuerSecretKey = issuerKeyPair.secret();
+  const issuerPublicKey = issuerKeyPair.publicKey();
+  // Distributor
+  const distributorKeyPair = SorobanClient.Keypair.random();
+  const distributorSecretKey = distributorKeyPair.secret();
+  const distributorPublicKey = distributorKeyPair.publicKey();
+  // Store the issuer and distributor key to mongoDB
+  const hashedIssuerSecretKey = await bcrypt.hash(issuerSecretKey, saltRounds);
+  const hashedDistributorSecretKey = await bcrypt.hash(distributorSecretKey, saltRounds);
+  try {
+    const newCertificate = new Certificate({
+
+      name: req.body.name,
+      email: req.body.email,
+      pkey: req.body.pkey,
+      cid: null,// Initialize cid to null,
+      certificateNumber: Math.floor(Math.random() * 1000000),
+      issuerSecretKey: hashedIssuerSecretKey,
+      issuerPublicKey: issuerPublicKey,
+      distributorSecretKey: hashedDistributorSecretKey,
+      distributorPublicKey: distributorPublicKey,
+
+    });
+    const savedCertificate = await newCertificate.save();
+    console.log('issuerPublicKey', issuerPublicKey);
+    console.log('issuerPublicKey', distributorPublicKey);
+    // Replace the token with your own API key
+    const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkaWQ6ZXRocjoweDlhYjlGNDI0Mzk2OGVEOTVmYThCYTVEMDEwQjU0YzE4N2M3ZWZlZjMiLCJpc3MiOiJ3ZWIzLXN0b3JhZ2UiLCJpYXQiOjE2ODEyMDY5MDQyNDMsIm5hbWUiOiJlZHVub2RlIn0.oVxeBO1VhEXwYvU5CnNUs5tYnx4lVm55oLkweDX7kJQ";
+
+    const client = new Web3Storage({ token })
+    const img = await Jimp.read('hyperledger.png')
+    const font = await Jimp.loadFont(Jimp.FONT_SANS_32_BLACK)
+    img.print(font, 150, 350, req.body.name);
+    img.write('newdiplomav2.jpg'); // save
+
+    const putFilesToWeb3Storage = async () => {
+      const files = await getFilesFromPath('newdiplomav2.jpg')
+      const cid = await client.put(files)
+      console.log('stored files with cid:', cid)
+      return cid;
+    }
+
+    const cid = await retry(
+      async (bail, attempt) => {
+        console.log(`Attempt ${attempt} putting files to web3.storage...`);
+        const result = await putFilesToWeb3Storage();
+        return result;
+      },
+      {
+        retries: 3, // number of retries
+        minTimeout: 1000, // minimum delay in ms between retries
+        maxTimeout: 5000, // maximum delay in ms between retries
+        onRetry: (error, attempt) => {
+          console.log(`Attempt ${attempt} failed: ${error}`);
+        },
+      }
+    );
+
+    // Update the savedCertificate object with the cid
+    savedCertificate.cid = cid;
+    await savedCertificate.save();
+
+
+
+    res.status(200).json(savedCertificate);
+  } catch (error) {
+    console.error(error);
+    res.status(500).send("Server Errorr");
+  }
+});
+
 router.get('/certificateNumber/:email', async (req, res) => {
   const email = req.params.email;
   const certificates = await Certificate.find({ email }, 'certificateNumber');
@@ -116,7 +478,7 @@ router.get("/:email", async (req, res) => {
     const certificates = await Certificate.find({ email: req.params.email });
     const certificateData = certificates.map(cert => ({
       certificateNumber: cert.certificateNumber,
-      issuerPublicKey : cert.issuerPublicKey,
+      issuerPublicKey: cert.issuerPublicKey,
       distributorPublicKey: cert.distributorPublicKey,
       cid: `https://${cert.cid}.ipfs.w3s.link/newdiplomav2.jpg`
     }));
@@ -131,7 +493,7 @@ router.get("/pkey/:pkey", async (req, res) => {
     const certificates = await Certificate.find({ pkey: req.params.pkey });
     const certificateData = certificates.map(cert => ({
       certificateNumber: cert.certificateNumber,
-      issuerPublicKey : cert.issuerPublicKey,
+      issuerPublicKey: cert.issuerPublicKey,
       distributorPublicKey: cert.distributorPublicKey,
       cid: `https://${cert.cid}.ipfs.w3s.link/newdiplomav2.jpg`
     }));
