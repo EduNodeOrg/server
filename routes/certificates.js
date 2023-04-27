@@ -572,4 +572,18 @@ router.get("/notification/:email", async (req, res) => {
   }
 });
 
+router.get("/notification/count/:email", async (req, res) => {
+  try {
+    const { email } = req.params;
+    const notificationCount = await Notification.aggregate([
+      { $match: { email } },
+      { $group: { _id: "$email", count: { $sum: 1 } } },
+      { $project: { _id: 0, email: "$_id", count: 1 } }
+    ]);
+    res.json(notificationCount);
+  } catch (error) {
+    console.error(error);
+    res.status(500).send("Server Error");
+  }
+});
 module.exports = router;
