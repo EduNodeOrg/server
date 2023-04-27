@@ -4,6 +4,7 @@ const cors = require('cors');
 const SorobanClient = require('soroban-client');
 const server = new SorobanClient.Server('https://rpc-futurenet.stellar.org:443/');
 const Certificate = require("../models/certificates");
+const Notification = require("../models/Notification");
 const app = express();
 const { Web3Storage, getFilesFromPath } = require('web3.storage')
 const { create } = require('ipfs-http-client')
@@ -16,17 +17,6 @@ const bcrypt = require('bcryptjs');
 app.use(cors());
 
 router.post("/diploma", async (req, res) => {
-
-
-  // Issuer
-  // const issuerKeyPair = SorobanClient.Keypair.random();
-  // const issuerSecretKey = issuerKeyPair.secret();
-  // const issuerPublicKey = issuerKeyPair.publicKey();
-
-  // Distributor
-  // const distributorKeyPair = SorobanClient.Keypair.random();
-  // const distributorSecretKey = distributorKeyPair.secret();
-  // const distributorPublicKey = distributorKeyPair.publicKey();
 
   // Store the issuer and distributor key to mongoDB
 
@@ -103,21 +93,21 @@ router.post("/diploma", async (req, res) => {
     console.error(error);
     res.status(500).send("Server Errorr");
   }
+  const newNotification = new Notification({
+    message: 'Congrats! You have a new certification for the Basic Concepts Course',
+    time: new Date(),
+    email: req.body.email,
+  });
+
+
+
+  await newNotification.save();
+ 
+
 });
 
 
 router.post("/diploma1", async (req, res) => {
-
-
-  // Issuer
-  // const issuerKeyPair = SorobanClient.Keypair.random();
-  // const issuerSecretKey = issuerKeyPair.secret();
-  // const issuerPublicKey = issuerKeyPair.publicKey();
-
-  // Distributor
-  // const distributorKeyPair = SorobanClient.Keypair.random();
-  // const distributorSecretKey = distributorKeyPair.secret();
-  // const distributorPublicKey = distributorKeyPair.publicKey();
 
   // Store the issuer and distributor key to mongoDB
 
@@ -180,6 +170,8 @@ router.post("/diploma1", async (req, res) => {
         onRetry: (error, attempt) => {
           console.log(`Attempt ${attempt} failed: ${error}`);
         },
+
+        
       }
     );
 
@@ -194,20 +186,25 @@ router.post("/diploma1", async (req, res) => {
     console.error(error);
     res.status(500).send("Server Errorr");
   }
+
+  
+    const newNotification = new Notification({
+      message: 'Congrats! You have a new certification for the Operations Course  ',
+      time: new Date(),
+      email: req.body.email,
+    });
+  
+  
+  
+    await newNotification.save();
+    
+    console.log('notification saved !')
+  
+
 });
 
 router.post("/diploma2", async (req, res) => {
 
-
-  // Issuer
-  // const issuerKeyPair = SorobanClient.Keypair.random();
-  // const issuerSecretKey = issuerKeyPair.secret();
-  // const issuerPublicKey = issuerKeyPair.publicKey();
-
-  // Distributor
-  // const distributorKeyPair = SorobanClient.Keypair.random();
-  // const distributorSecretKey = distributorKeyPair.secret();
-  // const distributorPublicKey = distributorKeyPair.publicKey();
 
   // Store the issuer and distributor key to mongoDB
 
@@ -284,22 +281,23 @@ router.post("/diploma2", async (req, res) => {
     console.error(error);
     res.status(500).send("Server Errorr");
   }
+
+  
+    const newNotification = new Notification({
+      message: 'Congrats! You have a new certification for the Anchors Course',
+      time: new Date(),
+      email: req.body.email,
+    });
+  
+  
+  
+    await newNotification.save();
+    
+    console.log('notification saved !')
+ 
 });
 
 router.post("/diploma3", async (req, res) => {
-
-
-  // Issuer
-  // const issuerKeyPair = SorobanClient.Keypair.random();
-  // const issuerSecretKey = issuerKeyPair.secret();
-  // const issuerPublicKey = issuerKeyPair.publicKey();
-
-  // Distributor
-  // const distributorKeyPair = SorobanClient.Keypair.random();
-  // const distributorSecretKey = distributorKeyPair.secret();
-  // const distributorPublicKey = distributorKeyPair.publicKey();
-
-  // Store the issuer and distributor key to mongoDB
 
   console.log("test")
   const saltRounds = 10; // Number of salt rounds for bcrypt to use
@@ -374,20 +372,24 @@ router.post("/diploma3", async (req, res) => {
     console.error(error);
     res.status(500).send("Server Errorr");
   }
+
+  
+    const newNotification = new Notification({
+      message: 'Congrats! You have a new certification for the SEPs Course',
+      time: new Date(),
+      email: req.body.email,
+    });
+  
+  
+  
+    await newNotification.save();
+    
+    console.log('notification saved !')
+ 
 });
 
 router.post("/diploma4", async (req, res) => {
 
-
-  // Issuer
-  // const issuerKeyPair = SorobanClient.Keypair.random();
-  // const issuerSecretKey = issuerKeyPair.secret();
-  // const issuerPublicKey = issuerKeyPair.publicKey();
-
-  // Distributor
-  // const distributorKeyPair = SorobanClient.Keypair.random();
-  // const distributorSecretKey = distributorKeyPair.secret();
-  // const distributorPublicKey = distributorKeyPair.publicKey();
 
   // Store the issuer and distributor key to mongoDB
 
@@ -418,6 +420,7 @@ router.post("/diploma4", async (req, res) => {
       distributorPublicKey: distributorPublicKey,
 
     });
+    
     const savedCertificate = await newCertificate.save();
     console.log('issuerPublicKey', issuerPublicKey);
     console.log('issuerPublicKey', distributorPublicKey);
@@ -464,6 +467,20 @@ router.post("/diploma4", async (req, res) => {
     console.error(error);
     res.status(500).send("Server Errorr");
   }
+
+  
+    const newNotification = new Notification({
+      message: 'Congrats! You have a new certification for the Hyperledger Course',
+      time: new Date(),
+      email: req.body.email,
+    });
+  
+  
+  
+    await newNotification.save();
+  
+    console.log('notification saved !')
+  
 });
 
 router.get('/certificateNumber/:email', async (req, res) => {
@@ -533,6 +550,22 @@ router.get("/count/pkey/:pkey", async (req, res) => {
       { $project: { _id: 0, pkey: "$_id", count: 1 } }
     ]);
     res.json(certificateCount);
+  } catch (error) {
+    console.error(error);
+    res.status(500).send("Server Error");
+  }
+});
+
+router.get("/notification/:email", async (req, res) => {
+  try {
+    const notifications = await Notification.find({ email: req.params.email });
+    const notificationData = notifications.map(not => ({
+      notificationMessage: not.message,
+      notificationDate: not.date,
+      email: cert.email,
+      
+    }));
+    res.status(200).json(notificationData);
   } catch (error) {
     console.error(error);
     res.status(500).send("Server Error");
