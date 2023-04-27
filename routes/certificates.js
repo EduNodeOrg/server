@@ -559,10 +559,10 @@ router.get("/count/pkey/:pkey", async (req, res) => {
 router.get("/notification/:email", async (req, res) => {
   try {
     const notifications = await Notification.find({ email: req.params.email });
-    const notificationData = notifications.map(not => ({
-      notificationMessage: not.message,
-      notificationDate: not.date,
-      email: cert.email,
+    const notificationData = notifications.map(notif => ({
+      notificationMessage: notif.message,
+      notificationDate: notif.date,
+      email: notif.email,
       
     }));
     res.status(200).json(notificationData);
