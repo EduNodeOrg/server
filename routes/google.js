@@ -31,9 +31,11 @@ router.post('/', function (req, res) {
                 if (err) throw err;
                 res.json({
                   token,
+                  newUser,
                   user: {
                     id: newUser._id,
                     email: newUser.email,
+                    name:newUser.name,
                     confirmationCode: newUser.confirmationCode
                   },
                 });

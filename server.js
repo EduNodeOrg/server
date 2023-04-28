@@ -68,7 +68,7 @@ const certificateRoutes = require("./routes/certificates");
 const profile = require("./routes/profile");
 const project = require("./routes/project");
 const cours = require("./routes/cours");
-const google=require("./routes/google")
+const google = require("./routes/google")
 
 
 
