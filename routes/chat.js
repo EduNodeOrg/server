@@ -23,8 +23,8 @@ router.post('/openai', async (req, res) => {
     const configuration = new Configuration({
       apiKey: process.env.OPENAI_API_KEY,
     });
-    const openai = new ChatUser(configuration);
-
+    const openai = new OpenAIApi(configuration);
+    
     async function generateText() {
       const response = await openai.createCompletion({
         model: "text-davinci-003",
