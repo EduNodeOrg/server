@@ -9,8 +9,8 @@
   "scripts": {
     "dev": "nodemon server.js",
     "deployHeroku": "git add . && git commit -am 'commit' && git push heroku master",
-    "git pull":"git status && git add . && git commit -am 'commit' && git pull",
-    "git push":"git status && git add . && git commit -am 'commit' && git push"
+    "git pull": "git status && git add . && git commit -am 'commit' && git pull",
+    "git push": "git status && git add . && git commit -am 'commit' && git push"
   },
   "keywords": [],
   "author": "",
@@ -44,6 +44,7 @@
     "node-fetch": "^3.3.1",
     "node-mailjet": "^6.0.2",
     "nodemailer": "^6.9.1",
+    "openai": "^3.2.1",
     "passport": "^0.4.1",
     "passport-google-oauth20": "^2.0.0",
     "passport-twitter": "^1.0.4",

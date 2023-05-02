@@ -70,7 +70,7 @@ const project = require("./routes/project");
 const cours = require("./routes/cours");
 const google = require("./routes/google")
 const blog = require("./routes/blog")
-
+const chat = require("./routes/chat")
 
 app.use('/api/gcallback', gcallback);
 app.use('/api/search', search);
@@ -100,5 +100,11 @@ app.use("/api/project", project);
 app.use("/api/cours", cours);
 app.use("/api/google", google);
 app.use("/api/blog", blog);
+app.use("/api/chat", chat);
+
+
+
+
+
 
 app.listen(PORT, () => console.log(`server started at ${PORT}`))
