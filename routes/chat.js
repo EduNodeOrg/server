@@ -5,9 +5,6 @@ const router = express.Router();
 const ChatUser = require('../models/ChatUser');
 const { Configuration, OpenAIApi } = require("openai");
 
-router.get("/", (req, res) => {
-  res.json("welcome to our /openai route, refer to our docs for more info")
-})
 
 
 
@@ -24,33 +21,47 @@ router.post('/openai', async (req, res) => {
       apiKey: process.env.OPENAI_API_KEY,
     });
     const openai = new OpenAIApi(configuration);
-    
+    const input1=` ${input} please limit the answer to a maximum 400 tokens `
+  
     async function generateText() {
       const response = await openai.createCompletion({
         model: "text-davinci-003",
-        prompt: input,
+        prompt: input1,
         temperature: 0,
-        max_tokens: 50,
-      })
-        .then(response => {
-          console.log(response.data);
-          console.log(response.data.choices[0].text);
+        max_tokens: 400,
+      }) 
+      console.log(response.data.choices[0].text.trim());
+      
+      // Save data to the database
+      const chatUser = new ChatUser({
+        input,
+        email,
+        output: response.data.choices[0].text.trim(),
+      });
+      await chatUser.save();
 
-          // response.json({msg: response.data.choices[0].text})
-        })
-        .catch(error => {
-          console.log(error);
-        });
-
+      // Return response to the client
+      res.status(201).json({msg: response.data.choices[0].text.trim()});
     }
-    generateText()
-    // console.log(completion.data.choices[0].text);
-    // console.log(res.data.choices[0].text)
-
+    await generateText();
   } catch (error) {
     console.log(error);
     res.status(500).json({ error: 'Something went wrong' });
   }
 });
+
+
+router.get('/openai/:email', async (req, res) => {
+  const { email } = req.params;
+  try {
+    const chatUsers = await ChatUser.find({ email });
+    res.status(200).json(chatUsers);
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ error: 'Something went wrong' });
+  }
+});
+
+
 
 module.exports = router;
