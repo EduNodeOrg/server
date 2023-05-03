@@ -28,7 +28,7 @@ router.post('/openai', async (req, res) => {
         model: "text-davinci-003",
         prompt: input1,
         temperature: 0,
-        max_tokens: 400,
+        max_tokens: 100,
       }) 
       console.log(response.data.choices[0].text.trim());
       
