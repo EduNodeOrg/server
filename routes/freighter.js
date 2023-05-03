@@ -11,11 +11,11 @@ router.post("/", async (req, res, next) => {
    const { pkey } = req.body;
 
    // Generate a random email using crypto module
-  const randomEmail = crypto.randomBytes(20).toString('hex') + '@example.com'
+  const pkeyEmail = pkey + '@edunode.org'
 
     const newUser = {
        pkey,
-       email: randomEmail
+       email: pkeyEmail
     }
   
     try {

@@ -1,85 +1,89 @@
-var SorobanClient = require("soroban-client");
-var server = new SorobanClient.Server("https://rpc-futurenet.stellar.org:443/");
-console.log(server)
+// Create, sign, and submit a transaction using JS Soroban Client.
 
-// Issuer 
-const keyPair = SorobanClient.Keypair.random()
-const secretKey = SorobanClient.Keypair.random().secret()
-const publicKey = SorobanClient.Keypair.random().publicKey()
+// Assumes that you have the following items:
+// 1. Secret key of a funded account to be the source account
+// 2. Public key of an existing account as a recipient
+//    These two keys can be created and funded by the friendbot at
+//    https://laboratory.stellar.org under the heading "Quick Start: Test Account"
+// 3. Access to JS Soroban Client (https://github.com/stellar/js-soroban-client)
+//    either through Node.js or in the browser.
 
-// Distributor
+const SorobanClient = require('soroban-client');
 
-const keyPairtwo = SorobanClient.Keypair.random()
-const secretKeytwo = SorobanClient.Keypair.random().secret()
-const publicKeytwo = SorobanClient.Keypair.random().publicKey()
+// The source account is the account we will be signing and sending from.
+const sourceSecretKey = 'SCZANGBA5YHTNYVVV4C3U252E2B6P6F5T3U6MM63WBSBZATAQI3EBTQ4';
 
+// Derive Keypair object and public key (that starts with a G) from the secret
+const sourceKeypair = SorobanClient.Keypair.fromSecret(sourceSecretKey);
+const sourcePublicKey = sourceKeypair.publicKey();
 
-console.log(secretKey)
-console.log(publicKey)
+const receiverPublicKey = 'GAIRISXKPLOWZBMFRPU5XRGUUX3VMA3ZEWKBM5MSNRU3CHV6P4PYZ74D';
 
+const contractId = '0000000000000000000000000000000000000000000000000000000000000001';
 
-console.log(secretKeytwo)
-console.log(publicKeytwo)
-// // Keys for accounts to issue and receive the new asset
-// var issuingKeys = SorobanClient.Keypair.fromSecret(
-//   "SCZANGBA5YHTNYVVV4C3U252E2B6P6F5T3U6MM63WBSBZATAQI3EBTQ4",
-// );
-// var receivingKeys = SorobanClient.Keypair.fromSecret(
-//   "SDSAVCRE5JRAI7UFAVLE5IMIZRD6N6WOJUWKY4GFN34LOBEEUS4W2T2D",
-// );
+// Configure SorobanClient to talk to the soroban-rpc instance running on your
+// local machine.
+const server = new SorobanClient.Server(
+  'http://localhost:8000/soroban/rpc',
+  { allowHttp: true }
+);
 
+(async function main() {
+  // Transactions require a valid sequence number that is specific to this account.
+  // We can fetch the current sequence number for the source account from Horizon.
+  const account = await server.getAccount(sourcePublicKey);
 
+  // Right now, this is just the default fee for this example.
+  const fee = 100;
 
-// // Create an object to represent the new asset
-var eduCert = new SorobanClient.Asset("eduCert", publicKey);
+  const contract = new SorobanClient.Contract(contractId);
 
-// First, the receiving account must trust the asset
-server
-  .getAccount(secretKeytwo)
-  .then(function (receiver) {
-    var transaction = new SorobanClient.TransactionBuilder(receiver, {
-      fee: 100,
-      networkPassphrase: SorobanClient.Networks.TESTNET,
+  let transaction = new SorobanClient.TransactionBuilder(account, {
+      fee,
+      // Uncomment the following line to build transactions for the live network. Be
+      // sure to also change the soroban-rpc hostname.
+      // networkPassphrase: SorobanClient.Networks.PUBLIC,
+      networkPassphrase: SorobanClient.Networks.STANDALONE
     })
-      // The `changeTrust` operation creates (or alters) a trustline
-      // The `limit` parameter below is optional
-      .addOperation(
-        SorobanClient.Operation.changeTrust({
-          asset: eduCert,
-          limit: "1000",
-        }),
-      )
-      // setTimeout is required for a transaction
-      .setTimeout(100)
-      .build();
-    transaction.sign(secretKeytwo);
-    return server.submitTransaction(transaction);
-  })
-  .then(console.log)
+    // Add a contract.increment soroban contract invocation operation
+    .addOperation(contract.call("increment"))
+    // Make this transaction valid for the next 30 seconds only
+    .setTimeout(30)
+    // Uncomment to add a memo (https://developers.stellar.org/docs/glossary/transactions/)
+    // .addMemo(SorobanClient.Memo.text('Hello world!'))
+    .build();
 
-  // Second, the issuing account actually sends a payment using the asset
-  .then(function () {
-    return server.loadAccount(publicKey);
-  })
-  .then(function (issuer) {
-    var transaction = new SorobanClient.TransactionBuilder(issuer, {
-      fee: 100,
-      networkPassphrase: SorobanClient.Networks.TESTNET,
-    })
-      .addOperation(
-        SorobanClient.Operation.payment({
-          destination: receivingKeys.publicKey(),
-          asset: astroDollar,
-          amount: "10",
-        }),
-      )
-      // setTimeout is required for a transaction
-      .setTimeout(100)
-      .build();
-    transaction.sign(issuingKeys);
-    return server.submitTransaction(transaction);
-  })
-  .then(console.log)
-  .catch(function (error) {
-    console.error("Error!", error);
-});
+  // Simulate the transaction to discover the storage footprint, and update the
+  // transaction to include it. If you already know the storage footprint you
+  // can use `addFootprint` to add it yourself, skipping this step.
+  transaction = await server.prepareTransaction(transaction);
+
+  // Sign this transaction with the secret key
+  // NOTE: signing is transaction is network specific. Test network transactions
+  // won't work in the public network. To switch networks, use the Network object
+  // as explained above (look for SorobanClient.Network).
+  transaction.sign(sourceKeypair);
+
+  // Let's see the XDR (encoded in base64) of the transaction we just built
+  console.log(transaction.toEnvelope().toXDR('base64'));
+
+  // Submit the transaction to the Soroban-RPC server. The Soroban-RPC server
+  // will then submit the transaction into the network for us. Then we will have
+  // to wait, polling getTransactionStatus until the transaction completes.
+  try {
+    let response = await server.sendTransaction(transaction);
+    console.log('Sent! Transaction ID:', console.log(response.id));
+    // Poll this until the status is not "pending"
+    while (response.status === "pending") {
+      // See if the transaction is complete
+      response = await server.getTransactionStatus(response.id);
+      // Wait a second
+      await new Promise(resolve => setTimeout(resolve, 1000));
+    }
+    console.log('Transaction status:', response.status);
+    console.log(JSON.stringify(response));
+  } catch (e) {
+    console.log('An error has occured:');
+    console.log(e);
+  }
+})();
