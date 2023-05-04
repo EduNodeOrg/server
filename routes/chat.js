@@ -21,7 +21,7 @@ router.post('/openai', async (req, res) => {
       apiKey: process.env.OPENAI_API_KEY,
     });
     const openai = new OpenAIApi(configuration);
-    const input1=` ${input} please limit the answer to a maximum 400 tokens `
+    const input1= input
   
     async function generateText() {
       const response = await openai.createCompletion({
