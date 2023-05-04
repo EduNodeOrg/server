@@ -24,7 +24,7 @@ const contractId = '000000000000000000000000000000000000000000000000000000000000
 // Configure SorobanClient to talk to the soroban-rpc instance running on your
 // local machine.
 const server = new SorobanClient.Server(
-  'http://localhost:8000/soroban/rpc',
+  'https://rpc-futurenet.stellar.org:443/',
   { allowHttp: true }
 );
 

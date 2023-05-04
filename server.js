@@ -3,6 +3,7 @@ const dotenv = require('dotenv');
 const mongoose = require("mongoose");
 const cors = require("cors");
 dotenv.config({ path: './config/config.env' });
+const fs = require('fs');
 
 const PORT = process.env.PORT || 5001 
 
@@ -42,6 +43,14 @@ connectDB();
 app.get('/', (req, res) => {
   res.send('Welcome to the edunode API!');
 });
+
+app.get('/.well-known/stellar.toml', (req, res) => {
+  console.log("hi")
+  const tomlFilePath = __dirname + '/stellar.toml';
+  const tomlContent = fs.readFileSync(tomlFilePath, 'utf8');
+  res.send(tomlContent);
+});
+
 const confirm = require('./routes/confirm');
 const users = require('./routes/users');
 const auth = require('./routes/auth');
