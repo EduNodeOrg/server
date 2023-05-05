@@ -522,7 +522,7 @@ router.post("/diploma5", async (req, res) => {
     const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkaWQ6ZXRocjoweDlhYjlGNDI0Mzk2OGVEOTVmYThCYTVEMDEwQjU0YzE4N2M3ZWZlZjMiLCJpc3MiOiJ3ZWIzLXN0b3JhZ2UiLCJpYXQiOjE2ODEyMDY5MDQyNDMsIm5hbWUiOiJlZHVub2RlIn0.oVxeBO1VhEXwYvU5CnNUs5tYnx4lVm55oLkweDX7kJQ";
 
     const client = new Web3Storage({ token })
-    const img = await Jimp.read('hyperledger.png')
+    const img = await Jimp.read('soroban.png')
     const font = await Jimp.loadFont(Jimp.FONT_SANS_64_BLACK)
     img.print(font, 400, 500, req.body.name);
     img.write('newdiplomav2.jpg'); // save
