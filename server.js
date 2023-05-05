@@ -44,12 +44,12 @@ app.get('/', (req, res) => {
   res.send('Welcome to the edunode API!');
 });
 
-app.get('/.well-known/stellar.toml', (req, res) => {
-  console.log("hi")
-  const tomlFilePath = __dirname + '/stellar.toml';
-  const tomlContent = fs.readFileSync(tomlFilePath, 'utf8');
-  res.send(tomlContent);
-});
+//app.get('/.well-known/stellar.toml', (req, res) => {
+ // console.log("hi")
+  //const tomlFilePath = __dirname + '/stellar.toml';
+  //const tomlContent = fs.readFileSync(tomlFilePath, 'utf8');
+  //res.send(tomlContent);
+//});
 
 const confirm = require('./routes/confirm');
 const users = require('./routes/users');

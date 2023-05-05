@@ -67,6 +67,10 @@ const UserSchema = new mongoose.Schema({
   courseOneDone: {
     type: Boolean,
     default: false
+  },
+  preferences:{
+    type: [String],
+    required: false,
   }
 },
 
