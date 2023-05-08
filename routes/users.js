@@ -417,6 +417,23 @@ router.put("/google", async (req, res) => {
 
 
 })
+router.post('/preferences', (req, res) => {
+  const { email, preferences } = req.body;
+
+  // Find the user by email and update their preferences
+  User.findOneAndUpdate({ email }, { preferences }, { new: true })
+    .then(user => {
+      if (!user) {
+        res.status(404).json({ message: 'User not found' });
+      } else {
+        res.json({ message: 'Preferences updated successfully' });
+      }
+    })
+    .catch(error => {
+      console.error(error);
+      res.status(500).json({ message: 'Internal server error' });
+    });
+});
 
 
 
