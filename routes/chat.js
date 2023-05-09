@@ -22,20 +22,18 @@ router.post('/openai', async (req, res) => {
     });
     const openai = new OpenAIApi(configuration);
     const input1= input
-  
+    const codePlaceholder = '<<INSERT CODE HERE>>';
     async function generateText() {
       const response = await openai.createCompletion({
         model: "text-davinci-003",
-        prompt:[
-          {"role": "Assistant", "content": `${input}, if the response contain a code, the code sent by the Assistant should always start and end with quotes ''',`
-        }
-        
-        ],
-       
+        prompt: `${input1}, if the response contains any codes or commands, only the code and command sent by the Assistant should always start and end with 3 quotes '''${codePlaceholder}''' 
+        so I can know where are the codes and commands.`,
         temperature: 0,
         max_tokens: 500,
       }) 
-      console.log(response.data.choices[0].text.trim());
+      const code = 'your code goes here';
+      const output = response.data.choices[0].text.trim().replace(codePlaceholder, `'''${code}'''`);
+      console.log(output);
       
       // Save data to the database
       const chatUser = new ChatUser({
