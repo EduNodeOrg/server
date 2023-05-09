@@ -26,7 +26,12 @@ router.post('/openai', async (req, res) => {
     async function generateText() {
       const response = await openai.createCompletion({
         model: "text-davinci-003",
-        prompt: input1,
+        prompt:[
+          {"role": "Assistant", "content": `${input}, if the response contain a code, the code sent by the Assistant should always start and end with quotes ''',`
+        }
+        
+        ],
+       
         temperature: 0,
         max_tokens: 500,
       }) 
