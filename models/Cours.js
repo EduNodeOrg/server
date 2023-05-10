@@ -36,6 +36,10 @@ const CoursSchema = new mongoose.Schema({
     default: Date.now,
     required: false
   },
+  privatee: {
+    type: Boolean,
+    required: false
+  },
   
   
 },
