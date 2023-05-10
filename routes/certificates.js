@@ -52,7 +52,9 @@ router.post("/diploma", async (req, res) => {
     console.log('issuerPublicKey', distributorPublicKey);
     // Replace the token with your own API key
     const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkaWQ6ZXRocjoweDlhYjlGNDI0Mzk2OGVEOTVmYThCYTVEMDEwQjU0YzE4N2M3ZWZlZjMiLCJpc3MiOiJ3ZWIzLXN0b3JhZ2UiLCJpYXQiOjE2ODEyMDY5MDQyNDMsIm5hbWUiOiJlZHVub2RlIn0.oVxeBO1VhEXwYvU5CnNUs5tYnx4lVm55oLkweDX7kJQ";
-
+    server.getAccount(
+      issuerPublicKey
+    ).then(function(r){ console.log(r); });
     const client = new Web3Storage({ token })
     const img = await Jimp.read('newediploma.png')
     const font = await Jimp.loadFont(Jimp.FONT_SANS_32_BLACK)

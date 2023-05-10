@@ -1,20 +1,12 @@
 VERSION="2.0.0"
 
 NETWORK_PASSPHRASE="Public Global Stellar Network ; September 2015"
-FEDERATION_SERVER="https://api.domain.com/federation"
-TRANSFER_SERVER="https://api.domain.com"
-SIGNING_KEY="GBBHQ7H4V6RRORKYLHTCAWP6MOHNORRFJSDPXDFYDGJB2LPZUFPXUEW3"
-HORIZON_URL="https://horizon.domain.com"
-ACCOUNTS=[
-"GD5DJQDDBKGAYNEAXU562HYGOOSYAEOO6AS53PZXBOZGCP5M2OPGMZV3",
-"GAENZLGHJGJRCMX5VCHOLHQXU3EMCU5XWDNU4BGGJFNLI2EL354IVBK7",
-"GAOO3LWBC4XF6VWRP5ESJ6IBHAISVJMSBTALHOQM2EZG7Q477UWA6L7U"
-]
+HORIZON_URL="https://horizon.edunode.org"
 
 [DOCUMENTATION]
-ORG_NAME="OG Technologies EU"
-ORG_DBA="Organization DBA"
-ORG_URL="https://www.ogtechnologies.co/"
+ORG_NAME="EduNode brand of OG Technologies EU"
+ORG_DBA="EduNode"
+ORG_URL="https://www.edunode.org/"
 ORG_LOGO="https://ipfs.io/ipfs/bafybeicnzq7myym5i5do3clg7fmioq2axsg7hjwdbmigde4hann7ke5ebi/OG%20Technologies%20%281%29.png"
 ORG_DESCRIPTION="Einzelunternehmen: Dienstleistungen in der automatischen Datenverarbeitung und Informationstechnik (IT-Services), Wirtschaftskammer Wien."
 ORG_PHYSICAL_ADDRESS="Liechtensteinstraße 111-115, 1090 Vienna, Austria"
