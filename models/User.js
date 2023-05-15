@@ -57,7 +57,7 @@ const UserSchema = new mongoose.Schema({
     type: String,
     required: false
   },
-  _id: {
+  id: {
     type: String,
     required: false
   },
