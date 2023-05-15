@@ -71,6 +71,20 @@ router.post('/comments/:postId', async (req, res) => {
     res.status(500).json({ error: 'Server error' });
   }
 });
+router.get('/comments/:postId', async (req, res) => {
+  const postId = req.params.postId;
+  try {
+    const post = await Post.findById(postId);
+    if (!post) {
+      return res.status(404).json({ error: 'Post not found' });
+    }
+    const comments = post.comments;
+    res.json(comments);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Server error' });
+  }
+});
 
   
 
