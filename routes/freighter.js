@@ -22,14 +22,14 @@ router.post("/", async (req, res, next) => {
       let user = await User.findOne({ pkey: pkey })
       if (user) {
         jwt.sign(
-          { _id: user._id }, process.env.JWT_SECRET,
+          { id: user.id }, process.env.JWT_SECRET,
           { expiresIn: 3600 },
           (err, token) => {
             if (err) throw err;
             res.json({
               token,
           user: {
-            _id: user._id,
+            id: user._id,
             pkey: user.pkey,
             email: user.email,
             name:user.name,
@@ -44,17 +44,25 @@ router.post("/", async (req, res, next) => {
       } else {
         user = await User.create(newUser)
 
-       
+        jwt.sign(
+          { id: user.id }, process.env.JWT_SECRET,
+          { expiresIn: 3600 },
+          (err, token) => {
+            if (err) throw err;
             res.json({
               token,
           user: {
-            _id: user._id,
+            id: user._id,
             pkey: user.pkey,
             email: user.email,
-           
+            name:user.name,
+            age:user.age,
+            bio:user.bio,
+            location:user.location,
+            preferences:user.preferences
           }
         });
-       
+       } );
   
       }
   
