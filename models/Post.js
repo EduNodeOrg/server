@@ -40,6 +40,18 @@ const PostSchema = new mongoose.Schema({
     type: Boolean,
     required: false
   },
+  comments: [
+    {
+      text: {
+        type: String,
+        required: true,
+      },
+      email: {
+        type: String,
+        required: true,
+      },
+    },
+  ],
   
 },
 
