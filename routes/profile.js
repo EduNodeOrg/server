@@ -17,9 +17,9 @@ router.post('/', async (req, res) => {
   res.header("Access-Control-Allow-Headers", 'Origin,X-Requested-With,Content-Type,Accept,content-type,application/json');
   res.header('Content-Type', 'application/json');
   try {
-    const { id, name, age, bio, location } = req.body;
+    const { _id, name, age, bio, location } = req.body;
     const updatedUser = await User.findByIdAndUpdate(
-      id, // user id to update
+      _id, // user id to update
       { name, age, bio, location }, // new user data
       { new: true, runValidators: true } // options
     );
