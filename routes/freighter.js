@@ -1,8 +1,8 @@
 const express = require("express");
 const router = express.Router();
 const User = require('../models/User');
-const crypto = require('crypto');
 const jwt = require("jsonwebtoken");
+const { use } = require("passport");
 router.post("/", async (req, res, next) => {
 
    console.log("newUser")
@@ -33,6 +33,12 @@ router.post("/", async (req, res, next) => {
             id: user._id,
             pkey: user.pkey,
             email: user.email,
+            name:user.name,
+            age:user.age,
+            bio:user.bio,
+            location:user.location,
+            preferences:user.preferences
+
           }
         });
        } );
@@ -50,6 +56,11 @@ router.post("/", async (req, res, next) => {
             id: user._id,
             pkey: user.pkey,
             email: user.email,
+            name:user.name,
+            age:user.age,
+            bio:user.bio,
+            location:user.location,
+            preferences:user.preferences
           }
         });
        } );
