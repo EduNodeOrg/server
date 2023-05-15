@@ -4,7 +4,7 @@ dotenv.config({ path: './config/config.env' });
 const router = express.Router();
 const ChatUser = require('../models/ChatUser');
 const { Configuration, OpenAIApi } = require("openai");
-
+const axios = require('axios');
 
 
 
@@ -64,6 +64,28 @@ router.get('/openai/:email', async (req, res) => {
     res.status(500).json({ error: 'Something went wrong' });
   }
 });
+
+router.post('/openai/plugin', async (req, res) => {
+  const { message } = req.body; // Assuming the user's message is sent in the request body
+  
+  // Send the user's message to the ChatGPT API
+  const response = await axios.post('https://api.openai.com/v1/completions', {
+    prompt: message,
+    max_tokens: 50, // Adjust as needed
+    temperature: 0.7, // Adjust as needed
+    model: "text-davinci-003",
+  }, {
+    headers: {
+      'Authorization': 'Bearer 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',
+      'Content-Type': 'application/json',
+    },
+  });
+  
+  // Extract the generated response from the API and send it back to the user
+  const generatedText = response.data.choices[0].text.trim();
+  res.send({ reply: generatedText });
+});
+
 
 
 
