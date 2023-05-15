@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 const User = require('../models/User');
 const crypto = require('crypto');
+const jwt = require("jsonwebtoken");
 router.post("/", async (req, res, next) => {
 
    console.log("newUser")
@@ -21,14 +22,19 @@ router.post("/", async (req, res, next) => {
     try {
       let user = await User.findOne({ pkey: pkey })
       if (user) {
-  
-        res.send({
+        jwt.sign(
+          { id: user.id }, process.env.JWT_SECRET,
+          { expiresIn: 3600 },
+          (err, token) => {
+            if (err) throw err;
+            res.json({
           user: {
             // granted: true,
             pkey: user.pkey,
             email: user.email,
           }
         });
+       } );
       } else {
         user = await User.create(newUser)
 
