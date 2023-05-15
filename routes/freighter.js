@@ -41,19 +41,13 @@ router.post("/", async (req, res, next) => {
     } else {
       user = await User.create(newUser)
 
-      jwt.sign(
-        { id: user.id }, process.env.JWT_SECRET,
-        { expiresIn: 3600 },
-        (err, token) => {
-          if (err) throw err;
-          res.json({
+      res.send({
         user: {
-          // granted: true,
           pkey: user.pkey,
           email: user.email,
+
         }
       });
-    });
 
     }
 
