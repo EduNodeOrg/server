@@ -8,14 +8,13 @@ router.post("/", async (req, res, next) => {
    console.log("newUser")
 
     res.setHeader('Access-Control-Allow-Origin', '*');
-    // validation 1
+    
    const { pkey } = req.body;
-
-   // Generate a random email using crypto module
+   // Generate a random email
   const pkeyEmail = pkey + '@edunode.org'
 
     const newUser = {
-       pkey,
+       pkey:pkey,
        email: pkeyEmail
     }
   
