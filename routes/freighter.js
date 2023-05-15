@@ -30,7 +30,7 @@ router.post("/", async (req, res, next) => {
         { expiresIn: 3600 },
         (err, token) => {
           if (err) throw err;
-          res.json({
+          res.send({
         user: {
           // granted: true,
           pkey: user.pkey,
