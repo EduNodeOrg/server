@@ -48,6 +48,30 @@ router.get("/posts", async (req, res) => {
       res.status(500).send({ error: error.message });
     }
   });
+
+
+// Route for adding a comment
+router.post('/comments/:postId', async (req, res) => {
+  const postId = req.params.postId;
+  const newComment = {
+    text: req.body.text,
+    email: req.body.email,
+  };
+
+  try {
+    const post = await Post.findById(postId);
+    if (!post) {
+      return res.status(404).json({ error: 'Post not found' });
+    }
+    post.comments.push(newComment);
+    await post.save();
+    res.json(post);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
   
 
 module.exports = router;
