@@ -17,10 +17,11 @@ router.post('/', async (req, res) => {
   res.header("Access-Control-Allow-Headers", 'Origin,X-Requested-With,Content-Type,Accept,content-type,application/json');
   res.header('Content-Type', 'application/json');
   try {
-    const { name, age, bio, location } = req.body;
+    const { email, name, age, bio, location } = req.body;
     const updatedUser = await User.findOneAndUpdate(
       { email }, // search query
       { name, age, bio, location }, // new user data
+      { new: true, runValidators: true } // options
     );
 
     // Handle the updated user
@@ -30,5 +31,6 @@ router.post('/', async (req, res) => {
     res.status(500).send('Server error');
   }
 });
+
 
 module.exports = router;
