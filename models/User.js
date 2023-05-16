@@ -71,6 +71,10 @@ const UserSchema = new mongoose.Schema({
   preferences:{
     type: [String],
     required: false,
+  },
+  skills:{
+    type: [String],
+    required: false,
   }
 },
 
