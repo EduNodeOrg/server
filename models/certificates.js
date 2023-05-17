@@ -44,7 +44,10 @@ const CertificateSchema = new Schema({
     type: String,
     required: false
   },
-
+  date: {
+    type: Date,
+    default: Date.now
+  },
 });
 {/*CertificateSchema.pre('save', function (next) {
   const certificate = this;
