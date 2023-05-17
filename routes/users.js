@@ -436,5 +436,24 @@ router.post('/preferences', (req, res) => {
 });
 
 
+router.post('/skills', (req, res) => {
+  const { email, skills } = req.body;
+
+  // Find the user by email and update their skills
+  User.findOneAndUpdate({ email }, { skills }, { new: true })
+    .then(user => {
+      if (!user) {
+        res.status(404).json({ message: 'User not found' });
+      } else {
+        res.json({ message: 'skills updated successfully' });
+      }
+    })
+    .catch(error => {
+      console.error(error);
+      res.status(500).json({ message: 'Internal server error' });
+    });
+});
+
+
 
 module.exports = router;
