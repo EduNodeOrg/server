@@ -40,6 +40,23 @@ const CoursSchema = new mongoose.Schema({
     type: Boolean,
     required: false
   },
+  feedbacks: [
+    {
+
+      rate: {
+        type: Number,
+        required: true,
+      },
+      text: {
+        type: String,
+        required: false,
+      },
+      email: {
+        type: String,
+        required: true,
+      },
+    },
+  ],
   
   
 },

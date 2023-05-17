@@ -38,5 +38,42 @@ router.get("/cours", async (req, res) => {
     }
   });
   
+  router.get('/cours/:courseId', async (req, res) => {
+    const courseId = req.params.postId;
+    try {
+      const cours = await Cours.findById(courseId);
+      if (!cours) {
+        return res.status(404).json({ error: 'course not found' });
+      }
+      const feedbacks = cours.feedbacks;
+      res.json(feedbacks);
+    } catch (err) {
+      console.error(err);
+      res.status(500).json({ error: 'Server error' });
+    }
+  });
+
+  router.post('/cours/:courseId', async (req, res) => {
+    const courseId = req.params.courseId;
+    const newFeedback = {
+      rate:req.body.rate,
+      text: req.body.text,
+      email: req.body.email,
+    };
+  
+    try {
+      const cours = await Cours.findById(courseId);
+      if (!cours) {
+        return res.status(404).json({ error: 'course not found' });
+      }
+      cours.feedbacks.push(newFeedback);
+      await cours.save();
+      res.json(cours);
+    } catch (err) {
+      console.error(err);
+      res.status(500).json({ error: 'Server error' });
+    }
+  });
+
 
 module.exports = router;
