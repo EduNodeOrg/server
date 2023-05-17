@@ -52,11 +52,11 @@ app.get('/.well-known/stellar.toml', (req, res) => {
 });
 
 app.get('/.well-known/ai-plugin.json', (req, res) => {
-  console.log("hi")
+  console.log("hi");
   const tomlFilePath = __dirname + '/ai-plugin.json';
-  const pluginContent = fs.readFileSync(tomlFilePath, 'utf8');
-  res.send(pluginContent);
+  res.sendFile(tomlFilePath);
 });
+
 
 const confirm = require('./routes/confirm');
 const users = require('./routes/users');
