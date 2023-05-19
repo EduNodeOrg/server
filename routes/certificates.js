@@ -158,7 +158,7 @@ router.post("/diploma1", async (req, res) => {
     console.log('issuerPublicKey', issuerPublicKey);
     console.log('issuerPublicKey', distributorPublicKey);
     // Replace the token with your own API key
-    const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkaWQ6ZXRocjoweDlhYjlGNDI0Mzk2OGVEOTVmYThCYTVEMDEwQjU0YzE4N2M3ZWZlZjMiLCJpc3MiOiJ3ZWIzLXN0b3JhZ2UiLCJpYXQiOjE2ODEyMDY5MDQyNDMsIm5hbWUiOiJlZHVub2RlIn0.oVxeBO1VhEXwYvU5CnNUs5tYnx4lVm55oLkweDX7kJQ";
+    const token = process.env.WEBTHREE_API_TOKEN;
 
     const client = new Web3Storage({ token })
     const img = await Jimp.read('operation.png')
@@ -347,8 +347,8 @@ router.post("/diploma3", async (req, res) => {
     console.log('issuerPublicKey', issuerPublicKey);
     console.log('issuerPublicKey', distributorPublicKey);
     // Replace the token with your own API key
-    const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkaWQ6ZXRocjoweDlhYjlGNDI0Mzk2OGVEOTVmYThCYTVEMDEwQjU0YzE4N2M3ZWZlZjMiLCJpc3MiOiJ3ZWIzLXN0b3JhZ2UiLCJpYXQiOjE2ODEyMDY5MDQyNDMsIm5hbWUiOiJlZHVub2RlIn0.oVxeBO1VhEXwYvU5CnNUs5tYnx4lVm55oLkweDX7kJQ";
-
+    const token = process.env.WEBTHREE_API_TOKEN;v
+    
     const client = new Web3Storage({ token })
     const img = await Jimp.read('sep.png')
     const font = await Jimp.loadFont(Jimp.FONT_SANS_32_BLACK)
@@ -442,7 +442,7 @@ router.post("/diploma4", async (req, res) => {
     console.log('issuerPublicKey', issuerPublicKey);
     console.log('issuerPublicKey', distributorPublicKey);
     // Replace the token with your own API key
-    const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkaWQ6ZXRocjoweDlhYjlGNDI0Mzk2OGVEOTVmYThCYTVEMDEwQjU0YzE4N2M3ZWZlZjMiLCJpc3MiOiJ3ZWIzLXN0b3JhZ2UiLCJpYXQiOjE2ODEyMDY5MDQyNDMsIm5hbWUiOiJlZHVub2RlIn0.oVxeBO1VhEXwYvU5CnNUs5tYnx4lVm55oLkweDX7kJQ";
+    const token = process.env.WEBTHREE_API_TOKEN;
 
     const client = new Web3Storage({ token })
     const img = await Jimp.read('hyperledger.png')
@@ -536,7 +536,7 @@ router.post("/diploma5", async (req, res) => {
     console.log('issuerPublicKey', issuerPublicKey);
     console.log('issuerPublicKey', distributorPublicKey);
     // Replace the token with your own API key
-    const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkaWQ6ZXRocjoweDlhYjlGNDI0Mzk2OGVEOTVmYThCYTVEMDEwQjU0YzE4N2M3ZWZlZjMiLCJpc3MiOiJ3ZWIzLXN0b3JhZ2UiLCJpYXQiOjE2ODEyMDY5MDQyNDMsIm5hbWUiOiJlZHVub2RlIn0.oVxeBO1VhEXwYvU5CnNUs5tYnx4lVm55oLkweDX7kJQ";
+    const token = process.env.WEBTHREE_API_TOKEN;
 
     const client = new Web3Storage({ token })
     const img = await Jimp.read('soroban.png')
@@ -581,7 +581,7 @@ router.post("/diploma5", async (req, res) => {
 
   
     const newNotification = new Notification({
-      message: 'Congrats! You have a new certification for the Hyperledger Course',
+      message: 'Congrats! You have a new certification for the Soroban Course',
       time: new Date(),
       email: req.body.email,
     });
@@ -630,7 +630,7 @@ router.post("/diploma6", async (req, res) => {
     console.log('issuerPublicKey', issuerPublicKey);
     console.log('issuerPublicKey', distributorPublicKey);
     // Replace the token with your own API key
-    const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkaWQ6ZXRocjoweDlhYjlGNDI0Mzk2OGVEOTVmYThCYTVEMDEwQjU0YzE4N2M3ZWZlZjMiLCJpc3MiOiJ3ZWIzLXN0b3JhZ2UiLCJpYXQiOjE2ODEyMDY5MDQyNDMsIm5hbWUiOiJlZHVub2RlIn0.oVxeBO1VhEXwYvU5CnNUs5tYnx4lVm55oLkweDX7kJQ";
+   const token = process.env.WEBTHREE_API_TOKEN;
 
     const client = new Web3Storage({ token })
     const img = await Jimp.read('euthereum.png')
@@ -675,7 +675,7 @@ router.post("/diploma6", async (req, res) => {
 
   
     const newNotification = new Notification({
-      message: 'Congrats! You have a new certification for the Hyperledger Course',
+      message: 'Congrats! You have a new certification for the Ethereum Course',
       time: new Date(),
       email: req.body.email,
     });
@@ -725,8 +725,8 @@ router.post("/diploma7", async (req, res) => {
     console.log('issuerPublicKey', issuerPublicKey);
     console.log('issuerPublicKey', distributorPublicKey);
     // Replace the token with your own API key
-    const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkaWQ6ZXRocjoweDlhYjlGNDI0Mzk2OGVEOTVmYThCYTVEMDEwQjU0YzE4N2M3ZWZlZjMiLCJpc3MiOiJ3ZWIzLXN0b3JhZ2UiLCJpYXQiOjE2ODEyMDY5MDQyNDMsIm5hbWUiOiJlZHVub2RlIn0.oVxeBO1VhEXwYvU5CnNUs5tYnx4lVm55oLkweDX7kJQ";
-
+    const token = process.env.WEBTHREE_API_TOKEN;
+    
     const client = new Web3Storage({ token })
     const img = await Jimp.read('oracles.png')
     const font = await Jimp.loadFont(Jimp.FONT_SANS_64_BLACK)
@@ -770,7 +770,7 @@ router.post("/diploma7", async (req, res) => {
 
   
     const newNotification = new Notification({
-      message: 'Congrats! You have a new certification for the Hyperledger Course',
+      message: 'Congrats! You have a new certification for the Oracles Course',
       time: new Date(),
       email: req.body.email,
     });
