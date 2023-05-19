@@ -129,6 +129,8 @@ router.post("/diploma1", async (req, res) => {
   res.header("Access-Control-Allow-Methods", "GET,PUT,POST,DELETE,OPTIONS");
   res.header("Access-Control-Allow-Headers","Origin,X-Requested-With,Content-Type,Accept,content-type,application/json" );
   res.header("Content-Type", "application/json");
+
+  try {
   // Store the issuer and distributor key to mongoDB
 
   console.log("test")
@@ -219,8 +221,15 @@ router.post("/diploma1", async (req, res) => {
     await newNotification.save();
     
     console.log('notification saved !')
+  } catch (error) {
+    console.error(error);
+    res.status(500).send("Server Error");
   
-
+    process.on("unhandledRejection", (error) => {
+      console.error("Unhandled Promise Rejection:", error);
+      // Optionally, you can perform additional error handling or logging here
+    });
+  }
 });
 
 router.post("/diploma2", async (req, res) => {
@@ -231,7 +240,7 @@ router.post("/diploma2", async (req, res) => {
   res.header("Access-Control-Allow-Headers","Origin,X-Requested-With,Content-Type,Accept,content-type,application/json" );
   res.header("Content-Type", "application/json");
   // Store the issuer and distributor key to mongoDB
-
+  try {
   console.log("test")
   const saltRounds = 10; // Number of salt rounds for bcrypt to use
   // Issuer
@@ -319,8 +328,17 @@ router.post("/diploma2", async (req, res) => {
     await newNotification.save();
     
     console.log('notification saved !')
- 
-});
+  } catch (error) {
+    console.error(error);
+    res.status(500).send("Server Error");
+  
+    process.on("unhandledRejection", (error) => {
+      console.error("Unhandled Promise Rejection:", error);
+      // Optionally, you can perform additional error handling or logging here
+    });
+  }
+
+  });
 
 router.post("/diploma3", async (req, res) => {
   res.header("Access-Control-Allow-Origin", "*");
