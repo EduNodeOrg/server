@@ -54,7 +54,26 @@ User.findOne({ email })
 })
 
 
+router.get('/user/:email', async (req, res) => {
+  try {
+    const { email } = req.params;
 
+    // Find the user by email
+    const user = await User.findOne({ email });
+
+    // Check if the user exists
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    // Return the user information
+    res.json(user);
+  } catch (err) {
+    // Handle any errors
+    console.error(err);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
 
 
   module.exports = router;
