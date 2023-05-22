@@ -57,6 +57,10 @@ const CoursSchema = new mongoose.Schema({
       },
     },
   ],
+  feedbacksavg:{
+    type: Number,
+    required: false,
+  }
   
   
 },

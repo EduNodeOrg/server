@@ -76,4 +76,40 @@ router.get("/cours", async (req, res) => {
   });
 
 
+  // GET average rating for a specific course
+router.get('/courses/:id/average-rating', async (req, res) => {
+  try {
+    const courseId = req.params.id;
+
+    // Find the course by ID
+    const course = await Cours.findById(courseId);
+
+    if (!course) {
+      return res.status(404).json({ message: 'Course not found' });
+    }
+
+    // Calculate the average rating
+    const totalRatings = course.feedbacks.length;
+    let sumRatings = 0;
+
+    for (const feedback of course.feedbacks) {
+      sumRatings += feedback.rate;
+    }
+
+    const averageRating = totalRatings > 0 ? sumRatings / totalRatings : 0;
+
+    // Update the course's average rating field
+    course.feedbacksavg = averageRating;
+    await course.save();
+
+    res.json({ averageRating });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Server Error' });
+  }
+});
+
+module.exports = router;
+
+
 module.exports = router;
