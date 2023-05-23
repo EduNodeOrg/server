@@ -60,7 +60,19 @@ const CoursSchema = new mongoose.Schema({
   feedbacksavg:{
     type: Number,
     required: false,
-  }
+  },
+  comments: [
+    {
+      text: {
+        type: String,
+        required: true,
+      },
+      email: {
+        type: String,
+        required: true,
+      },
+    },
+  ],
   
   
 },

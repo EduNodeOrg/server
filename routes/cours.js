@@ -122,6 +122,48 @@ router.get("/course/:id", async (req, res) => {
   }
 });
 
+// Route for adding a comment
+router.post('/comments/:courseId', async (req, res) => {
+  const courseId = req.params.courseId;
+  const newComment = {
+    text: req.body.text,
+    email: req.body.email,
+  };
+
+  try {
+    const course = await Cours.findById(courseId);
+    if (!course) {
+      return res.status(404).json({ error: 'Course not found' });
+    }
+    course.comments.push(newComment);
+    await course.save();
+    res.json(course);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
+
+
+
+router.get('/comments/:courseId', async (req, res) => {
+  const courseId = req.params.courseId;
+  try {
+    const course = await Cours.findById(courseId);
+    if (!course) {
+      return res.status(404).json({ error: 'Course not found' });
+    }
+    const comments = course.comments;
+    res.json(comments);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
+
+
 module.exports = router;
 
 
