@@ -39,7 +39,7 @@ router.get("/cours", async (req, res) => {
   });
   
   router.get('/cours/:courseId', async (req, res) => {
-    const courseId = req.params.postId;
+    const courseId = req.params.courseId;
     try {
       const cours = await Cours.findById(courseId);
       if (!cours) {
@@ -106,6 +106,19 @@ router.get('/courses/:id/average-rating', async (req, res) => {
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: 'Server Error' });
+  }
+});
+
+
+router.get("/course/:id", async (req, res) => {
+  try {
+    const course = await Cours.findById(req.params.id).populate("author", "_id name email");
+    if (!course) {
+      return res.status(404).send({ error: "course not found" });
+    }
+    res.send(course);
+  } catch (error) {
+    res.status(500).send({ error: error.message });
   }
 });
 
