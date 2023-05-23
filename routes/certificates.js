@@ -131,57 +131,64 @@ router.post("/diploma1", async (req, res) => {
   res.header("Content-Type", "application/json");
 
   try {
-  // Store the issuer and distributor key to mongoDB
+  
+    // Store the issuer and distributor key to MongoDB
 
-  console.log("test")
-  const saltRounds = 10; // Number of salt rounds for bcrypt to use
-  // Issuer
-  const issuerKeyPair = SorobanClient.Keypair.random();
-  const issuerSecretKey = issuerKeyPair.secret();
-  const issuerPublicKey = issuerKeyPair.publicKey();
-  // Distributor
-  const distributorKeyPair = SorobanClient.Keypair.random();
-  const distributorSecretKey = distributorKeyPair.secret();
-  const distributorPublicKey = distributorKeyPair.publicKey();
-  // Store the issuer and distributor key to mongoDB
-  const hashedIssuerSecretKey = await bcrypt.hash(issuerSecretKey, saltRounds);
-  const hashedDistributorSecretKey = await bcrypt.hash(distributorSecretKey, saltRounds);
-  try {
+    console.log("test");
+    const saltRounds = 10; // Number of salt rounds for bcrypt to use
+    // Issuer
+    const issuerKeyPair = SorobanClient.Keypair.random();
+    const issuerSecretKey = issuerKeyPair.secret();
+    const issuerPublicKey = issuerKeyPair.publicKey();
+    // Distributor
+    const distributorKeyPair = SorobanClient.Keypair.random();
+    const distributorSecretKey = distributorKeyPair.secret();
+    const distributorPublicKey = distributorKeyPair.publicKey();
+    // Store the issuer and distributor key to MongoDB
+    const hashedIssuerSecretKey = await bcrypt.hash(issuerSecretKey, saltRounds);
+    const hashedDistributorSecretKey = await bcrypt.hash(
+      distributorSecretKey,
+      saltRounds
+    );
+
     const newCertificate = new Certificate({
-
       name: req.body.name,
       email: req.body.email,
       pkey: req.body.pkey,
-      cid: null,// Initialize cid to null,
+      cid: null, // Initialize cid to null,
       certificateNumber: Math.floor(Math.random() * 1000000),
       issuerSecretKey: hashedIssuerSecretKey,
       issuerPublicKey: issuerPublicKey,
       distributorSecretKey: hashedDistributorSecretKey,
       distributorPublicKey: distributorPublicKey,
-
     });
+
     const savedCertificate = await newCertificate.save();
-    console.log('issuerPublicKey', issuerPublicKey);
-    console.log('issuerPublicKey', distributorPublicKey);
+    console.log("issuerPublicKey", issuerPublicKey);
+    console.log("issuerPublicKey", distributorPublicKey);
     // Replace the token with your own API key
     const token = process.env.WEBTHREE_API_TOKEN;
-
-    const client = new Web3Storage({ token })
-    const img = await Jimp.read('operation.png')
-    const font = await Jimp.loadFont(Jimp.FONT_SANS_32_BLACK)
+    
+    //server.getAccount(issuerPublicKey).then(function (r) {
+     // console.log(r);
+    //});
+    const client = new Web3Storage({ token });
+    const img = await Jimp.read("operation.png");
+    const font = await Jimp.loadFont(Jimp.FONT_SANS_32_BLACK);
     img.print(font, 150, 350, req.body.name);
-    img.write('newdiplomav2.jpg'); // save
+    img.write("newdiplomav2.jpg"); // save
 
     const putFilesToWeb3Storage = async () => {
-      const files = await getFilesFromPath('newdiplomav2.jpg')
-      const cid = await client.put(files)
-      console.log('stored files with cid:', cid)
+      const files = await getFilesFromPath("newdiplomav2.jpg");
+      const cid = await client.put(files);
+      console.log("stored files with cid:", cid);
       return cid;
-    }
+    };
 
     const cid = await retry(
       async (bail, attempt) => {
         console.log(`Attempt ${attempt} putting files to web3.storage...`);
+       
         const result = await putFilesToWeb3Storage();
         return result;
       },
@@ -192,8 +199,6 @@ router.post("/diploma1", async (req, res) => {
         onRetry: (error, attempt) => {
           console.log(`Attempt ${attempt} failed: ${error}`);
         },
-
-        
       }
     );
 
@@ -203,34 +208,26 @@ router.post("/diploma1", async (req, res) => {
 
 
 
-    res.status(200).json(savedCertificate);
-  } catch (error) {
-    console.error(error);
-    res.status(500).send("Server Errorr");
-  }
+  const newNotification = new Notification({
+    message:
+      "Congrats! You have a new certification for the Basic Concepts Course",
+    time: new Date(),
+    email: req.body.email,
+  });
 
-  
-    const newNotification = new Notification({
-      message: 'Congrats! You have a new certification for the Operations Course  ',
-      time: new Date(),
-      email: req.body.email,
-    });
-  
-  
-  
-    await newNotification.save();
-    
-    console.log('notification saved !')
-  } catch (error) {
-    console.error(error);
-    res.status(500).send("Server Error");
-  
-    process.on("unhandledRejection", (error) => {
-      console.error("Unhandled Promise Rejection:", error);
-      // Optionally, you can perform additional error handling or logging here
-    });
-  }
-});
+  await newNotification.save();
+
+  res.status(200).json(savedCertificate);
+} catch (error) {
+  console.error(error);
+  res.status(500).send("Server Error");
+
+  process.on("unhandledRejection", (error) => {
+    console.error("Unhandled Promise Rejection:", error);
+    // Optionally, you can perform additional error handling or logging here
+  });
+
+}});
 
 router.post("/diploma2", async (req, res) => {
 
