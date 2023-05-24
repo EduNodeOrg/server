@@ -4,12 +4,32 @@ const mongoose = require("mongoose");
 const cors = require("cors");
 dotenv.config({ path: './config/config.env' });
 const fs = require('fs');
+const passport =require('passport');
+const cookieSession =require('cookie-session');
+const authRoute = require("./routes/oauth");
+const passportStrategy = require("./passport");
 
 const PORT = process.env.PORT || 5001 
 
 const app = express();
+app.use(
+   cookieSession({
+    name:'session',
+    keys:['cyberwolve'],
+    macAge:24*60*60*100,
+   })
+)
 
-app.use(cors());
+app.use(passport.initialize())
+app.use(passport.session())
+app.use(
+	cors({
+		origin: "http://localhost:3000",
+		methods: "GET,POST,PUT,DELETE",
+		credentials: true,
+	})
+);
+//app.use(cors());
 app.use(express.json()); 
 app.use(function(req, res, next) {
   res.header("Access-Control-Allow-Origin", '*');
@@ -87,7 +107,7 @@ const cours = require("./routes/cours");
 const google = require("./routes/google")
 const blog = require("./routes/blog")
 const chat = require("./routes/chat")
-
+const passportSetup = require('./passport')
 app.use('/api/gcallback', gcallback);
 app.use('/api/search', search);
 app.use('/api/users', users);
@@ -117,7 +137,7 @@ app.use("/api/cours", cours);
 app.use("/api/google", google);
 app.use("/api/blog", blog);
 app.use("/api/chat", chat);
-
+app.use("/auth", authRoute);
 
 
 

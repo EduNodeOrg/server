@@ -3,7 +3,9 @@ const router = express.Router();
 const User = require('../models/User');
 const bcrypt = require('bcryptjs');
 const jwt = require("jsonwebtoken");
-
+const {OAuth2Client} = require('google-auth-library');
+const passport =require('passport');
+const cookieSession =require('cookie-session');
 router.post('/', function (req, res) {
    res.header("Access-Control-Allow-Origin", '*');
    res.header("Access-Control-Allow-Credentials", true);
@@ -74,6 +76,51 @@ router.get('/user/:email', async (req, res) => {
     res.status(500).json({ error: 'Internal Server Error' });
   }
 });
+
+/*
+const clientId = "249576166536-ctede4ekn8eipj22eucggedpbpirg6dc.apps.googleusercontent.com";
+const client = new OAuth2Client(clientId);
+const oauth2Client = new google.auth.OAuth2(
+  process.env.GOOGLE_CLIENT_ID,
+  process.env.GOOGLE_CLIENT_SECRET,
+  process.env.REDIRECT_URL
+);
+
+router.get('/auth/google/url', (req, res) => {
+  const scopes = [
+    'https://www.googleapis.com/auth/userinfo.profile',
+    'https://www.googleapis.com/auth/userinfo.email',
+  ];
+
+  const url = oauth2Client.generateAuthUrl({
+    access_type: 'offline',
+    scope: scopes
+  });
+
+  res.json({ url });
+});
+
+router.get('/auth/google/callback', async (req, res) => {
+  const { code } = req.query;
+
+  try {
+    const { tokens } = await oauth2Client.getToken(code);
+    oauth2Client.setCredentials(tokens);
+
+    // Now you can use 'oauth2Client' to make requests.
+    const oauth2 = google.oauth2({ auth: oauth2Client, version: 'v2' });
+    const userInfo = await oauth2.userinfo.get();
+
+    // Handle or send 'userInfo.data' as you wish.
+    res.json(userInfo.data);
+    console.log(userInfo.data)
+  } catch (error) {
+    res.status(400).json({ error: 'Error trying to get user info' });
+  }
+});
+*/
+
+
 
 
   module.exports = router;
