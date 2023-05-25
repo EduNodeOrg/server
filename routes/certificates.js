@@ -174,8 +174,8 @@ router.post("/diploma1", async (req, res) => {
     //});
     const client = new Web3Storage({ token });
     const img = await Jimp.read("operation.png");
-    const font = await Jimp.loadFont(Jimp.FONT_SANS_64_BLACK);
-    img.print(font,700, 800, req.body.name);
+    const font = await Jimp.loadFont(Jimp.FONT_SANS_128_BLACK);
+    img.print(font,400, 740, req.body.name);
     img.write("newdiplomav2.jpg"); // save
 
     const putFilesToWeb3Storage = async () => {
@@ -273,8 +273,8 @@ router.post("/diploma2", async (req, res) => {
      const token=process.env.WEBTHREE_API_TOKEN;
     const client = new Web3Storage({ token })
     const img = await Jimp.read('anchors.png')
-    const font = await Jimp.loadFont(Jimp.FONT_SANS_32_BLACK)
-    img.print(font, 150, 350, req.body.name);
+    const font = await Jimp.loadFont(Jimp.FONT_SANS_128_BLACK);
+    img.print(font,400, 740, req.body.name);
     img.write('newdiplomav2.jpg'); // save
 
     const putFilesToWeb3Storage = async () => {
@@ -378,8 +378,8 @@ router.post("/diploma3", async (req, res) => {
     
     const client = new Web3Storage({ token })
     const img = await Jimp.read('sep.png')
-    const font = await Jimp.loadFont(Jimp.FONT_SANS_32_BLACK)
-    img.print(font, 150, 350, req.body.name);
+    const font = await Jimp.loadFont(Jimp.FONT_SANS_128_BLACK);
+    img.print(font,400, 740, req.body.name);
     img.write('newdiplomav2.jpg'); // save
 
     const putFilesToWeb3Storage = async () => {
@@ -477,8 +477,8 @@ router.post("/diploma4", async (req, res) => {
 
     const client = new Web3Storage({ token })
     const img = await Jimp.read('hyperledger.png')
-    const font = await Jimp.loadFont(Jimp.FONT_SANS_64_BLACK)
-    img.print(font, 400, 500, req.body.name);
+    const font = await Jimp.loadFont(Jimp.FONT_SANS_128_BLACK);
+    img.print(font,400, 740, req.body.name);
     img.write('newdiplomav2.jpg'); // save
 
     const putFilesToWeb3Storage = async () => {
@@ -575,8 +575,8 @@ router.post("/diploma5", async (req, res) => {
 
     const client = new Web3Storage({ token })
     const img = await Jimp.read('soroban.png')
-    const font = await Jimp.loadFont(Jimp.FONT_SANS_64_BLACK)
-    img.print(font, 400, 500, req.body.name);
+    const font = await Jimp.loadFont(Jimp.FONT_SANS_128_BLACK);
+    img.print(font,400, 740, req.body.name);
     img.write('newdiplomav2.jpg'); // save
 
     const putFilesToWeb3Storage = async () => {
@@ -673,8 +673,8 @@ router.post("/diploma6", async (req, res) => {
 
     const client = new Web3Storage({ token })
     const img = await Jimp.read('euthereum.png')
-    const font = await Jimp.loadFont(Jimp.FONT_SANS_64_BLACK)
-    img.print(font, 400, 500, req.body.name);
+    const font = await Jimp.loadFont(Jimp.FONT_SANS_128_BLACK);
+    img.print(font,400, 740, req.body.name);
     img.write('newdiplomav2.jpg'); // save
 
     const putFilesToWeb3Storage = async () => {
@@ -772,8 +772,8 @@ router.post("/diploma7", async (req, res) => {
     
     const client = new Web3Storage({ token })
     const img = await Jimp.read('oracles.png')
-    const font = await Jimp.loadFont(Jimp.FONT_SANS_64_BLACK)
-    img.print(font, 400, 500, req.body.name);
+    const font = await Jimp.loadFont(Jimp.FONT_SANS_128_BLACK);
+    img.print(font,400, 740, req.body.name);
     img.write('newdiplomav2.jpg'); // save
 
     const putFilesToWeb3Storage = async () => {
