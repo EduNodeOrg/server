@@ -866,7 +866,7 @@ router.get("/pkey/:pkey", async (req, res) => {
 });
 
 // Define the route to get a certificate by its certificate number
-router.get('/:certificateNumber', async (req, res) => {
+router.get('/cert/:certificateNumber', async (req, res) => {
   try {
     const certificateNumber = req.params.certificateNumber;
     const certificate = await Certificate.findOne({ certificateNumber });

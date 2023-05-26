@@ -108,6 +108,8 @@ const google = require("./routes/google")
 const blog = require("./routes/blog")
 const chat = require("./routes/chat")
 const passportSetup = require('./passport')
+
+
 app.use('/api/gcallback', gcallback);
 app.use('/api/search', search);
 app.use('/api/users', users);
