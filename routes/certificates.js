@@ -848,6 +848,7 @@ router.get("/:email", async (req, res) => {
     res.status(500).send("Server Error");
   }
 });
+
 router.get("/pkey/:pkey", async (req, res) => {
   try {
     const certificates = await Certificate.find({ pkey: req.params.pkey });
@@ -864,10 +865,21 @@ router.get("/pkey/:pkey", async (req, res) => {
   }
 });
 
-router.get('/:certificateNumber', (req, res) => {
-  const certificateNumber = req.params.certificateNumber;
-  // Fetch the certificate image data based on the certificateNumber
-  // Send the image data back to the client as a response
+// Define the route to get a certificate by its certificate number
+router.get('/:certificateNumber', async (req, res) => {
+  try {
+    const certificateNumber = req.params.certificateNumber;
+    const certificate = await Certificate.findOne({ certificateNumber });
+
+    if (!certificate) {
+      return res.status(404).json({ error: 'Certificate not found' });
+    }
+
+    res.json(certificate);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
 });
 
 router.get("/count/:email", async (req, res) => {
@@ -884,6 +896,7 @@ router.get("/count/:email", async (req, res) => {
     res.status(500).send("Server Error");
   }
 });
+
 router.get("/count/pkey/:pkey", async (req, res) => {
   try {
     const { pkey } = req.params;
