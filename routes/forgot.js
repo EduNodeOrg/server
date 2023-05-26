@@ -41,7 +41,7 @@ async function main(request) {
        to: request.email, // list of receivers
        subject: "Reset Password", // Subject line
        text: "Reset Password :)", // plain text body
-       html: `Please click here to reset your password: <b>http://localhost:3000/reset/${id}</b>` 
+       html: `Please click here to reset your password: <b>https://edunode.org/reset/${id}</b>` 
       }
       
       
