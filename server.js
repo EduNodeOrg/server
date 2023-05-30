@@ -8,10 +8,16 @@ const passport =require('passport');
 const cookieSession =require('cookie-session');
 const authRoute = require("./routes/oauth");
 const passportStrategy = require("./passport");
+const bodyParser = require('body-parser');
+
 
 const PORT = process.env.PORT || 5001 
 
 const app = express();
+
+// Increase the maximum size limit to 10MB
+app.use(bodyParser.json({ limit: '20mb' }));
+
 app.use(
    cookieSession({
     name:'session',
