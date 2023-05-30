@@ -76,8 +76,13 @@ const UserSchema = new mongoose.Schema({
     type: [String],
     required: false,
     default:[]
+  },
+  images: {
+    type: [String], 
+    required: false
   }
 },
+
 
 );
 
