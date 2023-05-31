@@ -20,11 +20,11 @@ router.post("/diploma", async (req, res) => {
   res.header("Access-Control-Allow-Origin", "*");
   res.header("Access-Control-Allow-Credentials", true);
   res.header("Access-Control-Allow-Methods", "GET,PUT,POST,DELETE,OPTIONS");
-  res.header("Access-Control-Allow-Headers","Origin,X-Requested-With,Content-Type,Accept,content-type,application/json" );
+  res.header("Access-Control-Allow-Headers", "Origin,X-Requested-With,Content-Type,Accept,content-type,application/json");
   res.header("Content-Type", "application/json");
 
   try {
-  
+   
     // Store the issuer and distributor key to MongoDB
 
     console.log("test");
@@ -61,9 +61,9 @@ router.post("/diploma", async (req, res) => {
     console.log("issuerPublicKey", distributorPublicKey);
     // Replace the token with your own API key
     const token = process.env.WEBTHREE_API_TOKEN;
-    
+
     //server.getAccount(issuerPublicKey).then(function (r) {
-     // console.log(r);
+    // console.log(r);
     //});
     const client = new Web3Storage({ token });
     const img = await Jimp.read("newediploma.png");
@@ -81,7 +81,7 @@ router.post("/diploma", async (req, res) => {
     const cid = await retry(
       async (bail, attempt) => {
         console.log(`Attempt ${attempt} putting files to web3.storage...`);
-       
+
         const result = await putFilesToWeb3Storage();
         return result;
       },
@@ -101,59 +101,41 @@ router.post("/diploma", async (req, res) => {
 
 
 
-  const newNotification = new Notification({
-    message:
-      "Congrats! You have a new certification for the Basic Concepts Course",
-    time: new Date(),
-    email: req.body.email,
-  });
+    const newNotification = new Notification({
+      message:
+        "Congrats! You have a new certification for the Basic Concepts Course",
+      time: new Date(),
+      email: req.body.email,
+    });
 
-  await newNotification.save();
+    await newNotification.save();
 
-  res.status(200).json(savedCertificate);
-} catch (error) {
-  console.error(error);
-  res.status(500).send("Server Error");
-
-  process.on("unhandledRejection", (error) => {
-    console.error("Unhandled Promise Rejection:", error);
-    // Optionally, you can perform additional error handling or logging here
-  });
-
-
-
-  const { email } = req.body;
-  try {
-    // Find the user by their email
-    const user = await User.findOne({ email });
-
-    if (!user) {
-      return res.status(404).json({ message: 'User not found' });
-    }
-
-    // Increment the trophy value by 1
-    user.CoursesTrophy += 1;
-
-    // Save the updated user to the database
-    await user.save();
-
-    return res.status(200).json({ message: 'Trophy incremented successfully' });
+    res.status(200).json(savedCertificate);
   } catch (error) {
     console.error(error);
-    return res.status(500).json({ message: 'Server error' });
+    res.status(500).send("Server Error");
+
+    process.on("unhandledRejection", (error) => {
+      console.error("Unhandled Promise Rejection:", error);
+      // Optionally, you can perform additional error handling or logging here
+    });
+
+
+
+
   }
-}});
+});
 
 
 router.post("/diploma1", async (req, res) => {
   res.header("Access-Control-Allow-Origin", "*");
   res.header("Access-Control-Allow-Credentials", true);
   res.header("Access-Control-Allow-Methods", "GET,PUT,POST,DELETE,OPTIONS");
-  res.header("Access-Control-Allow-Headers","Origin,X-Requested-With,Content-Type,Accept,content-type,application/json" );
+  res.header("Access-Control-Allow-Headers", "Origin,X-Requested-With,Content-Type,Accept,content-type,application/json");
   res.header("Content-Type", "application/json");
 
   try {
-  
+
     // Store the issuer and distributor key to MongoDB
 
     console.log("test");
@@ -190,14 +172,14 @@ router.post("/diploma1", async (req, res) => {
     console.log("issuerPublicKey", distributorPublicKey);
     // Replace the token with your own API key
     const token = process.env.WEBTHREE_API_TOKEN;
-    
+
     //server.getAccount(issuerPublicKey).then(function (r) {
-     // console.log(r);
+    // console.log(r);
     //});
     const client = new Web3Storage({ token });
     const img = await Jimp.read("operation.png");
     const font = await Jimp.loadFont(Jimp.FONT_SANS_128_BLACK);
-    img.print(font,400, 740, req.body.name);
+    img.print(font, 400, 740, req.body.name);
     img.write("newdiplomav2.jpg"); // save
 
     const putFilesToWeb3Storage = async () => {
@@ -210,7 +192,7 @@ router.post("/diploma1", async (req, res) => {
     const cid = await retry(
       async (bail, attempt) => {
         console.log(`Attempt ${attempt} putting files to web3.storage...`);
-       
+
         const result = await putFilesToWeb3Storage();
         return result;
       },
@@ -230,140 +212,141 @@ router.post("/diploma1", async (req, res) => {
 
 
 
-  const newNotification = new Notification({
-    message:
-      "Congrats! You have a new certification for the Basic Concepts Course",
-    time: new Date(),
-    email: req.body.email,
-  });
+    const newNotification = new Notification({
+      message:
+        "Congrats! You have a new certification for the Basic Concepts Course",
+      time: new Date(),
+      email: req.body.email,
+    });
 
-  await newNotification.save();
+    await newNotification.save();
 
-  res.status(200).json(savedCertificate);
-} catch (error) {
-  console.error(error);
-  res.status(500).send("Server Error");
+    res.status(200).json(savedCertificate);
+  } catch (error) {
+    console.error(error);
+    res.status(500).send("Server Error");
 
-  process.on("unhandledRejection", (error) => {
-    console.error("Unhandled Promise Rejection:", error);
-    // Optionally, you can perform additional error handling or logging here
-  });
+    process.on("unhandledRejection", (error) => {
+      console.error("Unhandled Promise Rejection:", error);
+      // Optionally, you can perform additional error handling or logging here
+    });
 
-}});
+  }
+});
 
 router.post("/diploma2", async (req, res) => {
 
   res.header("Access-Control-Allow-Origin", "*");
   res.header("Access-Control-Allow-Credentials", true);
   res.header("Access-Control-Allow-Methods", "GET,PUT,POST,DELETE,OPTIONS");
-  res.header("Access-Control-Allow-Headers","Origin,X-Requested-With,Content-Type,Accept,content-type,application/json" );
+  res.header("Access-Control-Allow-Headers", "Origin,X-Requested-With,Content-Type,Accept,content-type,application/json");
   res.header("Content-Type", "application/json");
   // Store the issuer and distributor key to mongoDB
   try {
-  console.log("test")
-  const saltRounds = 10; // Number of salt rounds for bcrypt to use
-  // Issuer
-  const issuerKeyPair = SorobanClient.Keypair.random();
-  const issuerSecretKey = issuerKeyPair.secret();
-  const issuerPublicKey = issuerKeyPair.publicKey();
-  // Distributor
-  const distributorKeyPair = SorobanClient.Keypair.random();
-  const distributorSecretKey = distributorKeyPair.secret();
-  const distributorPublicKey = distributorKeyPair.publicKey();
-  // Store the issuer and distributor key to mongoDB
-  const hashedIssuerSecretKey = await bcrypt.hash(issuerSecretKey, saltRounds);
-  const hashedDistributorSecretKey = await bcrypt.hash(distributorSecretKey, saltRounds);
-  try {
-    const newCertificate = new Certificate({
+    console.log("test")
+    const saltRounds = 10; // Number of salt rounds for bcrypt to use
+    // Issuer
+    const issuerKeyPair = SorobanClient.Keypair.random();
+    const issuerSecretKey = issuerKeyPair.secret();
+    const issuerPublicKey = issuerKeyPair.publicKey();
+    // Distributor
+    const distributorKeyPair = SorobanClient.Keypair.random();
+    const distributorSecretKey = distributorKeyPair.secret();
+    const distributorPublicKey = distributorKeyPair.publicKey();
+    // Store the issuer and distributor key to mongoDB
+    const hashedIssuerSecretKey = await bcrypt.hash(issuerSecretKey, saltRounds);
+    const hashedDistributorSecretKey = await bcrypt.hash(distributorSecretKey, saltRounds);
+    try {
+      const newCertificate = new Certificate({
 
-      name: req.body.name,
-      email: req.body.email,
-      pkey: req.body.pkey,
-      cid: null,// Initialize cid to null,
-      certificateNumber: Math.floor(Math.random() * 1000000),
-      issuerSecretKey: hashedIssuerSecretKey,
-      issuerPublicKey: issuerPublicKey,
-      distributorSecretKey: hashedDistributorSecretKey,
-      distributorPublicKey: distributorPublicKey,
+        name: req.body.name,
+        email: req.body.email,
+        pkey: req.body.pkey,
+        cid: null,// Initialize cid to null,
+        certificateNumber: Math.floor(Math.random() * 1000000),
+        issuerSecretKey: hashedIssuerSecretKey,
+        issuerPublicKey: issuerPublicKey,
+        distributorSecretKey: hashedDistributorSecretKey,
+        distributorPublicKey: distributorPublicKey,
 
-    });
-    const savedCertificate = await newCertificate.save();
-    console.log('issuerPublicKey', issuerPublicKey);
-    console.log('issuerPublicKey', distributorPublicKey);
-    // Replace the token with your own API key
-    //const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkaWQ6ZXRocjoweDlhYjlGNDI0Mzk2OGVEOTVmYThCYTVEMDEwQjU0YzE4N2M3ZWZlZjMiLCJpc3MiOiJ3ZWIzLXN0b3JhZ2UiLCJpYXQiOjE2ODEyMDY5MDQyNDMsIm5hbWUiOiJlZHVub2RlIn0.oVxeBO1VhEXwYvU5CnNUs5tYnx4lVm55oLkweDX7kJQ";
-     const token=process.env.WEBTHREE_API_TOKEN;
-    const client = new Web3Storage({ token })
-    const img = await Jimp.read('anchors.png')
-    const font = await Jimp.loadFont(Jimp.FONT_SANS_128_BLACK);
-    img.print(font,400, 740, req.body.name);
-    img.write('newdiplomav2.jpg'); // save
+      });
+      const savedCertificate = await newCertificate.save();
+      console.log('issuerPublicKey', issuerPublicKey);
+      console.log('issuerPublicKey', distributorPublicKey);
+      // Replace the token with your own API key
+      //const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkaWQ6ZXRocjoweDlhYjlGNDI0Mzk2OGVEOTVmYThCYTVEMDEwQjU0YzE4N2M3ZWZlZjMiLCJpc3MiOiJ3ZWIzLXN0b3JhZ2UiLCJpYXQiOjE2ODEyMDY5MDQyNDMsIm5hbWUiOiJlZHVub2RlIn0.oVxeBO1VhEXwYvU5CnNUs5tYnx4lVm55oLkweDX7kJQ";
+      const token = process.env.WEBTHREE_API_TOKEN;
+      const client = new Web3Storage({ token })
+      const img = await Jimp.read('anchors.png')
+      const font = await Jimp.loadFont(Jimp.FONT_SANS_128_BLACK);
+      img.print(font, 400, 740, req.body.name);
+      img.write('newdiplomav2.jpg'); // save
 
-    const putFilesToWeb3Storage = async () => {
-      const files = await getFilesFromPath('newdiplomav2.jpg')
-      const cid = await client.put(files)
-      console.log('stored files with cid:', cid)
-      return cid;
+      const putFilesToWeb3Storage = async () => {
+        const files = await getFilesFromPath('newdiplomav2.jpg')
+        const cid = await client.put(files)
+        console.log('stored files with cid:', cid)
+        return cid;
+      }
+
+      const cid = await retry(
+        async (bail, attempt) => {
+          console.log(`Attempt ${attempt} putting files to web3.storage...`);
+          const result = await putFilesToWeb3Storage();
+          console.log('web3')
+          return result;
+        },
+        {
+          retries: 3, // number of retries
+          minTimeout: 1000, // minimum delay in ms between retries
+          maxTimeout: 5000, // maximum delay in ms between retries
+          onRetry: (error, attempt) => {
+            console.log(`Attempt ${attempt} failed: ${error}`);
+          },
+        }
+      );
+
+      // Update the savedCertificate object with the cid
+      savedCertificate.cid = cid;
+      await savedCertificate.save();
+
+
+
+      res.status(200).json(savedCertificate);
+    } catch (error) {
+      console.error(error);
+      res.status(500).send("Server Errorr");
     }
 
-    const cid = await retry(
-      async (bail, attempt) => {
-        console.log(`Attempt ${attempt} putting files to web3.storage...`);
-        const result = await putFilesToWeb3Storage();
-        console.log('web3')
-        return result;
-      },
-      {
-        retries: 3, // number of retries
-        minTimeout: 1000, // minimum delay in ms between retries
-        maxTimeout: 5000, // maximum delay in ms between retries
-        onRetry: (error, attempt) => {
-          console.log(`Attempt ${attempt} failed: ${error}`);
-        },
-      }
-    );
 
-    // Update the savedCertificate object with the cid
-    savedCertificate.cid = cid;
-    await savedCertificate.save();
-
-
-
-    res.status(200).json(savedCertificate);
-  } catch (error) {
-    console.error(error);
-    res.status(500).send("Server Errorr");
-  }
-
-  
     const newNotification = new Notification({
       message: 'Congrats! You have a new certification for the Anchors Course',
       time: new Date(),
       email: req.body.email,
     });
-  
-  
-  
+
+
+
     await newNotification.save();
-    
+
     console.log('notification saved !')
   } catch (error) {
     console.error(error);
     res.status(500).send("Server Error");
-  
+
     process.on("unhandledRejection", (error) => {
       console.error("Unhandled Promise Rejection:", error);
       // Optionally, you can perform additional error handling or logging here
     });
   }
 
-  });
+});
 
 router.post("/diploma3", async (req, res) => {
   res.header("Access-Control-Allow-Origin", "*");
   res.header("Access-Control-Allow-Credentials", true);
   res.header("Access-Control-Allow-Methods", "GET,PUT,POST,DELETE,OPTIONS");
-  res.header("Access-Control-Allow-Headers","Origin,X-Requested-With,Content-Type,Accept,content-type,application/json" );
+  res.header("Access-Control-Allow-Headers", "Origin,X-Requested-With,Content-Type,Accept,content-type,application/json");
   res.header("Content-Type", "application/json");
   console.log("test")
   const saltRounds = 10; // Number of salt rounds for bcrypt to use
@@ -396,12 +379,12 @@ router.post("/diploma3", async (req, res) => {
     console.log('issuerPublicKey', issuerPublicKey);
     console.log('issuerPublicKey', distributorPublicKey);
     // Replace the token with your own API key
-    const token = process.env.WEBTHREE_API_TOKEN;v
-    
+    const token = process.env.WEBTHREE_API_TOKEN; v
+
     const client = new Web3Storage({ token })
     const img = await Jimp.read('sep.png')
     const font = await Jimp.loadFont(Jimp.FONT_SANS_128_BLACK);
-    img.print(font,400, 740, req.body.name);
+    img.print(font, 400, 740, req.body.name);
     img.write('newdiplomav2.jpg'); // save
 
     const putFilesToWeb3Storage = async () => {
@@ -439,26 +422,26 @@ router.post("/diploma3", async (req, res) => {
     res.status(500).send("Server Errorr");
   }
 
-  
-    const newNotification = new Notification({
-      message: 'Congrats! You have a new certification for the SEPs Course',
-      time: new Date(),
-      email: req.body.email,
-    });
-  
-  
-  
-    await newNotification.save();
-    
-    console.log('notification saved !')
- 
+
+  const newNotification = new Notification({
+    message: 'Congrats! You have a new certification for the SEPs Course',
+    time: new Date(),
+    email: req.body.email,
+  });
+
+
+
+  await newNotification.save();
+
+  console.log('notification saved !')
+
 });
 
 router.post("/diploma4", async (req, res) => {
   res.header("Access-Control-Allow-Origin", "*");
   res.header("Access-Control-Allow-Credentials", true);
   res.header("Access-Control-Allow-Methods", "GET,PUT,POST,DELETE,OPTIONS");
-  res.header("Access-Control-Allow-Headers","Origin,X-Requested-With,Content-Type,Accept,content-type,application/json" );
+  res.header("Access-Control-Allow-Headers", "Origin,X-Requested-With,Content-Type,Accept,content-type,application/json");
   res.header("Content-Type", "application/json");
 
   // Store the issuer and distributor key to mongoDB
@@ -490,7 +473,7 @@ router.post("/diploma4", async (req, res) => {
       distributorPublicKey: distributorPublicKey,
 
     });
-    
+
     const savedCertificate = await newCertificate.save();
     console.log('issuerPublicKey', issuerPublicKey);
     console.log('issuerPublicKey', distributorPublicKey);
@@ -500,7 +483,7 @@ router.post("/diploma4", async (req, res) => {
     const client = new Web3Storage({ token })
     const img = await Jimp.read('hyperledger.png')
     const font = await Jimp.loadFont(Jimp.FONT_SANS_128_BLACK);
-    img.print(font,400, 740, req.body.name);
+    img.print(font, 400, 740, req.body.name);
     img.write('newdiplomav2.jpg'); // save
 
     const putFilesToWeb3Storage = async () => {
@@ -538,25 +521,25 @@ router.post("/diploma4", async (req, res) => {
     res.status(500).send("Server Errorr");
   }
 
-  
-    const newNotification = new Notification({
-      message: 'Congrats! You have a new certification for the Hyperledger Course',
-      time: new Date(),
-      email: req.body.email,
-    });
-  
-  
-  
-    await newNotification.save();
-  
-    console.log('notification saved !')
-  
+
+  const newNotification = new Notification({
+    message: 'Congrats! You have a new certification for the Hyperledger Course',
+    time: new Date(),
+    email: req.body.email,
+  });
+
+
+
+  await newNotification.save();
+
+  console.log('notification saved !')
+
 });
 router.post("/diploma5", async (req, res) => {
   res.header("Access-Control-Allow-Origin", "*");
   res.header("Access-Control-Allow-Credentials", true);
   res.header("Access-Control-Allow-Methods", "GET,PUT,POST,DELETE,OPTIONS");
-  res.header("Access-Control-Allow-Headers","Origin,X-Requested-With,Content-Type,Accept,content-type,application/json" );
+  res.header("Access-Control-Allow-Headers", "Origin,X-Requested-With,Content-Type,Accept,content-type,application/json");
   res.header("Content-Type", "application/json");
 
   // Store the issuer and distributor key to mongoDB
@@ -588,7 +571,7 @@ router.post("/diploma5", async (req, res) => {
       distributorPublicKey: distributorPublicKey,
 
     });
-    
+
     const savedCertificate = await newCertificate.save();
     console.log('issuerPublicKey', issuerPublicKey);
     console.log('issuerPublicKey', distributorPublicKey);
@@ -598,7 +581,7 @@ router.post("/diploma5", async (req, res) => {
     const client = new Web3Storage({ token })
     const img = await Jimp.read('soroban.png')
     const font = await Jimp.loadFont(Jimp.FONT_SANS_128_BLACK);
-    img.print(font,400, 740, req.body.name);
+    img.print(font, 400, 740, req.body.name);
     img.write('newdiplomav2.jpg'); // save
 
     const putFilesToWeb3Storage = async () => {
@@ -636,25 +619,25 @@ router.post("/diploma5", async (req, res) => {
     res.status(500).send("Server Errorr");
   }
 
-  
-    const newNotification = new Notification({
-      message: 'Congrats! You have a new certification for the Soroban Course',
-      time: new Date(),
-      email: req.body.email,
-    });
-  
-  
-  
-    await newNotification.save();
-  
-    console.log('notification saved !')
-  
+
+  const newNotification = new Notification({
+    message: 'Congrats! You have a new certification for the Soroban Course',
+    time: new Date(),
+    email: req.body.email,
+  });
+
+
+
+  await newNotification.save();
+
+  console.log('notification saved !')
+
 });
 router.post("/diploma6", async (req, res) => {
   res.header("Access-Control-Allow-Origin", "*");
   res.header("Access-Control-Allow-Credentials", true);
   res.header("Access-Control-Allow-Methods", "GET,PUT,POST,DELETE,OPTIONS");
-  res.header("Access-Control-Allow-Headers","Origin,X-Requested-With,Content-Type,Accept,content-type,application/json" );
+  res.header("Access-Control-Allow-Headers", "Origin,X-Requested-With,Content-Type,Accept,content-type,application/json");
   res.header("Content-Type", "application/json");
 
   // Store the issuer and distributor key to mongoDB
@@ -686,17 +669,17 @@ router.post("/diploma6", async (req, res) => {
       distributorPublicKey: distributorPublicKey,
 
     });
-    
+
     const savedCertificate = await newCertificate.save();
     console.log('issuerPublicKey', issuerPublicKey);
     console.log('issuerPublicKey', distributorPublicKey);
     // Replace the token with your own API key
-   const token = process.env.WEBTHREE_API_TOKEN;
+    const token = process.env.WEBTHREE_API_TOKEN;
 
     const client = new Web3Storage({ token })
     const img = await Jimp.read('euthereum.png')
     const font = await Jimp.loadFont(Jimp.FONT_SANS_128_BLACK);
-    img.print(font,400, 740, req.body.name);
+    img.print(font, 400, 740, req.body.name);
     img.write('newdiplomav2.jpg'); // save
 
     const putFilesToWeb3Storage = async () => {
@@ -734,26 +717,26 @@ router.post("/diploma6", async (req, res) => {
     res.status(500).send("Server Errorr");
   }
 
-  
-    const newNotification = new Notification({
-      message: 'Congrats! You have a new certification for the Ethereum Course',
-      time: new Date(),
-      email: req.body.email,
-    });
-  
-  
-  
-    await newNotification.save();
-  
-    console.log('notification saved !')
-  
+
+  const newNotification = new Notification({
+    message: 'Congrats! You have a new certification for the Ethereum Course',
+    time: new Date(),
+    email: req.body.email,
+  });
+
+
+
+  await newNotification.save();
+
+  console.log('notification saved !')
+
 });
 
 router.post("/diploma7", async (req, res) => {
   res.header("Access-Control-Allow-Origin", "*");
   res.header("Access-Control-Allow-Credentials", true);
   res.header("Access-Control-Allow-Methods", "GET,PUT,POST,DELETE,OPTIONS");
-  res.header("Access-Control-Allow-Headers","Origin,X-Requested-With,Content-Type,Accept,content-type,application/json" );
+  res.header("Access-Control-Allow-Headers", "Origin,X-Requested-With,Content-Type,Accept,content-type,application/json");
   res.header("Content-Type", "application/json");
 
   // Store the issuer and distributor key to mongoDB
@@ -785,17 +768,17 @@ router.post("/diploma7", async (req, res) => {
       distributorPublicKey: distributorPublicKey,
 
     });
-    
+
     const savedCertificate = await newCertificate.save();
     console.log('issuerPublicKey', issuerPublicKey);
     console.log('issuerPublicKey', distributorPublicKey);
     // Replace the token with your own API key
     const token = process.env.WEBTHREE_API_TOKEN;
-    
+
     const client = new Web3Storage({ token })
     const img = await Jimp.read('oracles.png')
     const font = await Jimp.loadFont(Jimp.FONT_SANS_128_BLACK);
-    img.print(font,400, 740, req.body.name);
+    img.print(font, 400, 740, req.body.name);
     img.write('newdiplomav2.jpg'); // save
 
     const putFilesToWeb3Storage = async () => {
@@ -833,19 +816,19 @@ router.post("/diploma7", async (req, res) => {
     res.status(500).send("Server Errorr");
   }
 
-  
-    const newNotification = new Notification({
-      message: 'Congrats! You have a new certification for the Oracles Course',
-      time: new Date(),
-      email: req.body.email,
-    });
-  
-  
-  
-    await newNotification.save();
-  
-    console.log('notification saved !')
-  
+
+  const newNotification = new Notification({
+    message: 'Congrats! You have a new certification for the Oracles Course',
+    time: new Date(),
+    email: req.body.email,
+  });
+
+
+
+  await newNotification.save();
+
+  console.log('notification saved !')
+
 });
 
 router.get('/certificateNumber/:email', async (req, res) => {
@@ -941,7 +924,7 @@ router.get("/notification/:email", async (req, res) => {
       notificationMessage: notif.message,
       notificationDate: notif.date,
       email: notif.email,
-      
+
     }));
     res.status(200).json(notificationData);
   } catch (error) {
@@ -964,4 +947,30 @@ router.get("/notification/count/:email", async (req, res) => {
     res.status(500).send("Server Error");
   }
 });
+
+router.put('/increment-trophy', async (req, res) => {
+  const { email } = req.body;
+
+  try {
+    // Find the user by their email
+    const user = await User.findOne({ email });
+
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    // Increment the trophy value by 1
+    user.CoursesTrophy += 1;
+
+    // Save the updated user to the database
+    await user.save();
+
+    return res.status(200).json({ message: 'Trophy incremented successfully' });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: 'Server error' });
+  }
+});
+
+
 module.exports = router;
