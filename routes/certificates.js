@@ -12,7 +12,7 @@ const Jimp = require('jimp');
 const retry = require('async-retry');
 const fs = require('fs');
 const bcrypt = require('bcryptjs');
-
+const User = require('../models/User');
 
 app.use(cors());
 
@@ -120,6 +120,28 @@ router.post("/diploma", async (req, res) => {
     // Optionally, you can perform additional error handling or logging here
   });
 
+
+
+  const { email } = req.body;
+  try {
+    // Find the user by their email
+    const user = await User.findOne({ email });
+
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    // Increment the trophy value by 1
+    user.CoursesTrophy += 1;
+
+    // Save the updated user to the database
+    await user.save();
+
+    return res.status(200).json({ message: 'Trophy incremented successfully' });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: 'Server error' });
+  }
 }});
 
 

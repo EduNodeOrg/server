@@ -80,7 +80,11 @@ const UserSchema = new mongoose.Schema({
   images: {
     type: [String], 
     required: false
-  }
+  },
+  CoursesTrophy: {
+    type: Number,
+    default: 0,
+  },
 },
 
 
