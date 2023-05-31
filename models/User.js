@@ -85,6 +85,18 @@ const UserSchema = new mongoose.Schema({
     type: Number,
     default: 0,
   },
+  PostsTrophy: {
+    type: Number,
+    default: 0,
+  },
+  AddCoursesTrophy: {
+    type: Number,
+    default: 0,
+  },
+  ChallengesTrophy: {
+    type: Number,
+    default: 0,
+  },
 },
 
 
