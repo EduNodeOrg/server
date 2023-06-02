@@ -12,6 +12,7 @@ router.post('/', function (req, res) {
 
   const email = req.body.email;
   const name = req.body.name;
+  const images =req.body.image;
   console.log(email);
 
   User.findOne({ email })
@@ -20,7 +21,7 @@ router.post('/', function (req, res) {
         return res.status(200).json({ user, msg: "User already exists, welcome back" });
       } else {
         const confirmationCode = Math.floor(Math.random() * 90000) + 10000;
-        const newUser = new User({ email,name, confirmationCode });
+        const newUser = new User({ email,name, confirmationCode,images });
         newUser.save()
           .then(() => {
             // Generate JWT token and send it in response
@@ -36,7 +37,8 @@ router.post('/', function (req, res) {
                     id: newUser._id,
                     email: newUser.email,
                     name:newUser.name,
-                    confirmationCode: newUser.confirmationCode
+                    confirmationCode: newUser.confirmationCode,
+                    images:newUser.images
                   },
                 });
               }
