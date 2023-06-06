@@ -4,11 +4,11 @@ const User = require('../models/User');
 const bcrypt = require('bcryptjs');
 const jwt = require("jsonwebtoken");
 const { OAuth2Client } = require('google-auth-library');
-const passport = require('passport');
-const cookieSession = require('cookie-session');
-const sgMail = require('@sendgrid/mail');
-const crypto = require('crypto');
-sgMail.setApiKey('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');
+//const passport = require('passport');
+//const cookieSession = require('cookie-session');
+//const sgMail = require('@sendgrid/mail');
+//const crypto = require('crypto');
+//sgMail.setApiKey('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');
 const formData = require('form-data');
 const Mailgun = require('mailgun.js');
 const mailgun = new Mailgun(formData);
@@ -54,8 +54,8 @@ router.post('/', function (req, res) {
                 text: `Hello! Your have logged in to edunode!`
               };
 
-              mg.messages.create(domain, data);
-              mg.messages.create(data, function (error, body) {
+              
+              mg.messages.create(domain, data, function (error, body) {
                 if (error) {
                   console.log('Error sending email:', error);
                   res.status(500).json({ error: 'Error sending email' });

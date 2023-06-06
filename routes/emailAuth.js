@@ -36,8 +36,8 @@ router.post('/', function (req, res) {
           subject: 'Edunode Confirmation Code',
           text: `Hello! Your confirmation code is: ${confirmationCode}`
         };
-        mg.messages.create(domain, data);
-      mg.messages.create(data, function (error, body) {
+        
+        mg.messages.create(domain, data, function (error, body) {
         if (error) {
           console.log('Error sending email:', error);
           res.status(500).json({ error: 'Error sending email' });
