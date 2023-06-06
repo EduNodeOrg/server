@@ -12,8 +12,7 @@ const bodyParser = require('body-parser');
 const session = require('express-session');
 const MongoDBStore = require('connect-mongodb-session')(session);
 const crypto = require('crypto');
-const secretKey = crypto.randomBytes(32).toString('hex');
-console.log('Generated secret key:', secretKey);
+
 
 const PORT = process.env.PORT || 5001 
 
@@ -21,15 +20,17 @@ const app = express();
 
 // Increase the maximum size limit to 10MB
 app.use(bodyParser.json({ limit: '20mb' }));
-
+/*
 app.use(
    cookieSession({
     name:'session',
     keys:['cyberwolve'],
     macAge:24*60*60*100,
    })
-)
+)*/
 // Set up session middleware
+const secretKey = crypto.randomBytes(32).toString('hex');
+console.log('Generated secret key:', secretKey);
 app.use(session({
   secret: secretKey,
   resave: false,
@@ -39,9 +40,9 @@ app.use(session({
     collection: 'sessions',
   }),
 }));
+console.log('session set successfully');
 
-
-
+/*
 app.use(passport.initialize())
 app.use(passport.session())
 app.use(
@@ -50,8 +51,10 @@ app.use(
 		methods: "GET,POST,PUT,DELETE",
 		credentials: true,
 	})
-);
-//app.use(cors());
+);*/
+
+
+app.use(cors());
 app.use(express.json()); 
 app.use(function(req, res, next) {
   res.header("Access-Control-Allow-Origin", '*');

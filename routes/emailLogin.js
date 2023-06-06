@@ -8,7 +8,16 @@ const passport = require('passport');
 const cookieSession = require('cookie-session');
 const sgMail = require('@sendgrid/mail');
 const crypto = require('crypto');
-sgMail.setApiKey(process.env.SENDGRID_API);
+sgMail.setApiKey('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');
+const formData = require('form-data');
+const Mailgun = require('mailgun.js');
+const mailgun = new Mailgun(formData);
+const domain = "edunode.org"
+const mg = mailgun.client({username: 'api', key: "key-c8d12b7428fbe666e074108aaa0820bc" || 'key-yourkeyhere', url: 'https://api.eu.mailgun.net'});
+
+
+
+
 
 router.post('/', function (req, res) {
   res.header("Access-Control-Allow-Origin", '*');
@@ -21,19 +30,43 @@ router.post('/', function (req, res) {
   console.log(email)
   User.findOne({ email })
     .then((user) => {
-      if (user) return res.status(200).json({ user, msg: "User already exists, welcome back" });
+     // if (user) return res.status(200).json({ user, msg: "User already exists, welcome back" });
 
       //     // validation 1
       // const confirmationCode = JSON.stringify(Math.floor(Math.random() * 90000) + 10000)
       const password = req.body.password
       const email = req.body.email
-
+           console.log('login')
       User.findOne({ email })
         .then((user) => {
           if (!user) return res.status(401).json({ msg: "Invalid email or password" });
           bcrypt.compare(password, user.password, (err, isMatch) => {
             if (err) throw err;
             if (isMatch) {
+
+                     // Register session
+              req.session.userId = user.id;
+              // Send email notification
+              const data = {
+                from: 'hi@edunode.org',
+                to: email ,
+                subject: 'Welcome to Edunode ',
+                text: `Hello! Your have logged in to edunode!`
+              };
+
+              mg.messages.create(domain, data);
+              mg.messages.create(data, function (error, body) {
+                if (error) {
+                  console.log('Error sending email:', error);
+                  res.status(500).json({ error: 'Error sending email' });
+                } else {
+                  console.log('Email sent successfully:', body);
+                  res.json({ msg: 'Email sent' });
+                }
+              });
+
+
+
               jwt.sign(
                 { id: user.id }, process.env.JWT_SECRET,
                 { expiresIn: 3600 },
@@ -41,34 +74,11 @@ router.post('/', function (req, res) {
                   if (err) throw err;
                   res.json({
                     token,
-                    user: {
-                      id: user._id,
-                      email: user.email,
-                      confirmationCode: user.confirmationCode
-                    },
+                    user
                   });
                 }
               );
-              // Register session
-              req.session.userId = user._id;
-              // Send email notification
-              const msg = {
-                to: user.email,
-                from: 'hi@edunode.org',
-                subject: 'Login Notification',
-                text: 'You have successfully logged in to our website EduNode.org .',
-              };
-
-
-              sgMail.send(msg)
-                .then(() => {
-                  console.log('Login email sent.');
-                  res.json({ message: 'Login successful' });
-                })
-                .catch((error) => {
-                  console.error('Error sending login email:', error);
-                  res.json({ message: 'Login successful, but email notification failed' });
-                });
+             
 
 
             } else {
