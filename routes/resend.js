@@ -1,6 +1,5 @@
 const express = require("express");
 const router = express.Router();
-const nodemailer = require("nodemailer");
 const User = require('../models/User');
 const formData = require('form-data');
 const Mailgun = require('mailgun.js');

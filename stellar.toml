@@ -1,7 +1,7 @@
 VERSION="2.0.0"
 
 NETWORK_PASSPHRASE="Public Global Stellar Network ; September 2015"
-HORIZON_URL="https://horizon.edunode.org"
+HORIZON_URL="https://horizon.stellar.org/"
 
 [DOCUMENTATION]
 ORG_NAME="EduNode brand of OG Technologies EU"
@@ -11,11 +11,11 @@ ORG_LOGO="https://ipfs.io/ipfs/bafybeicnzq7myym5i5do3clg7fmioq2axsg7hjwdbmigde4h
 ORG_DESCRIPTION="Einzelunternehmen: Dienstleistungen in der automatischen Datenverarbeitung und Informationstechnik (IT-Services), Wirtschaftskammer Wien."
 ORG_PHYSICAL_ADDRESS="Liechtensteinstraße 111-115, 1090 Vienna, Austria"
 ORG_PHONE_NUMBER="+436604426691"
-ORG_TWITTER="og_technologies"
-ORG_OFFICIAL_EMAIL="hi@ogtechnologies.co"
+ORG_TWITTER="edunodeorg"
+ORG_OFFICIAL_EMAIL="hi@edunode.org"
 
 [[PRINCIPALS]]
 name="Olvis E. Gil Ríos"
-email="olvis@ogtechnologies.co"
+email="olvisgil@edunode.org"
 twitter="olvisgil"
 github="olvisgil"

@@ -3,6 +3,13 @@ const router = express.Router();
 const User = require('../models/User');
 const bcrypt = require('bcryptjs');
 const jwt = require("jsonwebtoken");
+const formData = require('form-data');
+const Mailgun = require('mailgun.js');
+const mailgun = new Mailgun(formData);
+const domain = "edunode.org"
+
+const mg = mailgun.client({username: 'api', key: "key-c8d12b7428fbe666e074108aaa0820bc" || 'key-yourkeyhere', url: 'https://api.eu.mailgun.net'});
+
 
 router.post('/', function (req, res) {
   res.header("Access-Control-Allow-Origin", '*');
@@ -23,7 +30,22 @@ router.post('/', function (req, res) {
         // If the user doesn't exist, create a new user
         const confirmationCode = JSON.stringify(Math.floor(Math.random() * 90000) + 10000)
         const newUser = { email, password, confirmationCode };
-        
+        const data = {
+          from: 'hi@edunode.org',
+          to: req.body.email ,
+          subject: 'Edunode Confirmation Code',
+          text: `Hello! Your confirmation code is: ${confirmationCode}`
+        };
+        mg.messages.create(domain, data);
+      mg.messages.create(data, function (error, body) {
+        if (error) {
+          console.log('Error sending email:', error);
+          res.status(500).json({ error: 'Error sending email' });
+        } else {
+          console.log('Email sent successfully:', body);
+          res.json({ msg: 'Email sent' });
+        }
+      });
         bcrypt.genSalt(10, (err, salt) => {
           bcrypt.hash(newUser.password, salt, (err, hash) => {
             if (err) throw err;
