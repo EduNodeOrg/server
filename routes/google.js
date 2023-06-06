@@ -49,7 +49,7 @@ router.post('/', function (req, res) {
         });
 
 
-        return res.status(200).json({ user, msg: "User already exists, welcome back" });
+        res.status(200).json({ user, msg: "User already exists, welcome back" });
 
 
 
