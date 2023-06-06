@@ -29,10 +29,10 @@ app.use(
    })
 )*/
 // Set up session middleware
-const secretKey = crypto.randomBytes(32).toString('hex');
-console.log('Generated secret key:', secretKey);
+//const secretKey = crypto.randomBytes(32).toString('hex');
+//console.log('Generated secret key:', secretKey);
 app.use(session({
-  secret: secretKey,
+  secret: 'cceb95c4de4ece0427c3fd2ac73bbde6bffb85ce827620a1b2edecb78a360634',
   resave: false,
   saveUninitialized: false,
   store: new MongoDBStore({

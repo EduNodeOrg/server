@@ -13,8 +13,8 @@ const formData = require('form-data');
 const Mailgun = require('mailgun.js');
 const mailgun = new Mailgun(formData);
 const domain = "edunode.org"
-const mg = mailgun.client({username: 'api', key: "key-c8d12b7428fbe666e074108aaa0820bc" || 'key-yourkeyhere', url: 'https://api.eu.mailgun.net'});
-
+const mg = mailgun.client({ username: 'api', key: "key-c8d12b7428fbe666e074108aaa0820bc" || 'key-yourkeyhere', url: 'https://api.eu.mailgun.net' });
+const session = require('express-session');
 
 
 
@@ -30,13 +30,13 @@ router.post('/', function (req, res) {
   console.log(email)
   User.findOne({ email })
     .then((user) => {
-     // if (user) return res.status(200).json({ user, msg: "User already exists, welcome back" });
+      // if (user) return res.status(200).json({ user, msg: "User already exists, welcome back" });
 
       //     // validation 1
       // const confirmationCode = JSON.stringify(Math.floor(Math.random() * 90000) + 10000)
       const password = req.body.password
       const email = req.body.email
-           console.log('login')
+      console.log('login')
       User.findOne({ email })
         .then((user) => {
           if (!user) return res.status(401).json({ msg: "Invalid email or password" });
@@ -44,17 +44,24 @@ router.post('/', function (req, res) {
             if (err) throw err;
             if (isMatch) {
 
-                     // Register session
-              req.session.userId = user.id;
+              // Register session
+              const sessionUser = {
+                id: user._id,
+                email: req.body.email,
+              };
+
+              // Store user data in the session
+              req.session.user = sessionUser;
+
               // Send email notification
               const data = {
                 from: 'hi@edunode.org',
-                to: email ,
+                to: email,
                 subject: 'Welcome to Edunode ',
                 text: `Hello! Your have logged in to edunode!`
               };
 
-              
+
               mg.messages.create(domain, data, function (error, body) {
                 if (error) {
                   console.log('Error sending email:', error);
@@ -78,7 +85,7 @@ router.post('/', function (req, res) {
                   });
                 }
               );
-             
+
 
 
             } else {
