@@ -49,7 +49,7 @@ router.post('/', function (req, res) {
         });
 
 
-        res.status(200).json({ user, msg: "User already exists, welcome back" });
+        res.json({ user, msg: "User already exists, welcome back" });
 
 
 
@@ -60,6 +60,30 @@ router.post('/', function (req, res) {
         const newUser = new User({ email, name, confirmationCode, images });
         newUser.save()
           .then(() => {
+
+            const sessionUser = {
+              name: name,
+              email: req.body.email,
+            };
+            req.session.user = sessionUser;
+    
+            // Send email notification
+            const data = {
+              from: 'hi@edunode.org',
+              to: email,
+              subject: 'Welcome to Edunode ',
+              text: `Hello! Your have logged in to edunode!`
+            };
+            mg.messages.create(domain, data, function (error, body) {
+              if (error) {
+                console.log('Error sending email:', error);
+                res.status(500).json({ error: 'Error sending email' });
+              } else {
+                console.log('Email sent successfully:', body);
+                res.json({ msg: 'Email sent' });
+              }
+            });
+
             // Generate JWT token and send it in response
             jwt.sign(
               { id: newUser.id }, process.env.JWT_SECRET,
