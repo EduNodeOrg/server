@@ -9,7 +9,11 @@ const cookieSession =require('cookie-session');
 const authRoute = require("./routes/oauth");
 const passportStrategy = require("./passport");
 const bodyParser = require('body-parser');
-
+const session = require('express-session');
+const MongoDBStore = require('connect-mongodb-session')(session);
+const crypto = require('crypto');
+const secretKey = crypto.randomBytes(32).toString('hex');
+console.log('Generated secret key:', secretKey);
 
 const PORT = process.env.PORT || 5001 
 
@@ -25,6 +29,18 @@ app.use(
     macAge:24*60*60*100,
    })
 )
+// Set up session middleware
+app.use(session({
+  secret: secretKey,
+  resave: false,
+  saveUninitialized: false,
+  store: new MongoDBStore({
+    uri: process.env.MONGO_URI, // Replace with your MongoDB connection URI
+    collection: 'sessions',
+  }),
+}));
+
+
 
 app.use(passport.initialize())
 app.use(passport.session())
