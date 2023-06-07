@@ -97,6 +97,13 @@ const UserSchema = new mongoose.Schema({
     type: Number,
     default: 0,
   },
+  resetToken: {
+    type: String
+  },
+  resetTokenExpiration: {
+    type: Date,
+    
+  },
 },
 
 

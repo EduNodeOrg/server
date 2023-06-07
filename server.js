@@ -132,7 +132,7 @@ const cours = require("./routes/cours");
 const google = require("./routes/google")
 const blog = require("./routes/blog")
 const chat = require("./routes/chat")
-const passportSetup = require('./passport')
+const password = require('./routes/reset-password')
 
 
 app.use('/api/gcallback', gcallback);
@@ -165,6 +165,7 @@ app.use("/api/google", google);
 app.use("/api/blog", blog);
 app.use("/api/chat", chat);
 app.use("/auth", authRoute);
+app.use("/api/password", password);
 
 
 
