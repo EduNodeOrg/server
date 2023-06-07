@@ -68,7 +68,7 @@ router.post('/reset-password', async (req, res) => {
 });
 
 
-router.post('/api/reset-password/:token', async (req, res) => {
+router.post('/reset-password/:token', async (req, res) => {
     const { token } = req.params;
     const { password } = req.body;
 
@@ -92,7 +92,7 @@ router.post('/api/reset-password/:token', async (req, res) => {
 });
 
 
-router.post('/api/validate-reset-token', (req, res) => {
+router.post('/validate-reset-token', (req, res) => {
     const { token } = req.body;
 
     // Validate the reset token

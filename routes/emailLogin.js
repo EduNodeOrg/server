@@ -46,7 +46,7 @@ router.post('/', function (req, res) {
 
               // Register session
               const sessionUser = {
-                id: user._id,
+                id: user.id,
                 email: req.body.email,
               };
 
