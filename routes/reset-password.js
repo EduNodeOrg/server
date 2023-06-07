@@ -99,23 +99,23 @@ router.post('/validate-reset-token', (req, res) => {
     // Compare the token against the stored token in the database
 
     // Example implementation assuming you have a User model
-    User.findOne({ resetToken: token }, (err, user) => {
-        if (err) {
+    User.findOne({ resetToken: token })
+        .then(user => {
+            if (user && !isTokenExpired(user.resetTokenExpiration)) {
+                // Token is valid
+                res.json({ tokenValid: true });
+            } else {
+                // Token is invalid or expired
+                res.json({ tokenValid: false });
+            }
+        })
+        .catch(err => {
             // Handle the error case
             console.error('Error finding user:', err);
             res.status(500).json({ tokenValid: false });
-            return;
-        }
-
-        if (user && !isTokenExpired(user.resetTokenExpiration)) {
-            // Token is valid
-            res.json({ tokenValid: true });
-        } else {
-            // Token is invalid or expired
-            res.json({ tokenValid: false });
-        }
-    });
+        });
 });
+
 
 
 // Function to check if the token is expired
