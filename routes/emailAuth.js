@@ -46,6 +46,7 @@ router.post('/', function (req, res) {
           res.json({ msg: 'Email sent' });
         }
       });
+      
         bcrypt.genSalt(10, (err, salt) => {
           bcrypt.hash(newUser.password, salt, (err, hash) => {
             if (err) throw err;

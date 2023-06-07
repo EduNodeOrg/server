@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 const User = require('../models/User');
 const crypto = require('crypto');
+const bcrypt = require('bcryptjs');
 const formData = require('form-data');
 const Mailgun = require('mailgun.js');
 const mailgun = new Mailgun(formData);
@@ -83,12 +84,18 @@ router.post('/reset-password/:token', async (req, res) => {
     }
 
     // Update the user's password
-    user.password = password;
-    user.resetToken = undefined;
-    user.resetTokenExpiration = undefined;
-    await user.save();
+    bcrypt.genSalt(10, async (err, salt) => {
+        bcrypt.hash(user.password, salt, async (err, hash) => {
+            if (err) throw err;
 
-    res.json({ message: 'Password reset successfully.' });
+            user.password = hash;
+            user.resetToken = undefined;
+            user.resetTokenExpiration = undefined;
+            await user.save();
+
+            res.json({ message: 'Password reset successfully.' });
+        })
+    })
 });
 
 
@@ -120,8 +127,8 @@ router.post('/validate-reset-token', (req, res) => {
 
 // Function to check if the token is expired
 function isTokenExpired(expiration) {
-  // Compare the token expiration with the current time
-  return expiration < Date.now();
+    // Compare the token expiration with the current time
+    return expiration < Date.now();
 }
 
 module.exports = router;
