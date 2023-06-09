@@ -1070,7 +1070,7 @@ router.put('/increment-trophy', async (req, res) => {
   }
 });
 
-router.put('/increment-Challenge', async (req, res) => {
+router.put('/challenge/increment-Challenge', async (req, res) => {
   const { email } = req.body;
 
   try {
