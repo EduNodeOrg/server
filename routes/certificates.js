@@ -830,6 +830,104 @@ router.post("/diploma7", async (req, res) => {
   console.log('notification saved !')
 
 });
+router.post("/challenge1", async (req, res) => {
+  res.header("Access-Control-Allow-Origin", "*");
+  res.header("Access-Control-Allow-Credentials", true);
+  res.header("Access-Control-Allow-Methods", "GET,PUT,POST,DELETE,OPTIONS");
+  res.header("Access-Control-Allow-Headers", "Origin,X-Requested-With,Content-Type,Accept,content-type,application/json");
+  res.header("Content-Type", "application/json");
+
+  // Store the issuer and distributor key to mongoDB
+
+  console.log("test")
+  const saltRounds = 10; // Number of salt rounds for bcrypt to use
+  // Issuer
+  const issuerKeyPair = SorobanClient.Keypair.random();
+  const issuerSecretKey = issuerKeyPair.secret();
+  const issuerPublicKey = issuerKeyPair.publicKey();
+  // Distributor
+  const distributorKeyPair = SorobanClient.Keypair.random();
+  const distributorSecretKey = distributorKeyPair.secret();
+  const distributorPublicKey = distributorKeyPair.publicKey();
+  // Store the issuer and distributor key to mongoDB
+  const hashedIssuerSecretKey = await bcrypt.hash(issuerSecretKey, saltRounds);
+  const hashedDistributorSecretKey = await bcrypt.hash(distributorSecretKey, saltRounds);
+  try {
+    const newCertificate = new Certificate({
+
+      name: req.body.name,
+      email: req.body.email,
+      pkey: req.body.pkey,
+      cid: null,// Initialize cid to null,
+      certificateNumber: Math.floor(Math.random() * 1000000),
+      issuerSecretKey: hashedIssuerSecretKey,
+      issuerPublicKey: issuerPublicKey,
+      distributorSecretKey: hashedDistributorSecretKey,
+      distributorPublicKey: distributorPublicKey,
+
+    });
+
+    const savedCertificate = await newCertificate.save();
+    console.log('issuerPublicKey', issuerPublicKey);
+    console.log('issuerPublicKey', distributorPublicKey);
+    // Replace the token with your own API key
+    const token = process.env.WEBTHREE_API_TOKEN;
+
+    const client = new Web3Storage({ token })
+    const img = await Jimp.read('rust.png')
+    const font = await Jimp.loadFont(Jimp.FONT_SANS_128_BLACK);
+    img.print(font, 400, 740, req.body.name);
+    img.write('newdiplomav2.jpg'); // save
+
+    const putFilesToWeb3Storage = async () => {
+      const files = await getFilesFromPath('newdiplomav2.jpg')
+      const cid = await client.put(files)
+      console.log('stored files with cid:', cid)
+      return cid;
+    }
+
+    const cid = await retry(
+      async (bail, attempt) => {
+        console.log(`Attempt ${attempt} putting files to web3.storage...`);
+        const result = await putFilesToWeb3Storage();
+        return result;
+      },
+      {
+        retries: 3, // number of retries
+        minTimeout: 1000, // minimum delay in ms between retries
+        maxTimeout: 5000, // maximum delay in ms between retries
+        onRetry: (error, attempt) => {
+          console.log(`Attempt ${attempt} failed: ${error}`);
+        },
+      }
+    );
+
+    // Update the savedCertificate object with the cid
+    savedCertificate.cid = cid;
+    await savedCertificate.save();
+
+
+
+    res.status(200).json(savedCertificate);
+  } catch (error) {
+    console.error(error);
+    res.status(500).send("Server Errorr");
+  }
+
+
+  const newNotification = new Notification({
+    message: 'Congrats! You have a new certification for the Oracles Course',
+    time: new Date(),
+    email: req.body.email,
+  });
+
+
+
+  await newNotification.save();
+
+  console.log('notification saved !')
+
+});
 
 router.get('/certificateNumber/:email', async (req, res) => {
   const email = req.params.email;
