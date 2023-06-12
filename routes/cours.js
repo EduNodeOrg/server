@@ -189,6 +189,19 @@ router.get('/comments/:courseId', async (req, res) => {
 });
 
 
+router.get('/coursemail/:email', async (req, res) => {
+  try {
+    const { email } = req.params;
+
+    const courses = await Cours.find({ email: email });
+
+    res.json(courses);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Server Error' });
+  }
+});
+
 
 module.exports = router;
 
