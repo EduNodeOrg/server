@@ -1,7 +1,8 @@
 const mongoose = require('mongoose');
 
 const PostSchema = new mongoose.Schema({
- 
+  
+  
   title: {
     type: String,
     required: true
@@ -20,6 +21,12 @@ const PostSchema = new mongoose.Schema({
     required: true,
   },
   
+  author: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "User",
+    required: false,
+    
+  },
   email: {
     type: String,
     required: false,

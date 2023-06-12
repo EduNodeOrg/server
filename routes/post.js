@@ -31,7 +31,7 @@ router.post("/", async (req, res) => {
 // Get all posts
 router.get("/posts", async (req, res) => {
   try {
-    const posts = await Post.find().populate("_id name email");
+    const posts = await Post.find().populate("author", "_id name email");
     res.send(posts);
   } catch (error) {
     res.status(500).send({ error: error.message });
@@ -41,7 +41,7 @@ router.get("/posts", async (req, res) => {
 
 router.get("/posts/:id", async (req, res) => {
   try {
-    const post = await Post.findById(req.params.id).populate( "_id name email");
+    const post = await Post.findById(req.params.id).populate("author", "_id name email");
     if (!post) {
       return res.status(404).send({ error: "Post not found" });
     }
