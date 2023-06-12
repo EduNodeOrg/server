@@ -110,6 +110,24 @@ router.get("/user",(req, res) => {
 
 });
 
+// Define a route to get the user ID based on the email
+router.get('/user/:email', async (req, res) => {
+  try {
+    const { email } = req.params;
+    const user = await User.findOne({ email });
+
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    // Return the user ID
+    res.json({ user});
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Server Error' });
+  }
+});
+
 // get users
 router.get("/googleusers", (req, res) => {
   res.setHeader('Access-Control-Allow-Origin', '*');
