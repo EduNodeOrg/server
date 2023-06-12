@@ -51,6 +51,25 @@ router.get("/posts/:id", async (req, res) => {
   }
 });
 
+router.get('/postemail/:email', async (req, res) => {
+  try {
+    const { email } = req.params;
+
+    const posts = await Post.find({ email: email });
+
+    res.json(posts);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Server Error' });
+  }
+});
+
+
+
+
+
+
+
 
 // Route for adding a comment
 router.post('/comments/:postId', async (req, res) => {
