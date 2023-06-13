@@ -85,7 +85,7 @@ router.post('/reset-password/:token', async (req, res) => {
 
     // Update the user's password
     bcrypt.genSalt(10, async (err, salt) => {
-        bcrypt.hash(user.password, salt, async (err, hash) => {
+        bcrypt.hash(password, salt, async (err, hash) => {
             if (err) throw err;
 
             user.password = hash;
