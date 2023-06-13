@@ -37,71 +37,71 @@ router.post("/", async (req, res, next) => {
 
   try {
 
-    let user = await User.findOne({ email },  { sparse: true })
-    .then(user => {
-      const confirmationCode = req.body.confirmationCode
-      const email = req.body.email
+    let user = await User.findOne({ email }, { sparse: true })
+      .then(user => {
+        const confirmationCode = req.body.confirmationCode
+        const email = req.body.email
 
-      if (user) return res.status(400).json({ user, msg: "User already exists" });
-      
-
-      const newUser = new User({
-       email,
-        password,
-        confirmationCode,
-      });
+        if (user) return res.status(400).json({ user, msg: "User already exists" });
 
 
+        const newUser = new User({
+          email,
+          password,
+          confirmationCode,
+        });
 
-      // create salt and hash
 
-bcrypt.genSalt(10, (err, salt) => {
-bcrypt.hash(newUser.password, salt, (err, hash) => {
-console.log(newUser.password)
-if (err) throw err;
-newUser.password = hash;
-console.log(hash)
 
-// store to mongodb .then(console.log("saved to mongodb"))
-EmailUser.create(newUser).then(console.log("saved to mongodb"))
+        // create salt and hash
 
-            .then(user => {
-             
-              jwt.sign(
-                { id: user.id }, process.env.JWT_SECRET,
-                { expiresIn: 3600 },
-                (err, token) => {
-                  if (err) throw err;
-                  res.json({
-                    token,
-                    user,
-                    user: {
-                      id: user.id,
-                      email: user.email,
-                      confirmationCode: user.confirmationCode
-                    }
-                  });
-                  // res.redirect('http://localhost:3000/dashboard');
+        bcrypt.genSalt(10, (err, salt) => {
+          bcrypt.hash(newUser.password, salt, (err, hash) => {
+            console.log(newUser.password)
+            if (err) throw err;
+            newUser.password = hash;
+            console.log(hash)
 
-                }
-              );
-              console.log(user)
-            }).catch((err) => {console.log(err)});
-            
+            // store to mongodb .then(console.log("saved to mongodb"))
+            EmailUser.create(newUser).then(console.log("saved to mongodb"))
+
+              .then(user => {
+
+                jwt.sign(
+                  { id: user.id }, process.env.JWT_SECRET,
+                  { expiresIn: 3600 },
+                  (err, token) => {
+                    if (err) throw err;
+                    res.json({
+                      token,
+                      user,
+                      user: {
+                        id: user.id,
+                        email: user.email,
+                        confirmationCode: user.confirmationCode
+                      }
+                    });
+                    // res.redirect('http://localhost:3000/dashboard');
+
+                  }
+                );
+                console.log(user)
+              }).catch((err) => { console.log(err) });
+
+          })
         })
+
       })
 
-    })
-    
   } catch (error) {
     console.log(error)
   }
-    next()
+  next()
 });
 
 
 // get users
-router.get("/user",(req, res) => {
+router.get("/user", (req, res) => {
   res.setHeader('Access-Control-Allow-Origin', '*');
   const email = req.body.email;
   User.findOne({ email })
@@ -121,13 +121,29 @@ router.get('/user/:email', async (req, res) => {
     }
 
     // Return the user ID
-    res.json({ user});
+    res.json({ user });
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: 'Server Error' });
   }
 });
 
+router.get('/userByid/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const user = await User.findById(id);
+
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    // Return the user
+    res.json({ user });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Server Error' });
+  }
+});
 // get users
 router.get("/googleusers", (req, res) => {
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -175,8 +191,8 @@ router.put("/useraccount", (req, res) => {
 
   User.updateOne(
     { "email": email },
-  {$set : {"userName": userName, "pkey": pkey }}
-  
+    { $set: { "userName": userName, "pkey": pkey } }
+
   )
     .then(() => {
       res.send({
@@ -184,12 +200,12 @@ router.put("/useraccount", (req, res) => {
         name: userName,
         pkey: pkey
       });
-      
+
     }
     )
     .catch(err => res.status(400).json("Error: " + err));
 
-    console.log("hi")
+  console.log("hi")
 
 })
 
@@ -199,9 +215,9 @@ router.put("/courses", (req, res) => {
   const { email } = req.body;
   const courseOneDone = true
 
-   if (!email) {
-     return res.status(400).json({ msg: "Email is required" });
-   }
+  if (!email) {
+    return res.status(400).json({ msg: "Email is required" });
+  }
 
   User.updateOne({ email: email }, { courseOneDone: courseOneDone })
     .then(() => {
@@ -236,18 +252,18 @@ router.get("/username", (req, res) => {
 router.put("/googlepk", async (req, res) => {
   const { email, pkey } = req.body;
 
-GoogleUser.updateOne( { "email": email }, {$set : {"pkey": pkey }})
+  GoogleUser.updateOne({ "email": email }, { $set: { "pkey": pkey } })
     .then(() => {
       res.send({
         email: email,
         pkey: pkey,
       });
-      
+
     }
     )
     .catch(err => res.status(400).json("Error: " + err));
 
-  
+
 
 
 
@@ -269,7 +285,7 @@ router.post("/google", async (req, res, next) => {
     googleProfilePic,
     userName,
     pkey
-  
+
   };
   // if (!email) {
   //   return res.status(400).json({ msg: "Email is required" })
@@ -332,7 +348,7 @@ router.post("/twitter", async (req, res, next) => {
     twitterProfilePic,
     userName,
     pkey
-  
+
   };
   // if (!email) {
   //   return res.status(400).json({ msg: "Email is required" })
@@ -404,10 +420,10 @@ router.get("/google", async (req, res) => {
         },
       });
     }
-    
+
   } catch (error) {
     console.log(error)
-    
+
   }
 
 
