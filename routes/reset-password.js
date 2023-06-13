@@ -25,7 +25,7 @@ function sendResetPasswordEmail(email, resetToken) {
         subject: 'Reset Password',
         html: `
       <p>Please click the following link to reset your password:</p>
-      <a href="http://localhost:3000/reset-password?token=${resetToken}">Reset Password</a>
+      <a href="https://edunode.org/reset-password?token=${resetToken}">Reset Password</a>
     `,
     };
 
