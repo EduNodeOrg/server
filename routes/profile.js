@@ -17,10 +17,10 @@ router.post('/', async (req, res) => {
   res.header("Access-Control-Allow-Headers", 'Origin,X-Requested-With,Content-Type,Accept,content-type,application/json');
   res.header('Content-Type', 'application/json');
   try {
-    const { email, name, age, bio, location,images } = req.body;
+    const { email, name, age, bio, location,images,university } = req.body;
     const updatedUser = await User.findOneAndUpdate(
       { email }, // search query
-      { name, age, bio, location,images }, // new user data
+      { name, age, bio, location,images,university }, // new user data
       { new: true, runValidators: true } // options
     );
 
