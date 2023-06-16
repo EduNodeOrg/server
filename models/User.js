@@ -9,6 +9,10 @@ const UserSchema = new mongoose.Schema({
     type: String,
     required: false
   },
+  university: {
+    type: String,
+    required: false
+  },
   pkey: {
     type: String,
     required: false

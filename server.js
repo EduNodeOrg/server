@@ -1,4 +1,5 @@
 const express = require("express")
+const router = express.Router();
 const dotenv = require('dotenv');
 const mongoose = require("mongoose");
 const cors = require("cors");
@@ -12,8 +13,8 @@ const bodyParser = require('body-parser');
 const session = require('express-session');
 const MongoDBStore = require('connect-mongodb-session')(session);
 const crypto = require('crypto');
-
-
+const csv = require('csv-parser');
+let results = [];
 const PORT = process.env.PORT || 5001 
 
 const app = express();
@@ -133,7 +134,7 @@ const google = require("./routes/google")
 const blog = require("./routes/blog")
 const chat = require("./routes/chat")
 const password = require('./routes/reset-password')
-
+const uni =require('./routes/Uni')
 
 app.use('/api/gcallback', gcallback);
 app.use('/api/search', search);
@@ -166,9 +167,19 @@ app.use("/api/blog", blog);
 app.use("/api/chat", chat);
 app.use("/auth", authRoute);
 app.use("/api/password", password);
+app.use("/api/universities", uni);
 
 
-
+app.get('/universities', (req, res) => {
+  try {
+    const universities = require('./universities.json').universities;
+    const universityNames = universities.map((item) => item['World Universities']);
+    res.json(universityNames);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
 
 
 app.listen(PORT, () => console.log(`server started at ${PORT}`))
