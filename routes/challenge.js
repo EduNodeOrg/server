@@ -9,7 +9,7 @@ router.post("/", async (req, res) => {
     try {
       const { title, description, link, date, tags, email, privatee } = req.body;
       //const authorEmail= req.user.auth.email;
-      const post = new Challenge({
+      const challenge = new Challenge({
         title,
         description,
         date,
@@ -20,8 +20,8 @@ router.post("/", async (req, res) => {
         // assuming you have a middleware that sets req.user to the currently logged in user
       });
   
-      await Challenge.save();
-      res.status(201).json(Challenge);
+      await challenge.save();
+      res.status(201).json(challenge);
     } catch (error) {
       console.log(error);
       res.status(500).json({ error: 'Server error' });
@@ -60,7 +60,7 @@ router.post("/", async (req, res) => {
     };
   
     try {
-      const challenge = await Challenge.findById(postId);
+      const challenge = await Challenge.findById(challengeId);
       if (!challenge) {
         return res.status(404).json({ error: 'Post not found' });
       }
@@ -90,3 +90,8 @@ router.post("/", async (req, res) => {
       res.status(500).json({ error: 'Server error' });
     }
   });
+
+
+  
+
+module.exports = router;

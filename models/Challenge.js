@@ -80,4 +80,4 @@ const ChallengeSchema = new mongoose.Schema({
 const Challenge = mongoose.model("Challenge", ChallengeSchema);
 
 
-module.exports = Cours;
+module.exports = Challenge;

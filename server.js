@@ -135,6 +135,7 @@ const blog = require("./routes/blog")
 const chat = require("./routes/chat")
 const password = require('./routes/reset-password')
 const uni =require('./routes/Uni')
+const challenge =require('./routes/challenge')
 
 app.use('/api/gcallback', gcallback);
 app.use('/api/search', search);
@@ -168,7 +169,7 @@ app.use("/api/chat", chat);
 app.use("/auth", authRoute);
 app.use("/api/password", password);
 app.use("/api/universities", uni);
-
+app.use("/api/challenge", challenge);
 
 app.get('/universities', (req, res) => {
   try {
