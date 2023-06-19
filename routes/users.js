@@ -508,7 +508,7 @@ router.post('/friend-request/:userId', async (req, res) => {
     }
 
     // Add the friend request
-    receiver.friendRequests.push({ user: sender._id });
+    receiver.friendRequests.push({ user: sender });
     await receiver.save();
 
     res.status(200).json({ message: 'Friend request sent.' });
@@ -517,6 +517,26 @@ router.post('/friend-request/:userId', async (req, res) => {
     res.status(500).json({ message: 'Server error' });
   }
 });
+
+//fetch requests
+router.get('/friend-requests/:userId', async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const user = await User.findById(userId).populate('friendRequests.user');
+
+    if (!user) {
+      return res.status(404).json({ message: 'User not found.' });
+    }
+
+    const friendRequests = user.friendRequests.filter(request => request.status === 'pending');
+
+    res.status(200).json(friendRequests);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
 
 // Accept a friend request
 router.post('/accept-friend-request/:userId', async (req, res) => {
