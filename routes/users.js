@@ -489,5 +489,73 @@ router.post('/skills', (req, res) => {
 });
 
 
+router.post('/friend-request/:userId', async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const { user } = req.body;
+
+    const sender = await User.findById(userId);
+    const receiver = await User.findById(user._id);
+
+    // Check if the users are already friends
+    if (sender.friends.includes(receiver._id) || receiver.friends.includes(sender._id)) {
+      return res.status(400).json({ message: 'Users are already friends.' });
+    }
+
+    // Check if the friend request already exists
+    if (sender.friendRequests.find((request) => request.user.equals(receiver._id))) {
+      return res.status(400).json({ message: 'Friend request already sent.' });
+    }
+
+    // Add the friend request
+    sender.friendRequests.push({ user: receiver._id });
+    await sender.save();
+
+    res.status(200).json({ message: 'Friend request sent.' });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
+// Accept a friend request
+router.post('/accept-friend-request/:userId', async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const { user } = req.body;
+
+    const receiver = await User.findById(userId);
+    const sender = await User.findById(user._id);
+
+    // Check if the friend request exists
+    const friendRequest = receiver.friendRequests.find((request) =>
+      request.user.equals(sender._id)
+    );
+    if (!friendRequest) {
+      return res.status(400).json({ message: 'Friend request not found.' });
+    }
+
+    // Accept the friend request
+    friendRequest.status = 'accepted';
+    receiver.friends.push(sender._id);
+
+    // Update the sender's friend list
+    sender.friends.push(receiver._id);
+
+    // Remove the friend request
+    receiver.friendRequests = receiver.friendRequests.filter(
+      (request) => !request.user.equals(sender._id)
+    );
+
+    await receiver.save();
+    await sender.save();
+
+    res.status(200).json({ message: 'Friend request accepted.' });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
 
 module.exports = router;
