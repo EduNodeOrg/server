@@ -494,7 +494,7 @@ router.post('/friend-request/:userId', async (req, res) => {
     const { userId } = req.params;
     const { user } = req.body;
 
-    const sender = await User.findById(userId);
+    const sender = await User.findById(userId).populate();
     const receiver = await User.findById(user._id);
 
     // Check if the users are already friends
@@ -508,7 +508,7 @@ router.post('/friend-request/:userId', async (req, res) => {
     }
 
     // Add the friend request
-    receiver.friendRequests.push({ user: sender });
+    receiver.friendRequests.push({ user: sender , userInfo: sender.name});
     await receiver.save();
 
     res.status(200).json({ message: 'Friend request sent.' });
@@ -542,10 +542,10 @@ router.get('/friend-requests/:userId', async (req, res) => {
 router.post('/accept-friend-request/:userId', async (req, res) => {
   try {
     const { userId } = req.params;
-    const { user } = req.body;
+    const user = req.body.user;
 
-    const receiver = await User.findById(userId);
-    const sender = await User.findById(user._id);
+    const sender = await User.findById(userId);
+    const receiver = await User.findById(user._id);
 
     // Check if the friend request exists
     const friendRequest = receiver.friendRequests.find((request) =>
@@ -582,10 +582,10 @@ router.post('/accept-friend-request/:userId', async (req, res) => {
 router.post('/reject-friend-request/:userId', async (req, res) => {
   try {
     const { userId } = req.params;
-    const { user } = req.body;
+    const user = req.body.user;
 
-    const receiver = await User.findById(userId);
-    const sender = await User.findById(user._id);
+    const sender = await User.findById(userId);
+    const receiver = await User.findById(user._id);
 
     // Check if the friend request exists
     const friendRequest = receiver.friendRequests.find((request) =>

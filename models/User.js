@@ -118,7 +118,11 @@ const UserSchema = new mongoose.Schema({
         type: String,
         enum: ['pending', 'accepted'],
         default: 'pending'
-      }
+      },
+      userInfo: {
+        type: String,
+        
+      },
     }
   ],
 
