@@ -503,13 +503,13 @@ router.post('/friend-request/:userId', async (req, res) => {
     }
 
     // Check if the friend request already exists
-    if (sender.friendRequests.find((request) => request.user.equals(receiver._id))) {
+    if (receiver.friendRequests.find((request) => request.user.equals(sender._id))) {
       return res.status(400).json({ message: 'Friend request already sent.' });
     }
 
     // Add the friend request
-    sender.friendRequests.push({ user: receiver._id });
-    await sender.save();
+    receiver.friendRequests.push({ user: sender._id });
+    await receiver.save();
 
     res.status(200).json({ message: 'Friend request sent.' });
   } catch (error) {
@@ -557,5 +557,36 @@ router.post('/accept-friend-request/:userId', async (req, res) => {
   }
 });
 
+
+// Reject a friend request
+router.post('/reject-friend-request/:userId', async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const { user } = req.body;
+
+    const receiver = await User.findById(userId);
+    const sender = await User.findById(user._id);
+
+    // Check if the friend request exists
+    const friendRequest = receiver.friendRequests.find((request) =>
+      request.user.equals(sender._id)
+    );
+    if (!friendRequest) {
+      return res.status(400).json({ message: 'Friend request not found.' });
+    }
+
+    // Remove the friend request
+    receiver.friendRequests = receiver.friendRequests.filter(
+      (request) => !request.user.equals(sender._id)
+    );
+
+    await receiver.save();
+
+    res.status(200).json({ message: 'Friend request rejected.' });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
 
 module.exports = router;
