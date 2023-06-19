@@ -134,8 +134,13 @@ const google = require("./routes/google")
 const blog = require("./routes/blog")
 const chat = require("./routes/chat")
 const password = require('./routes/reset-password')
+<<<<<<< HEAD
 const uni =require('./routes/Uni')
 const challenge =require('./routes/challenge')
+=======
+const compile = require('./routes/compile')
+
+>>>>>>> 4924ce13 (rust compiler)
 
 app.use('/api/gcallback', gcallback);
 app.use('/api/search', search);
@@ -168,6 +173,7 @@ app.use("/api/blog", blog);
 app.use("/api/chat", chat);
 app.use("/auth", authRoute);
 app.use("/api/password", password);
+<<<<<<< HEAD
 app.use("/api/universities", uni);
 app.use("/api/challenge", challenge);
 
@@ -181,6 +187,11 @@ app.get('/universities', (req, res) => {
     res.status(500).json({ error: 'Internal Server Error' });
   }
 });
+=======
+app.use("/api/compile", compile);
+
+
+>>>>>>> 4924ce13 (rust compiler)
 
 
 app.listen(PORT, () => console.log(`server started at ${PORT}`))
