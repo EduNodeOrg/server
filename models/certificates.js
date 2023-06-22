@@ -11,6 +11,14 @@ const CertificateSchema = new Schema({
     type: String,
     required: true,
   },
+  university: {
+    type: String,
+    required: true,
+  },
+  url: {
+    type: String,
+    required: false,
+  },
   email: {
     type: String,
     required: false,
@@ -48,5 +56,10 @@ const CertificateSchema = new Schema({
     type: Date,
     default: Date.now
   },
+  image: {
+    type:String,
+    required: false
+  }
+  
 });
 module.exports = certificates = mongoose.model("certificates", CertificateSchema);

@@ -1095,4 +1095,24 @@ router.put('/challenge/increment-Challenge', async (req, res) => {
 });
 
 
+router.post("/validCertificate", async (req, res) => {
+  try {
+    const { name, url, email, university ,image } = req.body;
+    //const authorEmail= req.user.auth.email;
+    const certificate = new Certificate({
+      name,
+      url,
+      university,
+      email,
+      image
+    });
+
+    await certificate.save();
+    res.status(201).json(certificate);
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
 module.exports = router;
