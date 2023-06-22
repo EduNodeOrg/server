@@ -9,11 +9,19 @@ const CoursSchema = new mongoose.Schema({
   },
   link: {
     type: String,
-    required: true
+    required: false
   },
   description: {
     type: String,
     required: true
+  },
+  questions: {
+    type: String,
+    required: false
+  },
+  grade: {
+    type: Number,
+    required: false
   },
 
   tags: {
