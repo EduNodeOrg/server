@@ -1,5 +1,4 @@
-{
-  "universities":[
+[
   {
     "AD": "AE",
     "World Universities": "Abu Dhabi University",
@@ -46810,4 +46809,4 @@
     "World Universities": "Zimbabwe Open University",
     "http://www.uda.ad/": "http://www.zou.ac.zw/"
   }
-]}
+]

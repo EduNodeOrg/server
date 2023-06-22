@@ -137,7 +137,7 @@ const password = require('./routes/reset-password')
 const uni =require('./routes/Uni')
 const challenge =require('./routes/challenge')
 const compile = require('./routes/compile')
-
+const universities = require('./routes/universities')
 
 app.use('/api/gcallback', gcallback);
 app.use('/api/search', search);
@@ -172,19 +172,8 @@ app.use("/auth", authRoute);
 app.use("/api/password", password);
 app.use("/api/universities", uni);
 app.use("/api/challenge", challenge);
-
-app.get('/universities', (req, res) => {
-  try {
-    const universities = require('./universities.json').universities;
-    const universityNames = universities.map((item) => item['World Universities']);
-    res.json(universityNames);
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: 'Internal Server Error' });
-  }
-});
 app.use("/api/compile", compile);
-
+app.use("/api/universities", universities);
 
 
 
