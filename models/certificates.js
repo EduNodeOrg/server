@@ -33,7 +33,7 @@ const CertificateSchema = new Schema({
   },
   certificateNumber: {
     type: Number,
-    required: true,
+    required: false,
     unique: true
   },
   issuerPublicKey: {
