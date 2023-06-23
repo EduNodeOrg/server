@@ -23,5 +23,10 @@ const ValidCertificateSchema = new Schema({
     type: String,
     required: false,
   },
+  status: {
+    type: String,
+    enum: ['pending', 'accepted','rejected'],
+    default: 'pending'
+  },
 });
 module.exports = validCertificates = mongoose.model("validCertificates", ValidCertificateSchema);
