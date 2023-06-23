@@ -1115,5 +1115,14 @@ router.post("/validCertificate", async (req, res) => {
     res.status(500).json({ error: 'Server error' });
   }
 });
-
+// GET route to fetch all valid certificates
+router.get("/valid-certifications", async (req, res) => {
+  try {
+    const certifications = await ValidCertificate.find();
+    res.json(certifications);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Server Error" });
+  }
+});
 module.exports = router;
