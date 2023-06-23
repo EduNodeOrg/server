@@ -136,6 +136,9 @@ const uni =require('./routes/Uni')
 const challenge =require('./routes/challenge')
 const compile = require('./routes/compile')
 const universities = require('./routes/universities')
+const valid = require('./routes/valid')
+
+
 
 app.use('/api/gcallback', gcallback);
 app.use('/api/search', search);
@@ -172,7 +175,7 @@ app.use("/api/universities", uni);
 app.use("/api/challenge", challenge);
 app.use("/api/compile", compile);
 app.use("/api/universities", universities);
-
+app.use("/api/validCertificate", valid);
 
 
 app.listen(PORT, () => console.log(`server started at ${PORT}`))
