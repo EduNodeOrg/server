@@ -4,6 +4,7 @@ const cors = require('cors');
 const SorobanClient = require('soroban-client');
 const server = new SorobanClient.Server('https://rpc-futurenet.stellar.org:443/');
 const Certificate = require("../models/certificates");
+const ValidCertificate = require("../models/ValidCertificate");
 const Notification = require("../models/Notification");
 const app = express();
 const { Web3Storage, getFilesFromPath } = require('web3.storage')
@@ -1099,7 +1100,7 @@ router.post("/validCertificate", async (req, res) => {
   try {
     const { name, url, email, university ,image } = req.body;
     //const authorEmail= req.user.auth.email;
-    const certificate = new Certificate({
+    const validCertificate = new ValidCertificate({
       name,
       url,
       university,
@@ -1107,8 +1108,8 @@ router.post("/validCertificate", async (req, res) => {
       image
     });
 
-    await certificate.save();
-    res.status(201).json(certificate);
+    await validCertificate.save();
+    res.status(201).json(validCertificate);
   } catch (error) {
     console.log(error);
     res.status(500).json({ error: 'Server error' });

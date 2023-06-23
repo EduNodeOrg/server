@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const { exec } = require('child_process');
 const University = require('../models/University'); 
-
+const fs = require('fs');
 // API endpoint to import the JSON file into MongoDB and fetch university names
 router.get('/', async (req, res) => {
   const jsonFilePath = './universities.json'; 
@@ -42,6 +42,34 @@ router.get('/universities', async (req, res) => {
     console.error(`Error fetching university names: ${error}`);
     res.status(500).json({ error: 'Internal Server Error' });
   }
+});
+
+
+
+
+
+router.get('/read-json', (req, res) => {
+  fs.readFile('./universities.json', 'utf8', (err, jsonString) => {
+    if (err) {
+      console.log("File read failed:", err);
+      return res.status(500).json({ error: 'Failed to read file' });
+    }
+
+    const data = JSON.parse(jsonString);
+
+    exec('echo "File read successful"', (error, stdout, stderr) => {
+      if (error) {
+        console.log(`error: ${error.message}`);
+        return res.status(500).json({ error: 'Failed to execute command' });
+      }
+      if (stderr) {
+        console.log(`stderr: ${stderr}`);
+        return res.status(500).json({ error: 'Command execution error' });
+      }
+
+      return res.status(200).json({ message: stdout, data: data});
+    });
+  });
 });
 
 

@@ -13,8 +13,6 @@ const bodyParser = require('body-parser');
 const session = require('express-session');
 const MongoDBStore = require('connect-mongodb-session')(session);
 const crypto = require('crypto');
-const csv = require('csv-parser');
-let results = [];
 const PORT = process.env.PORT || 5001 
 
 const app = express();
