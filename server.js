@@ -13,23 +13,18 @@ const bodyParser = require('body-parser');
 const session = require('express-session');
 const MongoDBStore = require('connect-mongodb-session')(session);
 const crypto = require('crypto');
-const PORT = process.env.PORT || 5001 
-
+const http = require('http');
+const socketIo = require('socket.io');
 const app = express();
+const Message = require('./models/Messages');
+const server = http.createServer(app);
+const io = socketIo(server);
 
+const PORT = process.env.PORT || 5001 
 // Increase the maximum size limit to 10MB
 app.use(bodyParser.json({ limit: '20mb' }));
-/*
-app.use(
-   cookieSession({
-    name:'session',
-    keys:['cyberwolve'],
-    macAge:24*60*60*100,
-   })
-)*/
-// Set up session middleware
-//const secretKey = crypto.randomBytes(32).toString('hex');
-//console.log('Generated secret key:', secretKey);
+
+
 app.use(session({
   secret: 'cceb95c4de4ece0427c3fd2ac73bbde6bffb85ce827620a1b2edecb78a360634',
   resave: false,
@@ -41,16 +36,6 @@ app.use(session({
 }));
 console.log('session set successfully');
 
-/*
-app.use(passport.initialize())
-app.use(passport.session())
-app.use(
-	cors({
-		origin: "*",
-		methods: "GET,POST,PUT,DELETE",
-		credentials: true,
-	})
-);*/
 
 
 app.use(cors());
@@ -84,8 +69,30 @@ const connectDB = async () => {
 
 connectDB();
 
-app.get('/', (req, res) => {
-  res.send('Welcome to the edunode API!');
+io.on('connection', (socket) => {
+  console.log('New client connected');
+
+  socket.on('chat message', async (msg) => {
+    try {
+      const { senderEmail, receiverEmail, content } = msg;
+
+      const message = new Message({
+        senderEmail,
+        receiverEmail,
+        content,
+      });
+
+      const savedMessage = await message.save();
+
+      io.emit('chat message', savedMessage);
+    } catch (error) {
+      console.error('Error saving message:', error);
+    }
+  });
+
+  socket.on('disconnect', () => {
+    console.log('Client disconnected');
+  });
 });
 
 app.get('/.well-known/stellar.toml', (req, res) => {
@@ -137,7 +144,7 @@ const challenge =require('./routes/challenge')
 const compile = require('./routes/compile')
 const universities = require('./routes/universities')
 const valid = require('./routes/valid')
-
+const messagesRouter = require('./routes/messages');
 
 
 app.use('/api/gcallback', gcallback);
@@ -176,6 +183,6 @@ app.use("/api/challenge", challenge);
 app.use("/api/compile", compile);
 app.use("/api/universities", universities);
 app.use("/api/validCertificate", valid);
-
+app.use('/api/messages', messagesRouter);
 
 app.listen(PORT, () => console.log(`server started at ${PORT}`))

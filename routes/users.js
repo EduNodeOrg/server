@@ -609,4 +609,18 @@ router.post('/reject-friend-request/:userId', async (req, res) => {
   }
 });
 
+router.get('/friends/:email', async (req, res) => {
+  try {
+    const { email } = req.params;
+    const user = await User.findOne({ email }).populate('friends', '-friends');
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+    res.json({ friends: user.friends });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+});
+
 module.exports = router;
