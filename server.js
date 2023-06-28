@@ -19,6 +19,11 @@ const app = express();
 const Message = require('./models/Messages');
 const server = http.createServer(app);
 const io = socketIo(server);
+const messagesRouter = require('./routes/messages');
+const WebSocket = require('ws');
+
+
+const wss = new WebSocket.Server({ port: 5002 });
 
 const PORT = process.env.PORT || 5001 
 // Increase the maximum size limit to 10MB
@@ -69,29 +74,16 @@ const connectDB = async () => {
 
 connectDB();
 
-io.on('connection', (socket) => {
-  console.log('New client connected');
-
-  socket.on('chat message', async (msg) => {
-    try {
-      const { senderEmail, receiverEmail, content } = msg;
-
-      const message = new Message({
-        senderEmail,
-        receiverEmail,
-        content,
-      });
-
-      const savedMessage = await message.save();
-
-      io.emit('chat message', savedMessage);
-    } catch (error) {
-      console.error('Error saving message:', error);
-    }
-  });
-
-  socket.on('disconnect', () => {
-    console.log('Client disconnected');
+// WebSocket connection event handler
+wss.on('connection', (socket) => {
+  // WebSocket message event handler
+  socket.on('message', (message) => {
+    // Broadcast the received message to all connected WebSocket clients
+    wss.clients.forEach((client) => {
+      if (client !== socket && client.readyState === WebSocket.OPEN) {
+        client.send(message);
+      }
+    });
   });
 });
 
@@ -144,7 +136,6 @@ const challenge =require('./routes/challenge')
 const compile = require('./routes/compile')
 const universities = require('./routes/universities')
 const valid = require('./routes/valid')
-const messagesRouter = require('./routes/messages');
 
 
 app.use('/api/gcallback', gcallback);
@@ -186,3 +177,8 @@ app.use("/api/validCertificate", valid);
 app.use('/api/messages', messagesRouter);
 
 app.listen(PORT, () => console.log(`server started at ${PORT}`))
+server.on('upgrade', (request, socket, head) => {
+  wss.handleUpgrade(request, socket, head, (ws) => {
+    wss.emit('connection', ws, request);
+  });
+});

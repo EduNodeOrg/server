@@ -76,6 +76,10 @@ const UserSchema = new mongoose.Schema({
     type: [String],
     required: false,
   },
+   role:{
+    type: String,
+    required: false,
+  },
   skills:{
     type: [String],
     required: false,

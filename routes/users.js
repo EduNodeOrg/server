@@ -468,6 +468,23 @@ router.post('/preferences', (req, res) => {
       res.status(500).json({ message: 'Internal server error' });
     });
 });
+router.post('/role', (req, res) => {
+  const { email, role } = req.body;
+
+  // Find the user by email and update their preferences
+  User.findOneAndUpdate({ email }, { role }, { new: true })
+    .then(user => {
+      if (!user) {
+        res.status(404).json({ message: 'User not found' });
+      } else {
+        res.json({ message: 'role updated successfully' });
+      }
+    })
+    .catch(error => {
+      console.error(error);
+      res.status(500).json({ message: 'Internal server error' });
+    });
+});
 
 
 router.post('/skills', (req, res) => {
