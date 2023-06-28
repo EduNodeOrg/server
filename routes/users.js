@@ -101,13 +101,12 @@ router.post("/", async (req, res, next) => {
 
 
 // get users
-router.get("/user", (req, res) => {
+router.get('/user', (req, res) => {
   res.setHeader('Access-Control-Allow-Origin', '*');
-  const email = req.body.email;
+  const email = req.query.email; // Access the email value from query parameters
   User.findOne({ email })
     .then(users => res.json(users))
-    .catch(err => res.status(400).json("Error: " + err));
-
+    .catch(err => res.status(400).json('Error: ' + err));
 });
 
 // Define a route to get the user ID based on the email
