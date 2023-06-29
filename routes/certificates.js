@@ -14,6 +14,10 @@ const retry = require('async-retry');
 const fs = require('fs');
 const bcrypt = require('bcryptjs');
 const User = require('../models/User');
+const formData = require('form-data');
+const Mailgun = require('mailgun.js');
+const mailgun = new Mailgun(formData);
+const mg = mailgun.client({ username: 'api', key: "key-c8d12b7428fbe666e074108aaa0820bc" || 'key-yourkeyhere', url: 'https://api.eu.mailgun.net' });
 
 app.use(cors());
 
@@ -100,8 +104,22 @@ router.post("/diploma", async (req, res) => {
     savedCertificate.cid = cid;
     await savedCertificate.save();
 
-
-
+    const data = {
+      from: 'hi@edunode.org',
+      to: req.body.email,
+      subject: 'Congrats for your Certification',
+      text: 'Please find attached the E-certification!.',
+      attachment: `https://${cid}.ipfs.w3s.link/newdiplomav2.jpg`
+    };
+    mg.messages.create(domain, data, function (error, body) {
+      if (error) {
+        console.log('Error sending email:', error);
+        res.status(500).json({ error: 'Error sending email' });
+      } else {
+        console.log('Email sent successfully:', body);
+        res.json({ msg: 'Email sent' });
+      }
+    });
     const newNotification = new Notification({
       message:
         "Congrats! You have a new certification for the Basic Concepts Course",
@@ -120,10 +138,6 @@ router.post("/diploma", async (req, res) => {
       console.error("Unhandled Promise Rejection:", error);
       // Optionally, you can perform additional error handling or logging here
     });
-
-
-
-
   }
 });
 
