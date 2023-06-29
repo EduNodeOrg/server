@@ -15,6 +15,10 @@ const CoursSchema = new mongoose.Schema({
     type: String,
     required: true
   },
+  mit: {
+    type: String,
+    required: false
+  },
   questions: {
     type: String,
     required: false

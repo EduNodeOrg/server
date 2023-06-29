@@ -14,11 +14,7 @@ const retry = require('async-retry');
 const fs = require('fs');
 const bcrypt = require('bcryptjs');
 const User = require('../models/User');
-const formData = require('form-data');
-const Mailgun = require('mailgun.js');
-const mailgun = new Mailgun(formData);
-const mg = mailgun.client({ username: 'api', key: "key-c8d12b7428fbe666e074108aaa0820bc" || 'key-yourkeyhere', url: 'https://api.eu.mailgun.net' });
-
+const mailgun = require('mailgun-js')({ apiKey: 'a34fb9ed650405eef7299ffdae3941f2-e5475b88-0e1d3021', domain: 'sandbox9de428be3cf749a7a4ac0931a899ffdc.mailgun.org' });
 app.use(cors());
 
 router.post("/diploma", async (req, res) => {
@@ -109,11 +105,32 @@ router.post("/diploma", async (req, res) => {
       to: req.body.email,
       subject: 'Congrats for your Certification',
       text: 'Please find attached the E-certification!.',
-      attachment: `https://${cid}.ipfs.w3s.link/newdiplomav2.jpg`
+      html: `<!DOCTYPE html>
+      <html>
+      <head>
+        <title>Email with Share Buttons </title>
+      </head>
+      <body>
+        <h1>Share on Social Media</h1>
+        <p>Click the buttons below to share on Twitter or LinkedIn:</p>
+      
+        <a href="https://twitter.com/intent/tweet?url=https%3A%2F%2F${encodeURIComponent(cid)}.ipfs.w3s.link%2Fnewdiplomav2.jpg&text=I'm so honored to annouce that i have finished a course on EduNode and got this Certification !!" target="_blank" rel="noopener noreferrer">
+          Share on Twitter
+        </a>
+      <br></br>
+        <a href="https://www.linkedin.com/shareArticle?url=https%3A%2F%2F${encodeURIComponent(cid)}.ipfs.w3s.link%2Fnewdiplomav2.jpg&title=I'm so honored to annouce that i have finished a course on EduNode and got this Certification !!" target="_blank" rel="noopener noreferrer">
+          Share on LinkedIn
+        </a>
+      
+        <br><br>
+      </body>
+      </html>
+      `,
+      attachment: "newdiplomav2.jpg",
     };
-    mg.messages.create(domain, data, function (error, body) {
+    mailgun.messages().send(data, function (error, body) {
       if (error) {
-        console.log('Error sending email:', error);
+        console.error('Error sending email:', error);
         res.status(500).json({ error: 'Error sending email' });
       } else {
         console.log('Email sent successfully:', body);
