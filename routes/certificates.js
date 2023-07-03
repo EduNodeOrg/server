@@ -4,7 +4,7 @@ const cors = require('cors');
 const SorobanClient = require('soroban-client');
 const server = new SorobanClient.Server('https://rpc-futurenet.stellar.org:443/');
 const Certificate = require("../models/certificates");
-const validCertificates = require("../models/ValidCertificate");
+const ValidCertificates = require("../models/ValidCertificate");
 const Notification = require("../models/Notification");
 const app = express();
 const { Web3Storage, getFilesFromPath } = require('web3.storage')
@@ -1131,7 +1131,7 @@ router.post("/validCertificate", async (req, res) => {
   try {
     const { name, url, email, university ,image } = req.body;
     //const authorEmail= req.user.auth.email;
-    const validCertificate = new ValidCertificate({
+    const validCertificate = new ValidCertificates({
       name,
       url,
       university,
@@ -1153,7 +1153,7 @@ router.post("/validCertificate", async (req, res) => {
 // GET route to fetch all valid certificates
 router.get("/valid", async (req, res) => {
   try {
-    const certificates = await validCertificates.find();
+    const certificates = await ValidCertificates.find();
     console.log('certificate')
     res.json(certificates);
   } catch (error) {
