@@ -91,39 +91,6 @@ router.post("/", async (req, res) => {
     }
   });
 
-  let challengeReadyCount = 0;
-  let challengeStarted = false;
-  let challengeFinished = false;
-  let winnerEmail = '';
-  
-  router.post('/ready', (req, res) => {
-    // Store the user's readiness status
-    challengeReadyCount++;
-     console.log('a user is ready')
-    if (challengeReadyCount === 2) {
-      // Two users are ready, mark the challenge as started
-      challengeStarted = true;
-      res.send(challengeStarted);
-      // Notify both users that the challenge has started
-      
-    }
-    res.send(challengeStarted);
-  });
-  
-  router.post('/submit', (req, res) => {
-    // Evaluate the challenge submission and calculate the grade
-    // Store the grade and other relevant information on the backend
-  
-    if (gradeCondition) {
-      // The user meets the grade condition, set them as the winner
-      winnerEmail = 'example@example.com'; 
-      challengeFinished = true;
-  
-      // Notify both users about the winner
-    }
-  
-    res.sendStatus(200);
-  });
   
   
 
