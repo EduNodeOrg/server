@@ -25,7 +25,7 @@ router.post("/diploma", async (req, res) => {
   res.header("Content-Type", "application/json");
 
   try {
-   
+
     // Store the issuer and distributor key to MongoDB
 
     console.log("test");
@@ -1080,6 +1080,13 @@ router.get("/notification/count/:email", async (req, res) => {
 
 router.put('/increment-trophy', async (req, res) => {
   const { email } = req.body;
+  const newNotification = new Notification({
+    message:
+      "Congrats! You have a new Course Badge for finishig a Course !",
+    time: new Date(),
+    email: req.body.email,
+  });
+  await newNotification.save();
 
   try {
     // Find the user by their email
@@ -1100,11 +1107,19 @@ router.put('/increment-trophy', async (req, res) => {
     console.error(error);
     return res.status(500).json({ message: 'Server error' });
   }
+  
+
 });
 
 router.put('/challenge/increment-Challenge', async (req, res) => {
   const { email } = req.body;
-
+  const newNotification = new Notification({
+    message:
+      "Congrats! You have a new Challenge Badge for finishig a Challenge !",
+    time: new Date(),
+    email: req.body.email,
+  });
+  await newNotification.save();
   try {
     // Find the user by their email
     const user = await User.findOne({ email });
@@ -1129,7 +1144,7 @@ router.put('/challenge/increment-Challenge', async (req, res) => {
 
 router.post("/validCertificate", async (req, res) => {
   try {
-    const { name, url, email, university ,image } = req.body;
+    const { name, url, email, university, image } = req.body;
     //const authorEmail= req.user.auth.email;
     const validCertificate = new ValidCertificates({
       name,

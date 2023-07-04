@@ -1,110 +1,116 @@
 const express = require("express");
 const router = express.Router();
-const auth =require('../middleware/auth')
+const auth = require('../middleware/auth')
 const Cours = require("../models/Cours");
 const User = require('../models/User');
 // Create a new Cours
 router.post("/", async (req, res) => {
-    try {
-      const { title, description, link, date, tags,email,privatee,questions,grade } = req.body;
-      //const authorEmail= req.user.auth.email;
-      const cours = new Cours({
-        title,
-        description,
-        date,
-        link,
-        tags,
-        email,
-        privatee,
-        questions,
-        grade
-        // assuming you have a middleware that sets req.user to the currently logged in user
-      });
-      
-      await cours.save();
-      res.status(201).json(cours);
-    } catch (error) {
-      console.log(error);
-      res.status(500).json({ error: 'Server error' });
-    }
+  try {
+    const { title, description, link, date, tags, email, privatee, questions, grade } = req.body;
+    //const authorEmail= req.user.auth.email;
+    const cours = new Cours({
+      title,
+      description,
+      date,
+      link,
+      tags,
+      email,
+      privatee,
+      questions,
+      grade
+      // assuming you have a middleware that sets req.user to the currently logged in user
+    });
+
+    await cours.save();
+    res.status(201).json(cours);
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
+
+
+router.put('/increment-trophy', async (req, res) => {
+  const { email } = req.body;
+  const newNotification = new Notification({
+    message:
+      "Congrats! You have a new Course Badge for adding a Course !",
+    time: new Date(),
+    email: req.body.email,
   });
-  
+  await newNotification.save();
+  try {
+    // Find the user by their email
+    const user = await User.findOne({ email });
 
-
-  router.put('/increment-trophy', async (req, res) => {
-    const { email } = req.body;
-  
-    try {
-      // Find the user by their email
-      const user = await User.findOne({ email });
-  
-      if (!user) {
-        return res.status(404).json({ message: 'User not found' });
-      }
-  
-      // Increment the trophy value by 1
-      user.AddCoursesTrophy += 1;
-  
-      // Save the updated user to the database
-      await user.save();
-  
-      return res.status(200).json({ message: 'Trophy incremented successfully' });
-    } catch (error) {
-      console.error(error);
-      return res.status(500).json({ message: 'Server error' });
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
     }
-  });
 
-  
+    // Increment the trophy value by 1
+    user.AddCoursesTrophy += 1;
+
+    // Save the updated user to the database
+    await user.save();
+
+    return res.status(200).json({ message: 'Trophy incremented successfully' });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: 'Server error' });
+  }
+});
+
+
 // Get all Courss
 router.get("/cours", async (req, res) => {
-    try {
-      const Courses = await Cours.find().populate("author", "_id name email");
-      res.send(Courses);
-    } catch (error) {
-      res.status(500).send({ error: error.message });
-    }
-  });
-  
-  router.get('/cours/:courseId', async (req, res) => {
-    const courseId = req.params.courseId;
-    try {
-      const cours = await Cours.findById(courseId);
-      if (!cours) {
-        return res.status(404).json({ error: 'course not found' });
-      }
-      const feedbacks = cours.feedbacks;
-      res.json(feedbacks);
-    } catch (err) {
-      console.error(err);
-      res.status(500).json({ error: 'Server error' });
-    }
-  });
+  try {
+    const Courses = await Cours.find().populate("author", "_id name email");
+    res.send(Courses);
+  } catch (error) {
+    res.status(500).send({ error: error.message });
+  }
+});
 
-  router.post('/cours/:courseId', async (req, res) => {
-    const courseId = req.params.courseId;
-    const newFeedback = {
-      rate:req.body.rate,
-      text: req.body.text,
-      email: req.body.email,
-    };
-  
-    try {
-      const cours = await Cours.findById(courseId);
-      if (!cours) {
-        return res.status(404).json({ error: 'course not found' });
-      }
-      cours.feedbacks.push(newFeedback);
-      await cours.save();
-      res.json(cours);
-    } catch (err) {
-      console.error(err);
-      res.status(500).json({ error: 'Server error' });
+router.get('/cours/:courseId', async (req, res) => {
+  const courseId = req.params.courseId;
+  try {
+    const cours = await Cours.findById(courseId);
+    if (!cours) {
+      return res.status(404).json({ error: 'course not found' });
     }
-  });
+    const feedbacks = cours.feedbacks;
+    res.json(feedbacks);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
+router.post('/cours/:courseId', async (req, res) => {
+  const courseId = req.params.courseId;
+  const newFeedback = {
+    rate: req.body.rate,
+    text: req.body.text,
+    email: req.body.email,
+  };
+
+  try {
+    const cours = await Cours.findById(courseId);
+    if (!cours) {
+      return res.status(404).json({ error: 'course not found' });
+    }
+    cours.feedbacks.push(newFeedback);
+    await cours.save();
+    res.json(cours);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Server error' });
+  }
+});
 
 
-  // GET average rating for a specific course
+// GET average rating for a specific course
 router.get('/courses/:id/average-rating', async (req, res) => {
   try {
     const courseId = req.params.id;
