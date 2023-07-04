@@ -137,7 +137,7 @@ const gamechallenge =require('./routes/gameChallenge')
 const compile = require('./routes/compile')
 const universities = require('./routes/universities')
 const valid = require('./routes/valid')
-
+const glossary = require('./routes/glossary')
 
 app.use('/api/gcallback', gcallback);
 app.use('/api/search', search);
@@ -177,7 +177,7 @@ app.use("/api/universities", universities);
 app.use("/api/validCertificate", valid);
 app.use('/api/messages', messagesRouter);
 app.use("/api/gamechallenge", gamechallenge);
-
+app.use("/api/glossary", glossary);
 
 
 app.listen(PORT, () => console.log(`server started at ${PORT}`))
