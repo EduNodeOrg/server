@@ -12,7 +12,7 @@ const User = require('../models/User');
 const GoogleUser = require('../models/GoogleUser');
 const TwitterUser = require('../models/TwitterUser');
 dotenv.config({ path: './config/config.env' });
-
+const Notification = require("../models/Notification");
 
 
 // register email user
@@ -513,6 +513,14 @@ router.post('/friend-request/:userId', async (req, res) => {
     const sender = await User.findById(userId).populate();
     const receiver = await User.findById(user._id);
 
+    const newNotification = new Notification({
+      message:
+        `You have a new friend request from ${sender.email}`,
+      time: new Date(),
+      email: user.email,
+    });
+    await newNotification.save();
+
     // Check if the users are already friends
     if (sender.friends.includes(receiver._id) || receiver.friends.includes(sender._id)) {
       return res.status(400).json({ message: 'Users are already friends.' });
@@ -562,6 +570,7 @@ router.post('/accept-friend-request/:userId', async (req, res) => {
 
     const sender = await User.findById(userId);
     const receiver = await User.findById(user._id);
+
 
     // Check if the friend request exists
     const friendRequest = receiver.friendRequests.find((request) =>
