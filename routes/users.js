@@ -571,6 +571,13 @@ router.post('/accept-friend-request/:userId', async (req, res) => {
     const sender = await User.findById(userId);
     const receiver = await User.findById(user._id);
 
+    const newNotification = new Notification({
+      message:
+        `Your friend request to ${receiver.email} has been accepted!`,
+      time: new Date(),
+      email: sender.email,
+    });
+    await newNotification.save();
 
     // Check if the friend request exists
     const friendRequest = receiver.friendRequests.find((request) =>

@@ -3,7 +3,7 @@ const router = express.Router();
 const auth = require('../middleware/auth')
 const GameChallenge = require("../models/GameChallenge");
 const User = require('../models/User');
-
+const Notification = require("../models/Notification");
 
 
 let challengeReadyCount = 0;
@@ -97,6 +97,13 @@ router.get('/finish/:gameNumber', async (req, res) => {
             const { challengeFinished, winner } = gameChallenge;
 
             if (challengeFinished && winner) {
+                const newNotification = new Notification({
+                    message:
+                        `Congrats you have won a Challenge Game!`,
+                    time: new Date(),
+                    email: winner,
+                });
+                await newNotification.save();
                 res.json({ challengeFinished, winner });
             } else {
                 res.json({ challengeFinished });
