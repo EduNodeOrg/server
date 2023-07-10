@@ -19,8 +19,8 @@ router.post('/ready', async (req, res) => {
                 gameChallenge.user1email = localEmail;
             } else if (gameChallenge.user2email === '') {
                 gameChallenge.user2email = localEmail;
-                challengeStarted = true;
-                challengeReadyCount = 2;
+                gameChallenge.challengeStarted = true;
+                gameChallenge.challengeReadyCount = 2;
             }
         } else {
             // Create a new game challenge
@@ -40,7 +40,7 @@ router.post('/ready', async (req, res) => {
         await gameChallenge.save();
 
         // Notify both users that the challenge has started
-        res.send(challengeStarted);
+        res.send(gameChallenge.challengeStarted);
     } catch (error) {
         console.error('Error:', error);
         res.sendStatus(500);
