@@ -12,7 +12,7 @@ let challengeStarted = false;
 
 router.post('/ready', async (req, res) => {
     
-    let challengeStarted = false;
+    
 
     const { gameNumber, localEmail } = req.body;
     // Store the user's readiness status
@@ -58,15 +58,20 @@ router.post('/ready', async (req, res) => {
 
 });
 
-router.get('/start/:gameNumber',  async (req, res) => {
-    const { gameNumber } = req.params;
-    const gameChallenge = await GameChallenge.findOne({ gameNumber: gameNumber });
-    if (gameChallenge.challengeStarted) {
+router.get('/start/:gameNumber', async (req, res) => {
+    try {
+      const { gameNumber } = req.params;
+      const gameChallenge = await GameChallenge.findOne({ gameNumber: gameNumber });
+      if (gameChallenge && gameChallenge.challengeStarted) {
         res.send(gameChallenge.challengeStarted);
-    } else {
+      } else {
         res.sendStatus(404);
+      }
+    } catch (error) {
+      console.error(error);
+      res.sendStatus(500);
     }
-});
+  });
 
 
 router.post('/submit', async (req, res) => {
