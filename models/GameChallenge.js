@@ -35,6 +35,10 @@ const GameChallengeSchema = new mongoose.Schema({
     type: Boolean,
     required: false
   },
+  challengeStarted: {
+    type: Boolean,
+    required: false
+  },
   
 },
 

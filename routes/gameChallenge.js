@@ -31,6 +31,7 @@ router.post('/ready', async (req, res) => {
                 gameChallenge.user1email = localEmail;
             } else if (gameChallenge.user2email === '') {
                 gameChallenge.user2email = localEmail;
+                challengeStarted=true;
             }
         } else {
             // Create a new game challenge
@@ -42,6 +43,7 @@ router.post('/ready', async (req, res) => {
                 user1grade: null,
                 user2grade: null,
                 winner: ''
+
             });
         }
 
@@ -56,9 +58,11 @@ router.post('/ready', async (req, res) => {
 
 });
 
-router.get('/start', (req, res) => {
-    if (challengeStarted) {
-        res.send(challengeStarted);
+router.get('/start/:gameNumber',  async (req, res) => {
+    const { gameNumber } = req.params;
+    const gameChallenge = await GameChallenge.findOne({ gameNumber: gameNumber });
+    if (gameChallenge.challengeStarted) {
+        res.send(gameChallenge.challengeStarted);
     } else {
         res.sendStatus(404);
     }
