@@ -11,6 +11,9 @@ let challengeStarted = false;
 
 
 router.post('/ready', async (req, res) => {
+    let challengeReadyCount = 0;
+    let challengeStarted = false;
+
     const { gameNumber, localEmail } = req.body;
     // Store the user's readiness status
     challengeReadyCount++;
