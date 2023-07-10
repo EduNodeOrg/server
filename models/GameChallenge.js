@@ -5,6 +5,11 @@ const GameChallengeSchema = new mongoose.Schema({
     type: String,
     required: true
   },
+  challengeReadyCount: {
+    type: Number,
+    required: false,
+    default:0,
+  },
   user1email: {
     type: String,
     required: false
@@ -37,7 +42,8 @@ const GameChallengeSchema = new mongoose.Schema({
   },
   challengeStarted: {
     type: Boolean,
-    required: false
+    required: false,
+    default:false
   },
   
 },

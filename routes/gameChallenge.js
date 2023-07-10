@@ -6,22 +6,10 @@ const User = require('../models/User');
 const Notification = require("../models/Notification");
 
 
-let challengeReadyCount = 0;
-let challengeStarted = false;
 
 
 router.post('/ready', async (req, res) => {
-    
-    
-
     const { gameNumber, localEmail } = req.body;
-    // Store the user's readiness status
-    challengeReadyCount++;
-    console.log('a user is ready')
-    if (challengeReadyCount === 2) {
-        // Two users are ready, mark the challenge as started
-        challengeStarted = true;
-    }
     try {
         let gameChallenge = await GameChallenge.findOne({ gameNumber: gameNumber });
 
@@ -31,19 +19,21 @@ router.post('/ready', async (req, res) => {
                 gameChallenge.user1email = localEmail;
             } else if (gameChallenge.user2email === '') {
                 gameChallenge.user2email = localEmail;
-                challengeStarted=true;
+                challengeStarted = true;
+                challengeReadyCount = 2;
             }
         } else {
             // Create a new game challenge
             gameChallenge = new GameChallenge({
+                challengeReadyCount: 1,
                 gameNumber: gameNumber,
                 user1email: localEmail,
                 user2email: '',
                 date: new Date(),
                 user1grade: null,
                 user2grade: null,
-                winner: ''
-
+                winner: '',
+                challengeStarted : false
             });
         }
 
@@ -60,18 +50,18 @@ router.post('/ready', async (req, res) => {
 
 router.get('/start/:gameNumber', async (req, res) => {
     try {
-      const { gameNumber } = req.params;
-      const gameChallenge = await GameChallenge.findOne({ gameNumber: gameNumber });
-      if (gameChallenge && gameChallenge.challengeStarted) {
-        res.send(gameChallenge.challengeStarted);
-      } else {
-        res.sendStatus(404);
-      }
+        const { gameNumber } = req.params;
+        const gameChallenge = await GameChallenge.findOne({ gameNumber: gameNumber });
+        if (gameChallenge ) {
+            res.send(gameChallenge.challengeStarted);
+        } else {
+            res.sendStatus(404);
+        }
     } catch (error) {
-      console.error(error);
-      res.sendStatus(500);
+        console.error(error);
+        res.sendStatus(500);
     }
-  });
+});
 
 
 router.post('/submit', async (req, res) => {
