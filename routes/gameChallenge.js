@@ -119,6 +119,22 @@ router.get('/finish/:gameNumber', async (req, res) => {
     }
 });
 
+router.get("/winners", async (req, res) => {
+    try {
+      const challenges = await GameChallenge.find({ winner: { $exists: true, $ne: "" } });
+      const winnersEmails = challenges.map((challenge) => {
+        return {
+          winnerEmail: challenge.winner,
+        };
+      });
+  
+      res.json(winnersEmails);
+    } catch (err) {
+      console.error(err);
+      res.status(500).json({ message: "Failed to retrieve winners' emails" });
+    }
+  });
+  
 
 
 
