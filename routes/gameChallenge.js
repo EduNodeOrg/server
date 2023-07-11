@@ -4,7 +4,7 @@ const auth = require('../middleware/auth')
 const GameChallenge = require("../models/GameChallenge");
 const User = require('../models/User');
 const Notification = require("../models/Notification");
-const User = require('../models/User');
+
 
 
 
