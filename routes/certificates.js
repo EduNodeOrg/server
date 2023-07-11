@@ -1063,6 +1063,18 @@ router.get("/notification/:email", async (req, res) => {
   }
 });
 
+router.get("/notifications", async (req, res) => {
+  try {
+    const notifications = await Notification.find();
+
+    res.json(notifications);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Failed to retrieve notifications" });
+  }
+});
+
+
 router.get("/notification/count/:email", async (req, res) => {
   try {
     const { email } = req.params;
