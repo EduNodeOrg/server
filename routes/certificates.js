@@ -1048,6 +1048,7 @@ router.get("/count/pkey/:pkey", async (req, res) => {
 });
 
 router.get("/notification/:email", async (req, res) => {
+  console.log("heloooooooooooo");
   try {
     const notifications = await Notification.find({ email: req.params.email });
     const notificationData = notifications.map(notif => ({
@@ -1063,16 +1064,24 @@ router.get("/notification/:email", async (req, res) => {
   }
 });
 
-router.get("/notifications", async (req, res) => {
+router.get("/notificationgg", async (req, res) => {
+  console.log("heloooooooooooobit");
   try {
     const notifications = await Notification.find();
+    const notificationData = notifications.map(notif => ({
+      notificationMessage: notif.message,
+      notificationDate: notif.date,
+      email: notif.email,
 
-    res.json(notifications);
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ message: "Failed to retrieve notifications" });
+    }));
+    res.status(200).json(notificationData);
+  } catch (error) {
+    console.error(error);
+    res.status(500).send("Server Error");
   }
 });
+
+
 
 
 router.get("/notification/count/:email", async (req, res) => {
@@ -1119,7 +1128,7 @@ router.put('/increment-trophy', async (req, res) => {
     console.error(error);
     return res.status(500).json({ message: 'Server error' });
   }
-  
+
 
 });
 

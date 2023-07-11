@@ -133,6 +133,7 @@ const chat = require("./routes/chat")
 const password = require('./routes/reset-password')
 const uni =require('./routes/Uni')
 const challenge =require('./routes/challenge')
+const notif =require('./routes/notifications')
 const gamechallenge =require('./routes/gameChallenge')
 const compile = require('./routes/compile')
 const universities = require('./routes/universities')
@@ -178,6 +179,7 @@ app.use("/api/validCertificate", valid);
 app.use('/api/messages', messagesRouter);
 app.use("/api/gamechallenge", gamechallenge);
 app.use("/api/glossary", glossary);
+app.use("/api/notif", notif);
 
 
 app.listen(PORT, () => console.log(`server started at ${PORT}`))
