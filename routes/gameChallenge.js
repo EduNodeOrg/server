@@ -101,7 +101,7 @@ router.get('/finish/:gameNumber', async (req, res) => {
             if (challengeFinished && winner) {
                 const newNotification = new Notification({
                     message:
-                        `Congrats you have won a Challenge Game!`,
+                        `Congrats! You have won a Challenge Game!`,
                     time: new Date(),
                     email: winner,
                 });
