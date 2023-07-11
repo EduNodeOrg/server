@@ -112,6 +112,10 @@ const UserSchema = new mongoose.Schema({
     type: Date,
     
   },
+  Points: {
+    type: Number,
+    default: 0,
+  },
   friendRequests: [
     {
       user: {

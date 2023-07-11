@@ -4,7 +4,7 @@ const auth = require('../middleware/auth')
 const GameChallenge = require("../models/GameChallenge");
 const User = require('../models/User');
 const Notification = require("../models/Notification");
-
+const User = require('../models/User');
 
 
 
@@ -66,27 +66,57 @@ router.get('/start/:gameNumber', async (req, res) => {
 
 router.post('/submit', async (req, res) => {
     const { localEmail, challengeFinished, grade, gameNumber } = req.body;
-
+  
     try {
-        let gameChallenge = await GameChallenge.findOne({ gameNumber: gameNumber });
-
-        if (gameChallenge) {
-            gameChallenge.winner = localEmail;
-            if (gameChallenge.user1email === localEmail) {
-                gameChallenge.user1grade = grade;
-            } else if (gameChallenge.user2email === localEmail) {
-                gameChallenge.user2grade = grade;
+      let gameChallenge = await GameChallenge.findOne({ gameNumber: gameNumber });
+  
+      if (gameChallenge) {
+        gameChallenge.winner = localEmail;
+        if (gameChallenge.user1email === localEmail) {
+          gameChallenge.user1grade = grade;
+          const user2 = await User.findOne({ email: gameChallenge.user2email });
+  
+          if (user2) {
+            if (user2.Points < 50) {
+              user2.Points = 0;
+            } else {
+              user2.Points -= 50;
             }
-            gameChallenge.challengeFinished = challengeFinished;
-            await gameChallenge.save();
+  
+            await user2.save();
+          }
+        } else if (gameChallenge.user2email === localEmail) {
+          gameChallenge.user2grade = grade;
+          const user1 = await User.findOne({ email: gameChallenge.user1email });
+  
+          if (user1) {
+            if (user1.Points < 50) {
+              user1.Points = 0;
+            } else {
+              user1.Points -= 50;
+            }
+  
+            await user1.save();
+          }
         }
-
-        res.sendStatus(200);
+        const winner = await User.findOne({ email: localEmail });
+  
+        if (winner) {
+          winner.Points += 100;
+          await winner.save();
+        }
+  
+        gameChallenge.challengeFinished = challengeFinished;
+        await gameChallenge.save();
+      }
+  
+      res.sendStatus(200);
     } catch (error) {
-        console.error('Error:', error);
-        res.sendStatus(500);
+      console.error('Error:', error);
+      res.sendStatus(500);
     }
-});
+  });
+  
 
 
 router.get('/finish/:gameNumber', async (req, res) => {
