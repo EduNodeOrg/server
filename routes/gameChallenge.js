@@ -63,60 +63,89 @@ router.get('/start/:gameNumber', async (req, res) => {
     }
 });
 
-
 router.post('/submit', async (req, res) => {
-    const { localEmail, challengeFinished, grade, gameNumber } = req.body;
-  
-    try {
-      let gameChallenge = await GameChallenge.findOne({ gameNumber: gameNumber });
-  
-      if (gameChallenge) {
-        gameChallenge.winner = localEmail;
-        if (gameChallenge.user1email === localEmail) {
-          gameChallenge.user1grade = grade;
-          const user2 = await User.findOne({ email: gameChallenge.user2email });
-  
-          if (user2) {
-            if (user2.Points < 50) {
-              user2.Points = 0;
-            } else {
-              user2.Points -= 50;
-            }
-  
-            await user2.save();
+  const { localEmail, challengeFinished, grade, gameNumber } = req.body;
+
+  try {
+    let gameChallenge = await GameChallenge.findOne({ gameNumber: gameNumber });
+
+    if (gameChallenge) {
+      gameChallenge.winner = localEmail;
+      if (gameChallenge.user1email === localEmail) {
+        gameChallenge.user1grade = grade;
+        const user2 = await User.findOne({ email: gameChallenge.user2email });
+
+        if (user2) {
+          if (user2.Points < 100) {
+            user2.Points = 0;
+          } else {
+            user2.Points -= 100;
           }
-        } else if (gameChallenge.user2email === localEmail) {
-          gameChallenge.user2grade = grade;
-          const user1 = await User.findOne({ email: gameChallenge.user1email });
-  
-          if (user1) {
-            if (user1.Points < 50) {
-              user1.Points = 0;
-            } else {
-              user1.Points -= 50;
-            }
-  
-            await user1.save();
+
+          await user2.save();
+
+          const user2Games = await GameChallenge.countDocuments({
+            $or: [
+              { user1email: gameChallenge.user2email },
+              { user2email: gameChallenge.user2email }
+            ]
+          });
+
+          user2.rating = user2.Points / user2Games;
+          await user2.save();
+        }
+      } else if (gameChallenge.user2email === localEmail) {
+        gameChallenge.user2grade = grade;
+        const user1 = await User.findOne({ email: gameChallenge.user1email });
+
+        if (user1) {
+          if (user1.Points < 100) {
+            user1.Points = 0;
+          } else {
+            user1.Points -= 100;
           }
+
+          await user1.save();
+
+          const user1Games = await GameChallenge.countDocuments({
+            $or: [
+              { user1email: gameChallenge.user1email },
+              { user2email: gameChallenge.user1email }
+            ]
+          });
+
+          user1.rating = user1.Points / user1Games;
+          await user1.save();
         }
-        const winner = await User.findOne({ email: localEmail });
-  
-        if (winner) {
-          winner.Points += 100;
-          await winner.save();
-        }
-  
-        gameChallenge.challengeFinished = challengeFinished;
-        await gameChallenge.save();
       }
-  
-      res.sendStatus(200);
-    } catch (error) {
-      console.error('Error:', error);
-      res.sendStatus(500);
+      const winner = await User.findOne({ email: localEmail });
+
+      if (winner) {
+        winner.Points += 100;
+        await winner.save();
+
+        const winnerGames = await GameChallenge.countDocuments({
+          $or: [
+            { user1email: localEmail },
+            { user2email: localEmail }
+          ]
+        });
+
+        winner.rating = winner.Points / winnerGames;
+        await winner.save();
+      }
+
+      gameChallenge.challengeFinished = challengeFinished;
+      await gameChallenge.save();
     }
-  });
-  
+
+    res.sendStatus(200);
+  } catch (error) {
+    console.error('Error:', error);
+    res.sendStatus(500);
+  }
+});
+
 
 
 router.get('/finish/:gameNumber', async (req, res) => {

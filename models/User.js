@@ -114,6 +114,10 @@ const UserSchema = new mongoose.Schema({
   },
   Points: {
     type: Number,
+    default: 1000,
+  },
+  rating: {
+    type: Number,
     default: 0,
   },
   friendRequests: [
