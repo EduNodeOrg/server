@@ -71,6 +71,13 @@ router.post('/submit', async (req, res) => {
 
     if (gameChallenge) {
       gameChallenge.winner = localEmail;
+      const newNotification = new Notification({
+        message:
+            `Congrats! You have won a Challenge Game!`,
+        time: new Date(),
+        email: gameChallenge.winner,
+    });
+    await newNotification.save();
       if (gameChallenge.user1email === localEmail) {
         gameChallenge.user1grade = grade;
         const user2 = await User.findOne({ email: gameChallenge.user2email });
@@ -158,13 +165,7 @@ router.get('/finish/:gameNumber', async (req, res) => {
             const { challengeFinished, winner } = gameChallenge;
 
             if (challengeFinished && winner) {
-                const newNotification = new Notification({
-                    message:
-                        `Congrats! You have won a Challenge Game!`,
-                    time: new Date(),
-                    email: winner,
-                });
-                await newNotification.save();
+               
                 res.json({ challengeFinished, winner });
             } else {
                 res.json({ challengeFinished });
