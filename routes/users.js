@@ -655,4 +655,13 @@ router.get('/friends/:email', async (req, res) => {
   }
 });
 
+router.get('/rating', async (req, res) => {
+  try {
+    const users = await User.find().sort({ rating: -1 });
+    res.json(users);
+  } catch (error) {
+    console.error('Error:', error);
+    res.sendStatus(500);
+  }
+});
 module.exports = router;
