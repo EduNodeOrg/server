@@ -65,7 +65,7 @@ router.post("/", async (req, res) => {
         return res.status(404).json({ error: 'Post not found' });
       }
       challenge.comments.push(newComment);
-      await post.save();
+      await challenge.save();
       res.json(challenge);
     } catch (err) {
       console.error(err);
