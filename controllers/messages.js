@@ -32,7 +32,9 @@ exports.getMessages = async (req, res) => {
 exports.createMessage = async (req, res) => {
   try {
     const { senderEmail, receiverEmail, content } = req.body;
+    
     const newMessage = new Message({ senderEmail, receiverEmail, content });
+
     const savedMessage = await newMessage.save();
     res.status(201).json({ message: savedMessage });
   } catch (error) {
