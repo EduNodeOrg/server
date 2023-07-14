@@ -12,28 +12,34 @@ router.post('/', messageController.createMessage);
 
 router.get('/count', async (req, res) => {
     try {
-        const { sender, receiver } = req.query;
-    
-        let query = {
-          $or: [
-            { senderEmail: sender, receiverEmail: receiver },
-            { senderEmail: receiver, receiverEmail: sender },
-          ],
-        };
-    
-        // If the 'afterReset' query parameter is present and truthy, only consider messages sent after the reset
-        if (req.query.afterReset) {
-          query.createdAt = { $gt: new Date(req.query.afterReset) };
-        }
-    
-        const count = await Message.countDocuments(query);
-    
-        res.status(200).json({ count });
-      } catch (error) {
-        console.error(error);
-        res.status(500).json({ error: 'Server error' });
+      const { sender, receiver } = req.query;
+  
+      let query = {
+        $or: [
+          { senderEmail: receiver, receiverEmail: sender },
+          { senderEmail: receiver, receiverEmail: sender },
+        ],
+      };
+  
+      // If the 'afterReset' query parameter is present and truthy, only consider messages sent after the reset
+      if (req.query.afterReset) {
+        query.createdAt = { $gt: new Date(req.query.afterReset) };
       }
+  
+      const messages = await Message.find(query);
+  
+      let count = 0;
+      messages.forEach((message) => {
+        count += message.messageCount;
+      });
+  
+      res.status(200).json({ count });
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ error: 'Server error' });
+    }
   });
+  
   
   router.put('/reset', async (req, res) => {
     try {
@@ -43,7 +49,7 @@ router.get('/count', async (req, res) => {
       await Message.updateMany(
         {
           $or: [
-            { senderEmail: sender, receiverEmail: receiver },
+            { senderEmail: receiver, receiverEmail: sender },
             { senderEmail: receiver, receiverEmail: sender },
           ],
         },

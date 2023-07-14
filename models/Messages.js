@@ -22,7 +22,7 @@ const messageSchema = new mongoose.Schema({
     },
     messageCount: {
       type: Number,
-      default: 0,
+      default:1,
     },
   });
 
