@@ -1,7 +1,6 @@
 const Message = require('../models/Messages');
 
-// Get messages between sender and receiver
-// Get messages between sender and receiver
+
 exports.getMessages = async (req, res) => {
   try {
     const { sender, receiver } = req.query;
@@ -11,12 +10,22 @@ exports.getMessages = async (req, res) => {
         { senderEmail: receiver, receiverEmail: sender },
       ],
     }).sort({ createdAt: 1 });
-    res.status(200).json({ messages });
+
+    // Format the timestamp for each message
+    const formattedMessages = messages.map((message) => {
+      return {
+        ...message._doc,
+        timestamp: message.getRelativeTime(),
+      };
+    });
+
+    res.status(200).json({ messages: formattedMessages });
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: 'Server error' });
   }
 };
+
 
 
 // Create a new message
