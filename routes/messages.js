@@ -35,7 +35,7 @@ router.get('/count', async (req, res) => {
       }
   });
   
-  app.put('/reset', async (req, res) => {
+  router.put('/reset', async (req, res) => {
     try {
       const { sender, receiver } = req.body;
   
