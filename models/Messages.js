@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-const moment = require('moment');
+const moment = require('moment-timezone');
 
 const messageSchema = new mongoose.Schema({
     senderEmail: {
@@ -16,7 +16,9 @@ const messageSchema = new mongoose.Schema({
     },
     timestamp: {
       type: Date,
-      default: Date.now,
+      default: function () {
+        return moment().tz('Europe/Vienna').format();
+      },
     },
     messageCount: {
       type: Number,

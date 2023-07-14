@@ -181,6 +181,8 @@ app.use("/api/gamechallenge", gamechallenge);
 app.use("/api/glossary", glossary);
 app.use("/api/notif", notif);
 
+// Set the time zone to Europe/Vienna
+process.env.TZ = 'Europe/Vienna';
 
 app.listen(PORT, () => console.log(`server started at ${PORT}`))
 server.on('upgrade', (request, socket, head) => {
