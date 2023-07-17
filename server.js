@@ -140,7 +140,7 @@ const universities = require('./routes/universities')
 const valid = require('./routes/valid')
 const glossary = require('./routes/glossary')
 const game = require('./routes/game')
-
+const messagesNotif = require('./routes/messageNotif');
 
 
 app.use('/api/gcallback', gcallback);
@@ -184,7 +184,7 @@ app.use("/api/gamechallenge", gamechallenge);
 app.use("/api/glossary", glossary);
 app.use("/api/notif", notif);
 app.use("/api/game", game);
-
+app.use("/api/messageNotif", messagesNotif);
 // Set the time zone to Europe/Vienna
 process.env.TZ = 'Europe/Vienna';
 

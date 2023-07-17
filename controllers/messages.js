@@ -1,4 +1,5 @@
 const Message = require('../models/Messages');
+const MessageNotif = require('../models/MessageNotif');
 
 
 exports.getMessages = async (req, res) => {
@@ -32,10 +33,20 @@ exports.getMessages = async (req, res) => {
 exports.createMessage = async (req, res) => {
   try {
     const { senderEmail, receiverEmail, content } = req.body;
-    
-    const newMessage = new Message({ senderEmail, receiverEmail, content});
+
+    const newMessage = new Message({ senderEmail, receiverEmail, content });
 
     const savedMessage = await newMessage.save();
+
+    const newNotification = new MessageNotif({
+      message: `You have a new Message from ${senderEmail} `,
+      time: new Date(),
+      receiver: receiverEmail,
+      sender: senderEmail
+    });
+    await newNotification.save();
+    console.log('Message notification saved !')
+
     res.status(201).json({ message: savedMessage });
   } catch (error) {
     console.error(error);
