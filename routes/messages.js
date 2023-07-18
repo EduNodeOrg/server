@@ -41,9 +41,9 @@ router.get('/count', async (req, res) => {
 });
 
 
-router.get('/countAll', async (req, res) => {
+router.get('/countAll/:sender', async (req, res) => {
   try {
-    const { sender } = req.body;
+    const sender = req.params.sender;
 
     let query = {
       receiverEmail: sender
