@@ -21,7 +21,7 @@ router.post("/", async (req, res) => {
     });
 
     await post.save();
-    res.status(201).json(post);
+    c
   } catch (error) {
     console.log(error);
     res.status(500).json({ error: 'Server error' });

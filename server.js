@@ -141,7 +141,7 @@ const valid = require('./routes/valid')
 const glossary = require('./routes/glossary')
 const game = require('./routes/game')
 const messagesNotif = require('./routes/messageNotif');
-
+const blogDy =require('./routes/blogDy')
 
 app.use('/api/gcallback', gcallback);
 app.use('/api/search', search);
@@ -171,6 +171,7 @@ app.use("/api/project", project);
 app.use("/api/cours", cours);
 app.use("/api/google", google);
 app.use("/api/blog", blog);
+app.use("/api/blogdy", blogDy);
 app.use("/api/chat", chat);
 app.use("/auth", authRoute);
 app.use("/api/password", password);
