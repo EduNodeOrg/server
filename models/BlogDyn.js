@@ -1,6 +1,10 @@
 const mongoose = require('mongoose');
 
 const subtitleTextItemSchema = new mongoose.Schema({
+    subtitle: {
+        type: String,
+        required: true
+      },
     text: {
       type: String,
       required: true
@@ -21,7 +25,7 @@ const subtitleTextItemSchema = new mongoose.Schema({
       required: true
     }],
     subtitleTextItems: [subtitleTextItemSchema], 
-    
+
     conclusion: {
       type: String,
       required: false

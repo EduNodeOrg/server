@@ -3,29 +3,38 @@ const router = express.Router();
 const BlogDy = require('../models/BlogDyn'); // Assuming the path to the blog model file is correct
 
 // Create a new blog post
-router.post('/', (req, res) => {
-  const { title, subtitles, subtitleTexts, subtitleTextItems, conclusion } = req.body;
-
-  // Create a new blog entry using the Blog model
-  const newBlog = new BlogDy({
-    title,
-    subtitles,
-    subtitleTexts,
-    subtitleTextItems,
-    conclusion
+router.post("/", async (req, res) => {
+    try {
+      const {
+        title,
+        subtitles,
+        subtitle1Text,
+        subtitle2Text,
+        subtitle3Text,
+        subtitleTextItems,
+        conclusion,
+      } = req.body;
+  
+      // Create the blog post with the provided data
+      const blog = new BlogDy({
+        title,
+        subtitles,
+        subtitleTexts: [subtitle1Text, subtitle2Text, subtitle3Text],
+        subtitleTextItems,
+        conclusion,
+      });
+  
+      // Save the blog post to the database
+      const savedBlog = await blog.save();
+  
+      res.status(201).json(savedBlog);
+    } catch (error) {
+      console.error("Error creating blog post:", error);
+      res.status(500).json({ error: "Internal server error" });
+    }
   });
 
-  // Save the blog entry to the database
-  newBlog.save()
-    .then((savedBlog) => {
-      console.log("New blog entry saved successfully!");
-      res.status(201).json(savedBlog);
-    })
-    .catch((error) => {
-      console.error("Error saving the blog entry:", error);
-      res.status(500).json({ error: "An error occurred while saving the blog entry." });
-    });
-});
+
 router.get('/:id', (req, res) => {
     const blogId = req.params.id;
   
