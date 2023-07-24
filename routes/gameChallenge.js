@@ -78,8 +78,10 @@ router.post('/submit', async (req, res) => {
         email: gameChallenge.winner,
       });
       await newNotification.save();
+
       if (gameChallenge.user1email === localEmail) {
         gameChallenge.user1grade = grade;
+        gameChallenge.user2grade = 0;
         const user2 = await User.findOne({ email: gameChallenge.user2email });
         const user1 = await User.findOne({ email: gameChallenge.localEmail });
         if (user2) {
@@ -92,19 +94,20 @@ router.post('/submit', async (req, res) => {
           await user2.save();
 
 
-          if (user2) {
-            const expectedScore = 1 / (1 + Math.pow(10, (user1.rating - user2.rating) / 400));
-            const rate = user2.rating + kFactor * (gameChallenge.user2grade - expectedScore);
-            user2.rating = rate;
-          }
+
+          const expectedScore = 1 / (1 + Math.pow(10, (user1.rating - user2.rating) / 400));
+          const rate = user2.rating + kFactor * (gameChallenge.user2grade - expectedScore);
+          user2.rating = rate;
+
 
           await user2.save();
         }
       } else if (gameChallenge.user2email === localEmail) {
         gameChallenge.user2grade = grade;
+        gameChallenge.user1grade = 0;
         const user1 = await User.findOne({ email: gameChallenge.user1email });
         const user2 = await User.findOne({ email: gameChallenge.user2email });
-        
+
         if (user1) {
           if (user1.Points < 100) {
             user1.Points = 0;
@@ -114,30 +117,17 @@ router.post('/submit', async (req, res) => {
 
           await user1.save();
 
-           const expectedScore = 1 / (1 + Math.pow(10, (user2.rating - user1.rating) / 400));
-            const rate = user1.rating + kFactor * (gameChallenge.user1grade - expectedScore);
-            user1.rating = rate;
+          const expectedScore = 1 / (1 + Math.pow(10, (user2.rating - user1.rating) / 400));
+          const rate = user1.rating + kFactor * (gameChallenge.user1grade - expectedScore);
+          user1.rating = rate;
 
-          
+
           await user1.save();
         }
       }
       const winner = await User.findOne({ email: localEmail });
 
-      if (winner) {
-        winner.Points += 100;
-        await winner.save();
-
-        const winnerGames = await GameChallenge.countDocuments({
-          $or: [
-            { user1email: localEmail },
-            { user2email: localEmail }
-          ]
-        });
-
-        winner.rating = winner.Points / winnerGames;
-        await winner.save();
-      }
+      
 
       gameChallenge.challengeFinished = challengeFinished;
       await gameChallenge.save();
