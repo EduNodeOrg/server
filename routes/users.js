@@ -558,11 +558,6 @@ router.post('/friend-request/:userId', async (req, res) => {
       }
     });
 
-
-
-
-
-
     await receiver.save();
 
     res.status(200).json({ message: 'Friend request sent.' });
