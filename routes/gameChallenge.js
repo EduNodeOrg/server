@@ -158,7 +158,30 @@ router.post('/submit', async (req, res) => {
           const rate2 = user2.rating + kFactor * (gameChallenge.user2grade - expectedScore2);
           user2.rating = rate2;
           await user2.save();
+
+
+          const data = {
+            from: 'hi@edunode.org',
+            to: localEmail,
+            subject: 'Challenge Outcome! ',
+            text: `Congrats for winning the Edunode Challenge! You have won the challenge with ${grade} questions right and won 100 Edunode points !
+            Your rating is ${rate2}`
+          };
+
+
+          mg.messages.create(domain, data, function (error, body) {
+            if (error) {
+              console.log('Error sending email:', error);
+              res.status(500).json({ error: 'Error sending email' });
+            } else {
+              console.log('Email sent successfully:', body);
+              res.json({ msg: 'Email sent' });
+            }
+          });
+
         }
+
+        
       }
 
       gameChallenge.challengeFinished = challengeFinished;
