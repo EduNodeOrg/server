@@ -4,6 +4,12 @@ const auth = require('../middleware/auth')
 const GameChallenge = require("../models/GameChallenge");
 const User = require('../models/User');
 const Notification = require("../models/Notification");
+const formData = require('form-data');
+const Mailgun = require('mailgun.js');
+const mailgun = new Mailgun(formData);
+const domain = "edunode.org"
+const mg = mailgun.client({ username: 'api', key: "key-c8d12b7428fbe666e074108aaa0820bc" || 'key-yourkeyhere', url: 'https://api.eu.mailgun.net' });
+
 
 
 
@@ -98,7 +104,31 @@ router.post('/submit', async (req, res) => {
           const expectedScore = 1 / (1 + Math.pow(10, (user1.rating - user2.rating) / 400));
           const rate = user2.rating + kFactor * (gameChallenge.user2grade - expectedScore);
           user2.rating = rate;
+          await user2.save();
 
+          const expectedScore2 = 1 / (1 + Math.pow(10, (user2.rating - user1.rating) / 400));
+          const rate2 = user1.rating + kFactor * (gameChallenge.user1grade - expectedScore2);
+          user1.rating = rate2;
+          await user1.save();
+
+          const data = {
+            from: 'hi@edunode.org',
+            to: localEmail,
+            subject: 'Challenge Outcome! ',
+            text: `Congrats for winning the Edunode Challenge! You have won the challenge with ${grade} questions right and won 100 Edunode points !
+            Your rating is ${rate}`
+          };
+
+
+          mg.messages.create(domain, data, function (error, body) {
+            if (error) {
+              console.log('Error sending email:', error);
+              res.status(500).json({ error: 'Error sending email' });
+            } else {
+              console.log('Email sent successfully:', body);
+              res.json({ msg: 'Email sent' });
+            }
+          });
 
           await user2.save();
         }
@@ -123,11 +153,13 @@ router.post('/submit', async (req, res) => {
 
 
           await user1.save();
+
+          const expectedScore2 = 1 / (1 + Math.pow(10, (user1.rating - user2.rating) / 400));
+          const rate2 = user2.rating + kFactor * (gameChallenge.user2grade - expectedScore2);
+          user2.rating = rate2;
+          await user2.save();
         }
       }
-      const winner = await User.findOne({ email: localEmail });
-
-      
 
       gameChallenge.challengeFinished = challengeFinished;
       await gameChallenge.save();
