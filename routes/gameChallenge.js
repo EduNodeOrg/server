@@ -130,6 +130,28 @@ router.post('/submit', async (req, res) => {
             }
           });
 
+
+
+          const data1 = {
+            from: 'hi@edunode.org',
+            to: user2.email,
+            subject: 'Challenge Outcome! ',
+            text: `Unfortunately you lost the challenge! But you didn't miss nothing you can do it again ! 
+            Your rating is ${rate}
+            With love Edunode.`
+          };
+
+
+          mg.messages.create(domain, data1, function (error, body) {
+            if (error) {
+              console.log('Error sending email:', error);
+              res.status(500).json({ error: 'Error sending email' });
+            } else {
+              console.log('Email sent successfully:', body);
+              res.json({ msg: 'Email sent' });
+            }
+          });
+
           await user2.save();
         }
       } else if (gameChallenge.user2email === localEmail) {
@@ -170,6 +192,26 @@ router.post('/submit', async (req, res) => {
 
 
           mg.messages.create(domain, data, function (error, body) {
+            if (error) {
+              console.log('Error sending email:', error);
+              res.status(500).json({ error: 'Error sending email' });
+            } else {
+              console.log('Email sent successfully:', body);
+              res.json({ msg: 'Email sent' });
+            }
+          });
+
+          const data1 = {
+            from: 'hi@edunode.org',
+            to: user1.email,
+            subject: 'Challenge Outcome! ',
+            text: `Unfortunately you lost the challenge! But you didn't miss nothing you can do it again ! 
+            Your rating is ${rate}
+            With love Edunode.`
+          };
+
+
+          mg.messages.create(domain, data1, function (error, body) {
             if (error) {
               console.log('Error sending email:', error);
               res.status(500).json({ error: 'Error sending email' });
