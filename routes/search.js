@@ -4,6 +4,7 @@ const Cours = require('../models/Cours');
 const Post = require('../models/Post');
 const Blog = require('../models/Blog');
 const User = require('../models/User');
+const axios = require('axios');
 router.get('/', async (req, res) => {
   try {
     const searchQuery = req.query.searchQuery;
