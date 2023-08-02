@@ -143,10 +143,12 @@ const glossary = require('./routes/glossary')
 const game = require('./routes/game')
 const messagesNotif = require('./routes/messageNotif');
 const blogDy =require('./routes/blogDy')
+const badge =require('./routes/badge')
 
 app.use('/api/gcallback', gcallback);
 app.use('/api/search', search);
 app.use('/api/users', users);
+app.use('/api/badge', badge);
 app.use('/api/auth', auth);
 app.use('/api/emailauth', emailAuth);
 app.use('/api/emaillogin', emailLogin);
