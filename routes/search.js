@@ -73,4 +73,17 @@ router.get('/:email', async (req, res) => {
   }
 });
 
+router.get('/:searchQuery', async (req, res) => {
+  try {
+    const { searchQuery } = req.params;
+
+    const response = await axios.get(`https://en.wikipedia.org/w/api.php?action=opensearch&format=json&search=${searchQuery}`);
+
+    res.json(response.data);
+  } catch (error) {
+    console.error('Error fetching wiki data:', error.message);
+    res.status(500).json({ error: 'Error fetching wiki data' });
+  }
+});
+
 module.exports = router;
