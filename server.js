@@ -133,6 +133,7 @@ const blog = require("./routes/blog")
 const chat = require("./routes/chat")
 const password = require('./routes/reset-password')
 const uni =require('./routes/Uni')
+const tutor =require('./routes/tutor')
 const challenge =require('./routes/challenge')
 const notif =require('./routes/notifications')
 const gamechallenge =require('./routes/gameChallenge')
@@ -188,6 +189,7 @@ app.use("/api/gamechallenge", gamechallenge);
 app.use("/api/glossary", glossary);
 app.use("/api/notif", notif);
 app.use("/api/game", game);
+app.use("/api/tutors", tutor);
 app.use("/api/messageNotif", messagesNotif);
 // Set the time zone to Europe/Vienna
 process.env.TZ = 'Europe/Vienna';

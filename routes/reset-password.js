@@ -3,6 +3,7 @@ const router = express.Router();
 const User = require('../models/User');
 const crypto = require('crypto');
 const bcrypt = require('bcryptjs');
+
 const formData = require('form-data');
 const Mailgun = require('mailgun.js');
 const mailgun = new Mailgun(formData);
