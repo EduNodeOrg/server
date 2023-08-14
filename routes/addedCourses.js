@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const auth = require('../middleware/auth')
-const Cours = require("../models/Cours");
+const Cours = require("../models/AddedCourses");
 const Notification = require("../models/Notification");
 const User = require('../models/User');
 // Create a new Cours
@@ -211,8 +211,35 @@ router.get('/coursemail/:email', async (req, res) => {
   }
 });
 
+router.delete('/delete/:id', async (req, res) => {
+  const { id } = req.params;
 
-module.exports = router;
+  try {
+      await Cours.findByIdAndRemove(id);
+      res.json({ message: 'Cours deleted successfully' });
+  } catch (error) {
+      console.error('Error deleting Cours:', error);
+      res.status(500).json({ error: 'Failed to delete Cours' });
+  }
+});
+
+router.put('/edit/:id', async (req, res) => {
+  const { id } = req.params;
+  const { status } = req.body;
+
+  try {
+    const cours = await Cours.findByIdAndUpdate(
+      id,
+      { status },
+      { new: true }
+    );
+    res.json(cours);
+  } catch (error) {
+    console.error('Error updating Cours:', error);
+    res.status(500).json({ error: 'Failed to update Cours' });
+  }
+});
+
 
 
 module.exports = router;

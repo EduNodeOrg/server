@@ -128,6 +128,7 @@ const certificateRoutes = require("./routes/certificates");
 const profile = require("./routes/profile");
 const project = require("./routes/project");
 const cours = require("./routes/cours");
+const AddedCours = require("./routes/addedCourses");
 const google = require("./routes/google")
 const blog = require("./routes/blog")
 const chat = require("./routes/chat")
@@ -173,6 +174,7 @@ app.use("/api/certificates", certificateRoutes);
 app.use("/api/profile", profile);
 app.use("/api/project", project);
 app.use("/api/cours", cours);
+app.use("/api/addedcours", AddedCours);
 app.use("/api/google", google);
 app.use("/api/blog", blog);
 app.use("/api/blogdy", blogDy);

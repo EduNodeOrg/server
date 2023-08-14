@@ -10,6 +10,11 @@ const badgeSchema = new mongoose.Schema({
   expiration: { type: Date, required: true },
   privatee: { type: Boolean, default: false },
   image: { type: String },
+  status: {
+    type: String,
+    enum: ['pending', 'accepted','rejected'],
+    default: 'pending'
+  },
 }, { timestamps: true });
 
 const Badge = mongoose.model('Badge', badgeSchema);

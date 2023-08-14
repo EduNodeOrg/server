@@ -30,4 +30,33 @@ router.post('/', async (req, res) => {
   }
 });
 
+router.delete('/delete/:id', async (req, res) => {
+  const { id } = req.params;
+
+  try {
+      await GlossaryEntry.findByIdAndRemove(id);
+      res.json({ message: 'Glossary deleted successfully' });
+  } catch (error) {
+      console.error('Error deleting Glossary:', error);
+      res.status(500).json({ error: 'Failed to delete Glossary' });
+  }
+});
+
+router.put('/edit/:id', async (req, res) => {
+  const { id } = req.params;
+  const { status } = req.body;
+
+  try {
+    const glossary = await GlossaryEntry.findByIdAndUpdate(
+      id,
+      { status },
+      { new: true }
+    );
+    res.json(glossary);
+  } catch (error) {
+    console.error('Error updating glossary:', error);
+    res.status(500).json({ error: 'Failed to update glossary' });
+  }
+});
+
 module.exports = router;

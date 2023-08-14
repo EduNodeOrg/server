@@ -78,6 +78,7 @@ const UserSchema = new mongoose.Schema({
   },
    role:{
     type: String,
+    default:'Student',
     required: false,
   },
   skills:{

@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 
-const CoursSchema = new mongoose.Schema({
+const AddedCoursSchema = new mongoose.Schema({
   
   
   title: {
@@ -95,7 +95,7 @@ const CoursSchema = new mongoose.Schema({
 
 );
 
-const Cours = mongoose.model("Cours", CoursSchema);
+const AddedCours = mongoose.model("AddedCourses", AddedCoursSchema);
 
 
-module.exports = Cours;
+module.exports = AddedCours;
