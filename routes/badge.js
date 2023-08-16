@@ -65,4 +65,33 @@ router.get('/posted/:email', async (req, res) => {
   }
 });
 
+router.get("/acceptedCount", async (req, res) => {
+  try {
+      const count = await Badge.countDocuments({ status: "accepted" });
+      res.json({ count });
+  } catch (error) {
+      res.status(500).json({ error: "Server error" });
+  }
+});
+
+// Route to return the number of requests with a rejected status
+router.get("/rejectedCount", async (req, res) => {
+  try {
+      const count = await Badge.countDocuments({ status: "rejected" });
+      res.json({ count });
+  } catch (error) {
+      res.status(500).json({ error: "Server error" });
+  }
+});
+
+// Route to return the number of requests
+router.get("/count", async (req, res) => {
+  try {
+      const count = await Badge.countDocuments();
+      res.json({ count });
+  } catch (error) {
+      res.status(500).json({ error: "Server error" });
+  }
+});
+
 module.exports = router;
