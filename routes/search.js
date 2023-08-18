@@ -95,12 +95,18 @@ router.get('/youtube/:email', async (req, res) => {
 
     // Build the YouTube API search URL and make requests for each preference/skill
     for (const term of allSearchTerms) {
-      const youtubeApiUrl = `https://www.googleapis.com/youtube/v3/search?part=snippet&key=AIzaSyA88nAAzmcEnMBeWHA-tMHePt5XfhzEo8E&type=video&q=${term}`;
+      try {
+      const youtubeApiUrl = `https://www.googleapis.com/youtube/v3/search?part=snippet&key=AIzaSyBIBbtXwgfnZhq3OXCA8uewavg1lFZb-gY&type=video&q=${term}`;
       const response = await axios.get(youtubeApiUrl);
-      const videos = response.data.items;
-
-      // Append videos to the allVideos array
-      allVideos = allVideos.concat(videos.slice(0, 5));
+      if (response.status === 200) {
+        const videos = response.data.items;
+        allVideos = allVideos.concat(videos.slice(0, 5));
+      } else {
+        console.error(`YouTube API request failed with status: ${response.status}`);
+      }
+    } catch (error) {
+      console.error('Error making YouTube API request:', error);
+    }
     }
 
     // Return the found videos
@@ -112,7 +118,7 @@ router.get('/youtube/:email', async (req, res) => {
   }
 });
 
-module.exports = router;
+
 
 
 router.get('/wiki/:searchQuery', async (req, res) => {
