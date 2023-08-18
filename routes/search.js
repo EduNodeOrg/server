@@ -74,6 +74,47 @@ router.get('/:email', async (req, res) => {
   }
 });
 
+
+
+
+router.get('/youtube/:email', async (req, res) => {
+  try {
+    const { email } = req.params;
+
+    // Find the user by email to get their preferences and skills
+    const user = await User.findOne({ email });
+
+    // Extract preferences and skills from the user object
+    const { preferences, skills } = user;
+
+    // Combine preferences and skills into a single array for the YouTube API query
+    const allSearchTerms = preferences.concat(skills);
+
+    // Array to hold the results
+    let allVideos = [];
+
+    // Build the YouTube API search URL and make requests for each preference/skill
+    for (const term of allSearchTerms) {
+      const youtubeApiUrl = `https://www.googleapis.com/youtube/v3/search?part=snippet&key=AIzaSyA88nAAzmcEnMBeWHA-tMHePt5XfhzEo8E&type=video&q=${term}`;
+      const response = await axios.get(youtubeApiUrl);
+      const videos = response.data.items;
+
+      // Append videos to the allVideos array
+      allVideos = allVideos.concat(videos.slice(0, 5));
+    }
+
+    // Return the found videos
+    res.json({ videos: allVideos });
+  } catch (err) {
+    // Handle any errors
+    console.error(err);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+module.exports = router;
+
+
 router.get('/wiki/:searchQuery', async (req, res) => {
   res.header("Access-Control-Allow-Origin", '*');
   res.header("Access-Control-Allow-Credentials", true);

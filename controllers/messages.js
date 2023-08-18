@@ -38,9 +38,9 @@ exports.getMessages = async (req, res) => {
 // Create a new message
 exports.createMessage = async (req, res) => {
   try {
-    const { senderEmail, receiverEmail, content } = req.body;
+    const { senderEmail, receiverEmail, content,image  } = req.body;
 
-    const newMessage = new Message({ senderEmail, receiverEmail, content });
+    const newMessage = new Message({ senderEmail, receiverEmail, content,image  });
 
     const savedMessage = await newMessage.save();
 

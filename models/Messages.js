@@ -24,6 +24,10 @@ const messageSchema = new mongoose.Schema({
       type: Number,
       default:1,
     },
+    image: {
+      type: String,
+      default: null,
+    },
   });
 
 

@@ -64,7 +64,10 @@ router.post('/', function (req, res) {
                     user: {
                       id: user._id,
                       email: user.email,
-                      confirmationCode: user.confirmationCode
+                      confirmationCode: user.confirmationCode,
+                      images:user.images,
+                      preferences:user.preferences,
+                      role:user.role,
                     }
                   });
                 }
