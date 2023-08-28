@@ -20,7 +20,7 @@ router.post('/', function (req, res) {
   
   const email = req.body.email;
   const password = req.body.password;
-  
+  const name = req.body.name;
   User.findOne({ email })
     .then((user) => {
       if (user) {
@@ -29,7 +29,7 @@ router.post('/', function (req, res) {
       } else {
         // If the user doesn't exist, create a new user
         const confirmationCode = JSON.stringify(Math.floor(Math.random() * 90000) + 10000)
-        const newUser = { email, password, confirmationCode };
+        const newUser = { email,name ,password, confirmationCode };
         const data = {
           from: 'hi@edunode.org',
           to: req.body.email ,
@@ -62,6 +62,7 @@ router.post('/', function (req, res) {
                   res.json({
                     token,
                     user: {
+                      name: user.name,
                       id: user._id,
                       email: user.email,
                       confirmationCode: user.confirmationCode,
