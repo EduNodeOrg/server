@@ -85,7 +85,7 @@ router.get('/youtube/:email', async (req, res) => {
     const user = await User.findOne({ email });
 
     // Extract preferences and skills from the user object
-    const { preferences, skills } = user;
+    const { skills } = user;
 
     // Combine preferences and skills into a single array for the YouTube API query
     const allSearchTerms = preferences.concat(skills);
