@@ -25,7 +25,7 @@ router.post('/openai', async (req, res) => {
     const codePlaceholder = '';
     async function generateText() {
       const response = await openai.createCompletion({
-        model: "text-davinci-003",
+        model: "gpt-3.5-turbo-0125",
         prompt: `${input}, if the response contains any codes or commands, only the code and command returned should always start and end with 3 quotes '''${codePlaceholder}''' 
         so I can know where are the codes and commands.`,
         temperature: 0,

@@ -5,20 +5,20 @@ const mongoose = require("mongoose");
 const cors = require("cors");
 dotenv.config({ path: './config/config.env' });
 const fs = require('fs');
-const passport =require('passport');
-const cookieSession =require('cookie-session');
+// const passport =require('passport');
+// const cookieSession =require('cookie-session');
 const authRoute = require("./routes/oauth");
-const passportStrategy = require("./passport");
+// const passportStrategy = require("./passport");
 const bodyParser = require('body-parser');
 const session = require('express-session');
 const MongoDBStore = require('connect-mongodb-session')(session);
-const crypto = require('crypto');
+// const crypto = require('crypto');
 const http = require('http');
-const socketIo = require('socket.io');
+// const socketIo = require('socket.io');
 const app = express();
-const Message = require('./models/Messages');
+// const Message = require('./models/Messages');
 const server = http.createServer(app);
-const io = socketIo(server);
+// const io = socketIo(server);
 const messagesRouter = require('./routes/messages');
 const WebSocket = require('ws');
 
@@ -89,14 +89,14 @@ wss.on('connection', (socket) => {
 });
 
 app.get('/.well-known/stellar.toml', (req, res) => {
-  console.log("hi")
+
   const tomlFilePath = __dirname + '/stellar.toml';
   const tomlContent = fs.readFileSync(tomlFilePath, 'utf8');
   res.send(tomlContent);
 });
 
 app.get('/.well-known/ai-plugin.json', (req, res) => {
-  console.log("hi");
+
   const tomlFilePath = __dirname + '/ai-plugin.json';
   res.sendFile(tomlFilePath);
 });
@@ -196,9 +196,13 @@ app.use("/api/messageNotif", messagesNotif);
 // Set the time zone to Europe/Vienna
 process.env.TZ = 'Europe/Vienna';
 
+
 app.listen(PORT, () => console.log(`server started at ${PORT}`))
-server.on('upgrade', (request, socket, head) => {
-  wss.handleUpgrade(request, socket, head, (ws) => {
-    wss.emit('connection', ws, request);
-  });
+app.get("/", (req, res) => {
+  res.send("Hello, welcome to edunode server!");
 });
+// server.on('upgrade', (request, socket, head) => {
+//   wss.handleUpgrade(request, socket, head, (ws) => {
+//     wss.emit('connection', ws, request);
+//   });
+// });

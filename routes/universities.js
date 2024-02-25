@@ -23,7 +23,7 @@ router.get('/', async (req, res) => {
         const universityNames = universities.map(university => university['World Universities']);
 
         // Send the university names to the frontend
-        res.json(universityNames);
+        // res.json(universityNames);
       } catch (fetchError) {
         console.error(`Error fetching university names: ${fetchError}`);
         // Handle the error appropriately
@@ -37,7 +37,7 @@ router.get('/universities', async (req, res) => {
   try {
     const universities = await University.find({}, 'World Universities');
     const universityNames = universities.map(university => university['World Universities']);
-    res.json(universityNames);
+    // res.json(universityNames);
   } catch (error) {
     console.error(`Error fetching university names: ${error}`);
     res.status(500).json({ error: 'Internal Server Error' });
