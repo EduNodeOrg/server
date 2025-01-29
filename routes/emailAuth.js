@@ -7,6 +7,7 @@ const formData = require('form-data');
 const Mailgun = require('mailgun.js');
 const mailgun = new Mailgun(formData);
 const domain = "edunode.org"
+const { authorize } = require('../models/User');
 
 const mg = mailgun.client({username: 'api', key: "key-c8d12b7428fbe666e074108aaa0820bc" || 'key-yourkeyhere', url: 'https://api.eu.mailgun.net'});
 
@@ -68,7 +69,7 @@ router.post('/', function (req, res) {
                       confirmationCode: user.confirmationCode,
                       images:user.images,
                       preferences:user.preferences,
-                      role:user.role,
+                      role: user.role,
                     }
                   });
                 }
@@ -85,6 +86,11 @@ router.post('/', function (req, res) {
       console.log(err);
       res.status(500).json({ msg: "Internal server error" });
     });
+});
+
+// Protect admin-only routes
+router.get("/admin/users", auth, authorize('admin'), async (req, res) => {
+  // Get all users logic
 });
 
 module.exports = router;

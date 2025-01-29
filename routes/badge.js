@@ -1,6 +1,8 @@
 const express = require('express');
 const router = express.Router();
 const Badge = require('../models/Badge');
+const auth = require('../middleware/auth');
+const { authorize } = require('../models/User');
 
 
 // Fetch badges data
@@ -14,7 +16,7 @@ router.get('/', async (req, res) => {
 });
 
 // POST route to add a new badge
-router.post('/add', async (req, res) => {
+router.post('/add', auth, authorize('admin'), async (req, res) => {
   try {
     const badgeData = req.body;
     const badge = new Badge(badgeData);
@@ -25,7 +27,8 @@ router.post('/add', async (req, res) => {
     res.status(500).json({ message: 'Failed to add badge' });
   }
 });
-router.delete('/delete/:id', async (req, res) => {
+
+router.delete('/delete/:id', auth, authorize('admin'), async (req, res) => {
   const { id } = req.params;
 
   try {

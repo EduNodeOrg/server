@@ -4,8 +4,10 @@ const auth = require('../middleware/auth')
 const Cours = require("../models/AddedCourses");
 const Notification = require("../models/Notification");
 const User = require('../models/User');
+const { authorize } = require('../models/User');
+
 // Create a new Cours
-router.post("/", async (req, res) => {
+router.post("/", auth, authorize('admin'), async (req, res) => {
   try {
     const { title, description, link, date, tags, email, privatee, questions, grade } = req.body;
     //const authorEmail= req.user.auth.email;
@@ -211,7 +213,7 @@ router.get('/coursemail/:email', async (req, res) => {
   }
 });
 
-router.delete('/delete/:id', async (req, res) => {
+router.delete('/delete/:id', auth, authorize('admin'), async (req, res) => {
   const { id } = req.params;
 
   try {
