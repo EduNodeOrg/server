@@ -5,8 +5,6 @@ const mongoose = require("mongoose");
 const cors = require("cors");
 dotenv.config({ path: './config/config.env' });
 const fs = require('fs');
-// const passport =require('passport');
-// const cookieSession =require('cookie-session');
 const authRoute = require("./routes/oauth");
 // const passportStrategy = require("./passport");
 const bodyParser = require('body-parser');
@@ -201,8 +199,4 @@ app.listen(PORT, () => console.log(`server started at ${PORT}`))
 app.get("/", (req, res) => {
   res.send("Hello, welcome to edunode server!");
 });
-// server.on('upgrade', (request, socket, head) => {
-//   wss.handleUpgrade(request, socket, head, (ws) => {
-//     wss.emit('connection', ws, request);
-//   });
-// });
+
