@@ -1,3 +1,4 @@
+require('dotenv').config();
 const {Client, IntentsBitField} = require("discord.js")
 
 const myIntents = new IntentsBitField();
@@ -23,5 +24,5 @@ if (message.mentions.users.has(client.user.id)) { // this could be modified to m
 });
 
 client.login(
-    "MTEyMDM1NDM3MTI4OTQ5NzcyMA.Go-iIp.idCT2BMmcEu8XS8SgWKIuLjIZEgkqkOmeq-0D8"
+    process.env.DISCORD_TOKEN
 );
