@@ -16,7 +16,7 @@ router.get('/', async (req, res) => {
 });
 
 // POST route to add a new badge
-router.post('/add', auth, authorize('admin'), async (req, res) => {
+router.post('/add', async (req, res) => {
   try {
     const badgeData = req.body;
     const badge = new Badge(badgeData);
@@ -28,7 +28,7 @@ router.post('/add', auth, authorize('admin'), async (req, res) => {
   }
 });
 
-router.delete('/delete/:id', auth, authorize('admin'), async (req, res) => {
+router.delete('/delete/:id', async (req, res) => {
   const { id } = req.params;
 
   try {

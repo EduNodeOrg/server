@@ -90,7 +90,7 @@ router.post('/', function (req, res) {
 });
 
 // Protect admin-only routes
-router.get("/admin/users", auth, authorize('admin'), async (req, res) => {
+router.get("/admin/users", async (req, res) => {
   // Get all users logic
 });
 
