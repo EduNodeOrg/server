@@ -59,7 +59,8 @@ app.use(cors({
     'X-Requested-With',
     'Accept',
     'Origin',
-    'content-security-policy'
+    'content-security-policy',
+   'access-control-allow-methods',
   ],
   exposedHeaders: ['set-cookie'],
   optionsSuccessStatus: 200
