@@ -41,7 +41,10 @@ console.log('session set successfully');
 
 
 
-app.use(cors());
+app.use(cors({
+  origin: ["https://edunode.org", "https://www.edunode.org"],
+  credentials: true,
+}));
 app.use(express.json()); 
 
 app.use(function(req, res, next) {
