@@ -53,7 +53,14 @@ app.use(cors({
   },
   credentials: true,
   methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
-  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept', 'Origin'],
+  allowedHeaders: [
+    'Content-Type',
+    'Authorization',
+    'X-Requested-With',
+    'Accept',
+    'Origin',
+    'content-security-policy'
+  ],
   exposedHeaders: ['set-cookie'],
   optionsSuccessStatus: 200
 }));
