@@ -21,9 +21,11 @@
     "nodemon": "^2.0.15"
   },
   "dependencies": {
+    "@creit-tech/stellar-router-sdk": "npm:@jsr/creit-tech__stellar-router-sdk@^0.1.2",
+    "@google/genai": "^1.9.0",
     "@sendgrid/mail": "^7.7.0",
     "async-retry": "^1.3.3",
-    "axios": "^1.3.4",
+    "axios": "^1.10.0",
     "bcryptjs": "^2.4.3",
     "body-parser": "^1.20.2",
     "child_process": "^1.0.2",
@@ -37,6 +39,7 @@
     "dotenv": "^8.6.0",
     "express": "^4.17.2",
     "express-session": "^1.17.3",
+    "form-data": "^4.0.4",
     "fs": "^0.0.1-security",
     "google-auth-library": "^8.8.0",
     "googleapis": "^118.0.0",
@@ -53,6 +56,7 @@
     "mongoose": "^7.0.3",
     "multer": "^1.4.5-lts.1",
     "needle": "^3.0.0",
+    "nft.storage": "^7.2.0",
     "node": "^18.15.0",
     "node-fetch": "^3.3.1",
     "node-mailjet": "^6.0.2",

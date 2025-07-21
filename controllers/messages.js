@@ -7,7 +7,6 @@ const domain = "edunode.org"
 const mg = mailgun.client({ username: 'api', key: "key-c8d12b7428fbe666e074108aaa0820bc" || 'key-yourkeyhere', url: 'https://api.eu.mailgun.net' });
 
 
-
 exports.getMessages = async (req, res) => {
   try {
     const { sender, receiver } = req.query;

@@ -2,19 +2,26 @@ const express = require("express");
 const router = express.Router();
 const cors = require('cors');
 const SorobanClient = require('soroban-client');
-const server = new SorobanClient.Server('https://rpc-futurenet.stellar.org:443/');
 const Certificate = require("../models/certificates");
 const ValidCertificates = require("../models/ValidCertificate");
 const Notification = require("../models/Notification");
 const app = express();
-const { Web3Storage, getFilesFromPath } = require('web3.storage')
-const { create } = require('ipfs-http-client')
+const axios = require('axios');
+const FormData = require('form-data');
+const fs = require('fs');
+const path = require('path');
 const Jimp = require('jimp');
 const retry = require('async-retry');
-const fs = require('fs');
 const bcrypt = require('bcryptjs');
 const User = require('../models/User');
-const mailgun = require('mailgun-js')({ apiKey: 'a34fb9ed650405eef7299ffdae3941f2-e5475b88-0e1d3021', domain: 'sandbox9de428be3cf749a7a4ac0931a899ffdc.mailgun.org' });
+const Mailgun = require('mailgun.js');
+const mailgun = new Mailgun(FormData);
+const domain = process.env.MAILGUN_DOMAIN;
+const mg = mailgun.client({
+  username: 'api',
+  key: process.env.MAILGUN_API_KEY,
+  url: 'https://api.mailgun.net'
+});
 app.use(cors());
 
 router.post("/diploma", async (req, res) => {
@@ -61,40 +68,41 @@ router.post("/diploma", async (req, res) => {
     console.log("issuerPublicKey", issuerPublicKey);
     console.log("issuerPublicKey", distributorPublicKey);
     // Replace the token with your own API key
-    const token = process.env.WEBTHREE_API_TOKEN;
+    const token = process.env.NFT_STORAGE_API_KEY;
 
     //server.getAccount(issuerPublicKey).then(function (r) {
     // console.log(r);
     //});
-    const client = new Web3Storage({ token });
-    const img = await Jimp.read("newediploma.png");
-    const font = await Jimp.loadFont(Jimp.FONT_SANS_32_BLACK);
-    img.print(font, 150, 350, req.body.name);
-    img.write("newdiplomav2.jpg"); // save
+    const diplomaTemplatePath = path.join(__dirname, '../assets/images/newDiploma.png');
+    const img = await Jimp.read(diplomaTemplatePath);
+    const font = await Jimp.loadFont(Jimp.FONT_SANS_128_BLACK);
+    // Center the name horizontally on the line at y=700
+    const name = req.body.name;
+    const imageWidth = img.bitmap.width;
+    const nameWidth = Jimp.measureText(font, name);
+    const x = (imageWidth - nameWidth) / 2;
+    const y = 700; // Adjust this value if the line is at a different y position
+    img.print(font, x, y, name);
+    const outputDiplomaPath = path.join(__dirname, '../assets/images/newdiplomav2.jpg');
+    await img.writeAsync(outputDiplomaPath); // save
 
-    const putFilesToWeb3Storage = async () => {
-      const files = await getFilesFromPath("newdiplomav2.jpg");
-      const cid = await client.put(files);
-      console.log("stored files with cid:", cid);
-      return cid;
-    };
+    // Pinata API credentials from environment variables
+    const pinataApiKey = process.env.PINATA_API_KEY;
+    const pinataSecretApiKey = process.env.PINATA_SECRET_API_KEY;
 
-    const cid = await retry(
-      async (bail, attempt) => {
-        console.log(`Attempt ${attempt} putting files to web3.storage...`);
-
-        const result = await putFilesToWeb3Storage();
-        return result;
+    // Upload to Pinata
+    const formData = new FormData();
+    formData.append('file', fs.createReadStream(outputDiplomaPath));
+    const pinataRes = await axios.post('https://api.pinata.cloud/pinning/pinFileToIPFS', formData, {
+      maxContentLength: Infinity,
+      headers: {
+        ...formData.getHeaders(),
+        pinata_api_key: pinataApiKey,
+        pinata_secret_api_key: pinataSecretApiKey,
       },
-      {
-        retries: 3, // number of retries
-        minTimeout: 1000, // minimum delay in ms between retries
-        maxTimeout: 5000, // maximum delay in ms between retries
-        onRetry: (error, attempt) => {
-          console.log(`Attempt ${attempt} failed: ${error}`);
-        },
-      }
-    );
+    });
+    const cid = pinataRes.data.IpfsHash;
+    console.log('stored files with cid:', cid);
 
     // Update the savedCertificate object with the cid
     savedCertificate.cid = cid;
@@ -126,17 +134,17 @@ router.post("/diploma", async (req, res) => {
       </body>
       </html>
       `,
-      attachment: "newdiplomav2.jpg",
+      attachment: outputDiplomaPath,
     };
-    mailgun.messages().send(data, function (error, body) {
-      if (error) {
-        console.error('Error sending email:', error);
-        res.status(500).json({ error: 'Error sending email' });
-      } else {
+    mg.messages.create(domain, data)
+      .then(body => {
         console.log('Email sent successfully:', body);
         res.json({ msg: 'Email sent' });
-      }
-    });
+      })
+      .catch(error => {
+        console.error('Error sending email:', error);
+        res.status(500).json({ error: 'Error sending email' });
+      });
     const newNotification = new Notification({
       message:
         "Congrats! You have a new certification for the Basic Concepts Course",
@@ -148,12 +156,16 @@ router.post("/diploma", async (req, res) => {
 
     res.status(200).json(savedCertificate);
   } catch (error) {
-    console.error(error);
+    // Enhanced error logging
+    console.error('Error in /diploma endpoint:', error);
+    if (error.response) {
+      console.error('Pinata response data:', error.response.data);
+      console.error('Pinata response status:', error.response.status);
+      console.error('Pinata response headers:', error.response.headers);
+    }
     res.status(500).send("Server Error");
-
     process.on("unhandledRejection", (error) => {
       console.error("Unhandled Promise Rejection:", error);
-      // Optionally, you can perform additional error handling or logging here
     });
   }
 });
@@ -170,7 +182,7 @@ router.post("/diploma1", async (req, res) => {
 
     // Store the issuer and distributor key to MongoDB
 
-    console.log("test");
+
     const saltRounds = 10; // Number of salt rounds for bcrypt to use
     // Issuer
     const issuerKeyPair = SorobanClient.Keypair.random();
@@ -674,7 +686,7 @@ router.post("/diploma6", async (req, res) => {
 
   // Store the issuer and distributor key to mongoDB
 
-  console.log("test")
+
   const saltRounds = 10; // Number of salt rounds for bcrypt to use
   // Issuer
   const issuerKeyPair = SorobanClient.Keypair.random();
@@ -1048,7 +1060,7 @@ router.get("/count/pkey/:pkey", async (req, res) => {
 });
 
 router.get("/notification/:email", async (req, res) => {
-  console.log("heloooooooooooo");
+
   try {
     const notifications = await Notification.find({ email: req.params.email });
     const notificationData = notifications.map(notif => ({

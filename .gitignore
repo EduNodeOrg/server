@@ -4,3 +4,5 @@ config
 .env
 data/
 Procfile
+# Local Netlify folder
+.netlify

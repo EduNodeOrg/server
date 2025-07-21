@@ -5,8 +5,7 @@ const router = express.Router();
 const ChatUser = require('../models/ChatUser');
 const { Configuration, OpenAIApi } = require("openai");
 const axios = require('axios');
-
-
+const { GoogleGenAI } = require('@google/genai');
 
 
 // Define a route for handling POST requests to the OpenAI API
@@ -86,7 +85,25 @@ router.post('/openai/plugin', async (req, res) => {
   res.send({ reply: generatedText });
 });
 
-
+// Define a route for handling POST requests to the Google GenAI API
+router.post('/genai', async (req, res) => {
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  const { prompt } = req.body;
+  if (!prompt) {
+    return res.status(400).json({ error: 'Prompt is required' });
+  }
+  try {
+    const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
+    const response = await ai.models.generateContent({
+      model: 'gemini-2.5-flash',
+      contents: prompt,
+    });
+    res.status(200).json({ text: response.text });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Something went wrong with Google GenAI' });
+  }
+});
 
 
 module.exports = router;
