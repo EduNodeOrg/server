@@ -4,7 +4,7 @@ const auth = require('../middleware/auth')
 const Cours = require("../models/AddedCourses");
 const Notification = require("../models/Notification");
 const User = require('../models/User');
-const { authorize } = require('../models/User');
+const authorize = require('../middleware/authorize');
 
 // Create a new Cours
 router.post("/", auth, authorize('admin'), async (req, res) => {
