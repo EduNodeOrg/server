@@ -40,10 +40,26 @@ app.use(session({
 console.log('session set successfully');
 
 
+
+const allowedOrigins = ['https://edunode.org', 'https://www.edunode.org', 'http://localhost:3000', 'https://edunode.herokuapp.com', 'http://localhost:5173', 'https://edunode.herokuapp.com/api', 'http://localhost:5000', 'http://localhost:5001'];
+
 app.use(cors({
-  origin: ['https://edunode.org', 'https://www.edunode.org'],
+  origin: function (origin, callback) {
+    if (!origin || allowedOrigins.indexOf(origin) !== -1) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
   credentials: true,
+  methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept', 'Origin'],
+  exposedHeaders: ['set-cookie'],
+  optionsSuccessStatus: 200
 }));
+
+
+
 app.use(express.json()); 
 
 app.use(function(req, res, next) {
