@@ -154,17 +154,5 @@ const UserSchema = new mongoose.Schema({
 
 const User = mongoose.model('User', UserSchema);
 
-// Add authorization middleware
-const authorize = (role) => {
-  return (req, res, next) => {
-    if(req.user.role !== role) {
-      return res.status(403).json({ error: 'Forbidden' });
-    }
-    next();
-  };
-};
 
-module.exports = {
-  User,
-  authorize
-};
+module.exports = User;
