@@ -40,9 +40,8 @@ app.use(session({
 console.log('session set successfully');
 
 
-
 app.use(cors({
-  origin: ["https://edunode.org", "https://www.edunode.org"],
+  origin: ['https://edunode.org', 'https://www.edunode.org'],
   credentials: true,
 }));
 app.use(express.json()); 
