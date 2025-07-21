@@ -3,9 +3,7 @@ const router = express.Router();
 const User = require('../models/User');
 const bcrypt = require('bcryptjs');
 const jwt = require("jsonwebtoken");
-const { OAuth2Client } = require('google-auth-library');
-const passport = require('passport');
-const cookieSession = require('cookie-session');
+const cors = require('cors');
 //const sgMail = require('@sendgrid/mail');
 //const crypto = require('crypto');
 //sgMail.setApiKey('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');
@@ -16,6 +14,20 @@ const domain = "edunode.org"
 const mg = mailgun.client({ username: 'api', key: "key-c8d12b7428fbe666e074108aaa0820bc" || 'key-yourkeyhere', url: 'https://api.eu.mailgun.net' });
 const session = require('express-session');
 
+const allowedOrigins = ['https://edunode.org', 'https://www.edunode.org', 'http://localhost:3000', 'https://edunode.herokuapp.com', 'http://localhost:5173', 'https://edunode.herokuapp.com/api', 'http://localhost:5000', 'http://localhost:5001'];
+app.use(cors({
+  origin: function (origin, callback) {
+    if (!origin || allowedOrigins.indexOf(origin) !== -1) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
+  methods: 'GET,POST,PUT,DELETE,OPTIONS',
+  allowedHeaders: 'Origin,X-Requested-With,Content-Type,Accept,Authorization',
+  credentials: true, // Allow credentials such as cookies or auth tokens
+  optionsSuccessStatus: 200
+}));
 
 
 
