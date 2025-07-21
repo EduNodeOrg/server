@@ -10,11 +10,11 @@ const mg = mailgun.client({ username: 'api', key: "key-c8d12b7428fbe666e074108aa
 const session = require('express-session');
 
 router.post('/', function (req, res) {
-  res.header("Access-Control-Allow-Origin", '*');
-  res.header("Access-Control-Allow-Credentials", true);
-  res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS');
-  res.header("Access-Control-Allow-Headers", 'Origin,X-Requested-With,Content-Type,Accept,content-type,application/json');
-  res.header('Content-Type', 'application/json');
+ // res.header("Access-Control-Allow-Origin", '*');
+ // res.header("Access-Control-Allow-Credentials", true);
+ // res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS');
+ // res.header("Access-Control-Allow-Headers", 'Origin,X-Requested-With,Content-Type,Accept,content-type,application/json');
+ // res.header('Content-Type', 'application/json');
 
   const email = req.body.email;
   const name = req.body.name;
