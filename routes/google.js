@@ -9,6 +9,8 @@ const domain = "edunode.org"
 const mg = mailgun.client({ username: 'api', key: "key-c8d12b7428fbe666e074108aaa0820bc" || 'key-yourkeyhere', url: 'https://api.eu.mailgun.net' });
 const session = require('express-session');
 
+// Removed CORS setup from this file. It will be handled in server.js
+
 router.post('/', function (req, res) {
  // res.header("Access-Control-Allow-Origin", '*');
  // res.header("Access-Control-Allow-Credentials", true);
