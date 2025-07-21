@@ -7,7 +7,7 @@ const formData = require('form-data');
 const Mailgun = require('mailgun.js');
 const mailgun = new Mailgun(formData);
 const domain = "edunode.org"
-const { authorize } = require('../models/User');
+const authorize = require('../middleware/authorize');
 const auth = require('../middleware/auth');
 
 const mg = mailgun.client({username: 'api', key: "key-c8d12b7428fbe666e074108aaa0820bc" || 'key-yourkeyhere', url: 'https://api.eu.mailgun.net'});
