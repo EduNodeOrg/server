@@ -12,6 +12,10 @@ const MongoDBStore = require('connect-mongodb-session')(session);
 const http = require('http');
 // const socketIo = require('socket.io');
 const app = express();
+
+// Trust proxy for rate limiting behind Heroku
+app.set('trust proxy', 1);
+
 // const Message = require('./models/Messages');
 const server = http.createServer(app);
 // const io = socketIo(server);
@@ -210,4 +214,3 @@ app.listen(PORT, () => console.log(`server started at ${PORT}`))
 app.get("/", (req, res) => {
   res.send("Hello, welcome to edunode server!");
 });
-

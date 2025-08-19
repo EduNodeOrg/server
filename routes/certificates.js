@@ -87,9 +87,9 @@ const validateCertificateInput = (req, res, next) => {
     return res.status(400).json({ error: 'Name, email, and public key are required' });
   }
   
-  if (!isValidEmail(email)) {
-    return res.status(400).json({ error: 'Invalid email format' });
-  }
+ // if (!isValidEmail(email)) {
+   // return res.status(400).json({ error: 'Invalid email format' });
+  // }
   
   if (name.length > 100) {
     return res.status(400).json({ error: 'Name is too long' });
@@ -143,8 +143,18 @@ const CERTIFICATE_CONFIGS = {
     message: 'Congrats! You have a new certification for the Oracles Course by EduNode'
   },
   diploma8: {
+    template: '',
+    course: '',
+    message: ''
+  },
+  diploma9: {
     template: 'bootcamp.png',
-    course: 'Bootcampo Women in Tech',
+    course: 'Bootcamp Women in Tech',
+    message: ''
+  },
+  diploma10: {
+    template: '',
+    course: '',
     message: ''
   },
   challenge1: {

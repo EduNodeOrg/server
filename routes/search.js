@@ -5,6 +5,7 @@ const Post = require('../models/Post');
 const Blog = require('../models/Blog');
 const User = require('../models/User');
 const axios = require('axios');
+
 router.get('/', async (req, res) => {
   try {
     const searchQuery = req.query.searchQuery;
@@ -40,7 +41,6 @@ router.get('/', async (req, res) => {
   }
 });
 
-
 router.get('/:email', async (req, res) => {
   try {
     const { email } = req.params;
@@ -74,21 +74,27 @@ router.get('/:email', async (req, res) => {
   }
 });
 
-
-
-
 router.get('/youtube/:email', async (req, res) => {
   try {
     const { email } = req.params;
 
     // Find the user by email to get their preferences and skills
     const user = await User.findOne({ email });
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
 
-    // Extract preferences and skills from the user object
-    const { skills } = user;
+    // Extract preferences and skills from the user object with defaults
+    const preferences = user.preferences || [];
+    const skills = user.skills || [];
 
     // Combine preferences and skills into a single array for the YouTube API query
-    const allSearchTerms = preferences.concat(skills);
+    const allSearchTerms = [...new Set([...preferences, ...skills])]; // Remove duplicates
+
+    // If no search terms are available, return an empty array
+    if (allSearchTerms.length === 0) {
+      return res.json({ videos: [] });
+    }
 
     // Array to hold the results
     let allVideos = [];
@@ -96,17 +102,17 @@ router.get('/youtube/:email', async (req, res) => {
     // Build the YouTube API search URL and make requests for each preference/skill
     for (const term of allSearchTerms) {
       try {
-      const youtubeApiUrl = `https://www.googleapis.com/youtube/v3/search?part=snippet&key=AIzaSyBIBbtXwgfnZhq3OXCA8uewavg1lFZb-gY&type=video&q=${term}`;
-      const response = await axios.get(youtubeApiUrl);
-      if (response.status === 200) {
-        const videos = response.data.items;
-        allVideos = allVideos.concat(videos.slice(0, 5));
-      } else {
-        console.error(`YouTube API request failed with status: ${response.status}`);
+        const youtubeApiUrl = `https://www.googleapis.com/youtube/v3/search?part=snippet&key=AIzaSyBIBbtXwgfnZhq3OXCA8uewavg1lFZb-gY&type=video&maxResults=5&q=${encodeURIComponent(term)}`;
+        const response = await axios.get(youtubeApiUrl);
+        if (response.status === 200) {
+          const videos = response.data.items;
+          allVideos = allVideos.concat(videos.slice(0, 5));
+        } else {
+          console.error(`YouTube API request failed with status: ${response.status}`);
+        }
+      } catch (error) {
+        console.error('Error making YouTube API request:', error);
       }
-    } catch (error) {
-      console.error('Error making YouTube API request:', error);
-    }
     }
 
     // Return the found videos
@@ -117,9 +123,6 @@ router.get('/youtube/:email', async (req, res) => {
     res.status(500).json({ error: 'Internal Server Error' });
   }
 });
-
-
-
 
 router.get('/wiki/:searchQuery', async (req, res) => {
   res.header("Access-Control-Allow-Origin", '*');

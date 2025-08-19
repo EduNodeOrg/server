@@ -54,24 +54,31 @@ const CoursSchema = new mongoose.Schema({
   },
   feedbacks: [
     {
-
-      rate: {
+      rating: {
         type: Number,
         required: true,
+        min: 1,
+        max: 5
       },
       text: {
         type: String,
-        required: false,
+        default: ""
       },
       email: {
         type: String,
-        required: true,
+        required: true
       },
-    },
+      date: {
+        type: Date,
+        default: Date.now
+      }
+    }
   ],
-  feedbacksavg:{
+  feedbacksavg: {
     type: Number,
-    required: false,
+    default: 0,
+    min: 0,
+    max: 5
   },
   comments: [
     {

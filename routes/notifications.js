@@ -22,7 +22,7 @@ router.get("/notification/:email", async (req, res) => {
   });
   
   router.get("/notification", async (req, res) => {
-    console.log("heloooooooooooobit");
+
     try {
       const notifications = await Notification.find();
       const notificationData = notifications.map(notif => ({
