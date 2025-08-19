@@ -1,4 +1,5 @@
 node_modules/
+.soroban
 config/
 config
 .env
@@ -6,3 +7,7 @@ data/
 Procfile
 # Local Netlify folder
 .netlify
+temp/
+temp
+uploads/
+uploads
