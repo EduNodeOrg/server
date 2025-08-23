@@ -143,9 +143,9 @@ const CERTIFICATE_CONFIGS = {
     message: 'Congrats! You have a new certification for the Oracles Course by EduNode'
   },
   diploma8: {
-    template: '',
-    course: '',
-    message: ''
+    template: 'basicConcepts.png',
+    course: 'Computer System Engineering',
+    message: 'Congrats! You have a new certification for the Computer System Engineering Course by EduNode.'
   },
   diploma9: {
     template: 'bootcamp.png',
