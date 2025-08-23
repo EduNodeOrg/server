@@ -148,14 +148,14 @@ const CERTIFICATE_CONFIGS = {
     message: 'Congrats! You have a new certification for the Computer System Engineering Course by MIT and EduNode.'
   },
   diploma9: {
-    template: 'bootcamp.png',
-    course: 'Bootcamp Women in Tech',
-    message: 'Congrats! You have a new certification for the Bootcamp Women in Tech Course by EduNode.'
-  },
-  diploma10: {
     template: 'basicConcepts.png',
     course: 'Cryptocurrency Engineering And Design',
     message: 'Congrats! You have a new certification for the Cryptocurrency Engineering And Design Course MIT and EduNode'
+  },
+  diploma10: {
+    template: 'bootcamp.png',
+    course: 'Bootcamp Women in Tech',
+    message: '' // empty
   },
   challenge1: {
     template: 'basicConcepts.png',
