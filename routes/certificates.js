@@ -17,6 +17,8 @@ const Mailgun = require('mailgun.js');
 const rateLimit = require('express-rate-limit');
 // Removed validator dependency - using built-in validation functions
 const helmet = require('helmet');
+const { DiplomaNFTInteraction, DiplomaUtils } = require('../utils/contract');
+const DIPLOMA_NFT_CONTRACT = "CBTGYCVE27SUBICFXLTR53IELNCHYRPDSH3DRGRW6VNETMTOFILRB535";
 
 // Security middleware
 router.use(helmet());
@@ -276,48 +278,33 @@ const uploadToPinata = async (filePath) => {
 };
 
 const sendCertificateEmail = async (email, name, cid, course) => {
-  const data = {
-    from: 'hi@edunode.org',
-    to: email,
-    subject: `Congratulations on your ${course} Certification`,
-    html: `
-      <!DOCTYPE html>
-      <html>
-      <head>
-        <title>Certificate Achievement</title>
-        <style>
-          body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
-          .container { max-width: 600px; margin: 0 auto; padding: 20px; }
-          .header { background: #4CAF50; color: white; padding: 20px; text-align: center; }
-          .content { padding: 20px; background: #f9f9f9; }
-          .button { display: inline-block; padding: 12px 24px; background: #4CAF50; color: white; text-decoration: none; border-radius: 5px; margin: 10px; }
-          .social-share { margin-top: 20px; }
-        </style>
-      </head>
-      <body>
-        <div class="container">
-          <div class="header">
-            <h1>🎉 Congratulations ${name}!</h1>
-          </div>
-          <div class="content">
-            <p>You have successfully completed the <strong>${course}</strong> course and earned your certification!</p>
-            <p>Your certificate is now available on IPFS and can be verified using blockchain technology.</p>
-            
-            <div class="social-share">
-              <p>Share your achievement:</p>
-              <a href="https://twitter.com/intent/tweet?url=https%3A%2F%2F${encodeURIComponent(cid)}.ipfs.dweb.link&text=I just earned my ${encodeURIComponent(course)} certification from EduNode! 🎓" target="_blank" class="button">Share on Twitter</a>
-              <a href="https://www.linkedin.com/sharing/share-offsite/?url=https%3A%2F%2F${encodeURIComponent(cid)}.ipfs.dweb.link" target="_blank" class="button">Share on LinkedIn</a>
-            </div>
-            
-            <p><small>Certificate ID: View at https://${cid}.ipfs.dweb.link</small></p>
-          </div>
-        </div>
-      </body>
-      </html>
-    `
-  };
-  
-  return mg.messages.create(domain, data);
+  try {
+    if (!process.env.MAILGUN_API_KEY || !process.env.MAILGUN_DOMAIN) {
+      console.warn('Mailgun credentials not configured. Skipping email sending.');
+      return;
+    }
+
+    const mailgun = new Mailgun(FormData);
+    const mg = mailgun.client({
+      username: 'api',
+      key: process.env.MAILGUN_API_KEY,
+      url: process.env.MAILGUN_API_URL || 'https://api.mailgun.net'
+    });
+
+    const data = {
+      from: `EduNode <noreply@${process.env.MAILGUN_DOMAIN}>`,
+      to: email,
+      subject: `Your ${course} Certificate is Ready!`,
+      text: `Hello ${name},\n\nYour certificate for ${course} is ready!\n\nView it here: https://ipfs.io/ipfs/${cid}\n\nBest regards,\nEduNode Team`,
+      'h:Reply-To': 'support@edunode.org'
+    };
+
+    await mg.messages.create(process.env.MAILGUN_DOMAIN, data);
+    console.log(`Certificate email sent to ${email}`);
+  } catch (emailError) {
+    console.warn('Failed to send email:', emailError.message);
+    // Continue without failing the whole request
+  }
 };
 
 const createNotification = async (email, message) => {
@@ -341,7 +328,65 @@ const createCertificate = async (req, res, certificateType) => {
     
     // Generate key pairs
     const keyPairs = generateKeyPairs();
-    
+
+    // Create diploma data
+    const diplomaData = {
+      student_name: name,
+      email,
+      course: config.course,
+      institution: "EduNode",
+      issue_date: new Date().toISOString().split('T')[0],
+      certificate_id: keyPairs.publicKey // Using the public key as a unique ID
+    };
+
+    // Create diploma hash
+    const diplomaHash = DiplomaUtils.createDiplomaHash(diplomaData);
+
+    // Initialize the diploma NFT interaction
+    const diplomaNFT = new DiplomaNFTInteraction(DIPLOMA_NFT_CONTRACT);
+
+    try {
+      // Check if contract is initialized
+      const isInitialized = await diplomaNFT.isContractInitialized();
+      if (!isInitialized) {
+        throw new Error('Diploma NFT contract is not initialized');
+      }
+
+      // Mint the diploma NFT
+      const tokenId = Date.now(); // Using timestamp as token ID
+      const adminKeypair = DiplomaUtils.keypairFromSecret(process.env.ADMIN_SECRET_KEY);
+      
+      // Use the public key from the request body
+      const recipientAddress = req.body.pkey;
+      if (!recipientAddress) {
+        throw new Error('Recipient public key (pkey) is required');
+      }
+
+      console.log('Minting NFT with recipient address:', recipientAddress);
+      
+      // Import Stellar SDK for address handling
+      const StellarSdk = require('@stellar/stellar-sdk');
+      
+      try {
+        // Convert the public key to a valid Stellar address
+        const recipientKeypair = StellarSdk.Keypair.fromPublicKey(recipientAddress);
+        
+        await diplomaNFT.mintDiploma(
+          adminKeypair,
+          recipientKeypair.publicKey(), // Use the validated public key
+          tokenId
+        );
+        
+        console.log(`Successfully minted diploma NFT for ${email} with token ID: ${tokenId}`);
+      } catch (error) {
+        console.error('Error processing recipient address:', error);
+        throw new Error('Invalid recipient public key. Please provide a valid Stellar public key starting with "G"');
+      }
+    } catch (nftError) {
+      console.error('Error minting diploma NFT:', nftError);
+      // Continue with the rest of the process even if NFT minting fails
+    }
+
     // Hash secret keys
     const hashedIssuerSecretKey = await hashKeys(keyPairs.issuer.secret);
     const hashedDistributorSecretKey = await hashKeys(keyPairs.distributor.secret);
@@ -416,14 +461,8 @@ const createCertificate = async (req, res, certificateType) => {
     });
     
   } catch (error) {
-    console.error(`Error in /${certificateType} endpoint:`, error);
-    
-    // Don't expose internal errors to client
-    if (error.message.includes('validation')) {
-      return res.status(400).json({ error: 'Invalid input data' });
-    }
-    
-    res.status(500).json({ error: 'Internal server error' });
+    console.error('Error in createCertificate:', error);
+    return res.status(500).json({ error: 'Failed to create certificate', details: error.message });
   }
 };
 

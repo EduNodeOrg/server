@@ -144,7 +144,42 @@ const UserSchema = new mongoose.Schema({
       type: mongoose.Schema.Types.ObjectId,
       ref: 'User'
     }
-  ]
+  ],
+  emailPreferences: {
+    marketing: {
+      type: Boolean,
+      default: true
+    },
+    notifications: {
+      type: Boolean,
+      default: true
+    },
+    newsletters: {
+      type: Boolean,
+      default: true
+    },
+    updates: {
+      type: Boolean,
+      default: true
+    },
+    courseRecommendations: {
+      type: Boolean,
+      default: true
+    },
+    achievementNotifications: {
+      type: Boolean,
+      default: true
+    }
+  },
+  lastEmailSent: {
+    type: Date,
+    required: false
+  },
+  emailFrequency: {
+    type: String,
+    enum: ['daily', 'weekly', 'monthly', 'never'],
+    default: 'weekly'
+  }
 
 
 },

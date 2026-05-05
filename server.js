@@ -158,6 +158,11 @@ const game = require('./routes/game')
 const messagesNotif = require('./routes/messageNotif');
 const blogDy =require('./routes/blogDy')
 const badge =require('./routes/badge')
+const emailCampaigns = require('./routes/emailCampaigns')
+const emailTemplates = require('./routes/emailTemplates')
+const emailUnsubscribe = require('./routes/emailUnsubscribe')
+const emailWebhooks = require('./routes/emailWebhooks')
+const emailAnalytics = require('./routes/emailAnalytics')
 
 app.use('/api/gcallback', gcallback);
 app.use('/api/search', search);
@@ -206,6 +211,20 @@ app.use("/api/notif", notif);
 app.use("/api/game", game);
 app.use("/api/tutors", tutor);
 app.use("/api/messageNotif", messagesNotif);
+app.use("/api/email/campaigns", emailCampaigns);
+app.use("/api/email/templates", emailTemplates);
+app.use("/api/email/unsubscribe", emailUnsubscribe);
+app.use("/api/email/webhooks", emailWebhooks);
+app.use("/api/email/analytics", emailAnalytics);
+
+// Serve static files from public directory
+app.use(express.static('public'));
+
+// Serve email marketing admin interface
+app.get("/admin/email", (req, res) => {
+  res.sendFile(__dirname + '/public/email-admin.html');
+});
+
 // Set the time zone to Europe/Vienna
 process.env.TZ = 'Europe/Vienna';
 
