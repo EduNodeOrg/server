@@ -18,8 +18,16 @@ function getStripe() {
 // Helper: find/get the user from the JWT payload
 async function getUser(req) {
   const userId = req.user && (req.user.id || req.user._id);
-  if (!userId) return null;
-  return User.findById(userId);
+  if (!userId) {
+    console.warn('[stripe] getUser: missing user id in JWT payload', req.user);
+    return null;
+  }
+  const user = await User.findById(userId);
+  if (!user) {
+    console.warn('[stripe] getUser: user not found in DB for id', userId);
+    return null;
+  }
+  return user;
 }
 
 // @desc    Create Stripe Checkout Session for Pro tier
