@@ -7,14 +7,19 @@ const emailService = require('../services/emailService');
 // Handle unsubscribe requests
 router.get('/', async (req, res) => {
   try {
+    console.log('Unsubscribe route called at /api/email/unsubscribe');
+    console.log('Query params:', req.query);
     const { email, campaign, reason = 'user_request' } = req.query;
 
     if (!email) {
+      console.log('Email parameter missing');
       return res.status(400).send('Email parameter is required');
     }
 
+    console.log('Processing unsubscribe for email:', email);
     // Process unsubscribe
     await emailService.unsubscribeUser(email, campaign, reason);
+    console.log('Unsubscribe processed successfully');
 
     // Serve unsubscribe confirmation page
     res.send(`

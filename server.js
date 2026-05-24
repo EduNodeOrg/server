@@ -236,14 +236,19 @@ app.use("/api/email/crm", emailCRM);
 // Handle unsubscribe at root level for Mailgun redirects
 app.get("/unsubscribe", async (req, res) => {
   try {
+    console.log('Unsubscribe route called at /unsubscribe');
+    console.log('Query params:', req.query);
     const { email, campaign, reason = 'user_request' } = req.query;
 
     if (!email) {
+      console.log('Email parameter missing');
       return res.status(400).send('Email parameter is required');
     }
 
+    console.log('Processing unsubscribe for email:', email);
     const emailService = require('./services/emailService');
     await emailService.unsubscribeUser(email, campaign, reason);
+    console.log('Unsubscribe processed successfully');
 
     res.send(`
       <!DOCTYPE html>
