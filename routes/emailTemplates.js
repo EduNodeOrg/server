@@ -219,7 +219,7 @@ router.post('/:id/duplicate', auth, async (req, res) => {
 });
 
 // Preview template with sample data
-router.post('/:id/preview', auth, async (req, res) => {
+router.post('/:id/preview', async (req, res) => {
   try {
     const template = await EmailTemplate.findById(req.params.id);
     

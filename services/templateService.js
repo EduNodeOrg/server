@@ -1,8 +1,9 @@
 const EmailTemplate = require('../models/EmailTemplate');
+const TemplateServiceMonthly = require('./templateServiceMonthly');
 const fs = require('fs').promises;
 const path = require('path');
 
-class TemplateService {
+module.exports = class TemplateService {
   
   async createDefaultTemplates() {
     try {
@@ -16,23 +17,21 @@ class TemplateService {
           textContent: await this.getDefaultWelcomeTextTemplate(),
           variables: [
             { name: 'user.name', description: 'User\'s full name', type: 'string', required: true },
-            { name: 'user.email', description: 'User\'s email address', type: 'string', required: true },
-            { name: 'user.role', description: 'User\'s role (Student/Teacher)', type: 'string', required: false },
-            { name: 'campaign.name', description: 'Campaign name', type: 'string', required: false }
+            { name: 'user.lastLogin', description: 'Last login date', type: 'string', required: false },
+            { name: 'user.points', description: 'Current points', type: 'number', required: false }
           ]
         },
         {
           name: 'Weekly Digest',
-          description: 'Weekly digest of platform activity',
+          description: 'Weekly digest of platform activity and highlights',
           subject: 'Your Weekly EduNode Digest',
           category: 'newsletter',
           htmlContent: await this.getDefaultWeeklyDigestTemplate(),
           textContent: await this.getDefaultWeeklyDigestTextTemplate(),
           variables: [
             { name: 'user.name', description: 'User\'s full name', type: 'string', required: true },
-            { name: 'weeklyStats.coursesCompleted', description: 'Number of courses completed this week', type: 'number', required: false },
-            { name: 'weeklyStats.newConnections', description: 'Number of new connections', type: 'number', required: false },
-            { name: 'weeklyStats.pointsEarned', description: 'Points earned this week', type: 'number', required: false }
+            { name: 'user.lastLogin', description: 'Last login date', type: 'string', required: false },
+            { name: 'user.points', description: 'Current points', type: 'number', required: false }
           ]
         },
         {
@@ -73,6 +72,22 @@ class TemplateService {
             { name: 'user.name', description: 'User\'s full name', type: 'string', required: true },
             { name: 'user.lastLogin', description: 'Last login date', type: 'string', required: false },
             { name: 'user.points', description: 'Current points', type: 'number', required: false }
+          ]
+        },
+        {
+          name: 'Monthly Digest',
+          description: 'Monthly summary of platform activity and highlights',
+          subject: 'Your Monthly EduNode Digest',
+          category: 'newsletter',
+          htmlContent: await this.getDefaultMonthlyDigestTemplate(),
+          textContent: await this.getDefaultMonthlyDigestTextTemplate(),
+          variables: [
+            { name: 'user.name', description: 'User\'s full name', type: 'string', required: true },
+            { name: 'monthlyStats.coursesCompleted', description: 'Number of courses completed this month', type: 'number', required: false },
+            { name: 'monthlyStats.newConnections', description: 'Number of new connections this month', type: 'number', required: false },
+            { name: 'monthlyStats.pointsEarned', description: 'Points earned this month', type: 'number', required: false },
+            { name: 'monthlyStats.topSkills', description: 'Top skills developed', type: 'array', required: false },
+            { name: 'monthlyStats.upcomingEvents', description: 'Upcoming events and deadlines', type: 'array', required: false }
           ]
         }
       ];

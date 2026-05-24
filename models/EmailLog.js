@@ -4,7 +4,8 @@ const EmailLogSchema = new mongoose.Schema({
   campaignId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Campaign',
-    required: true
+    required: false,
+    default: null
   },
   userId: {
     type: mongoose.Schema.Types.ObjectId,

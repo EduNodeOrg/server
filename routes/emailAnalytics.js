@@ -242,6 +242,65 @@ router.get('/export/:campaignId', auth, async (req, res) => {
   }
 });
 
+// Get all campaigns with email status breakdown
+router.get('/campaigns-status', async (req, res) => {
+  try {
+    const campaigns = await Campaign.find({ status: { $in: ['sent', 'sending', 'completed'] } })
+      .sort({ sentAt: -1 })
+      .select('name subject status sentAt analytics')
+      .lean();
+
+    const campaignsWithStatus = await Promise.all(
+      campaigns.map(async (campaign) => {
+        const statusCounts = await EmailLog.aggregate([
+          { $match: { campaignId: campaign._id } },
+          { $group: { _id: '$status', count: { $sum: 1 } } }
+        ]);
+
+        const statusBreakdown = statusCounts.reduce((acc, item) => {
+          acc[item._id] = item.count;
+          return acc;
+        }, {});
+
+        return {
+          ...campaign,
+          statusBreakdown
+        };
+      })
+    );
+
+    // Also get direct emails (without campaign)
+    const directEmailCounts = await EmailLog.aggregate([
+      { $match: { campaignId: null } },
+      { $group: { _id: '$status', count: { $sum: 1 } } }
+    ]);
+
+    const directEmailBreakdown = directEmailCounts.reduce((acc, item) => {
+      acc[item._id] = item.count;
+      return acc;
+    }, {});
+
+    const totalDirectEmails = Object.values(directEmailBreakdown).reduce((a, b) => a + b, 0);
+
+    if (totalDirectEmails > 0) {
+      campaignsWithStatus.push({
+        _id: 'direct',
+        name: 'Direct Emails (No Campaign)',
+        subject: 'Individual emails sent directly to contacts',
+        status: 'sent',
+        sentAt: new Date(),
+        isDirect: true,
+        statusBreakdown: directEmailBreakdown
+      });
+    }
+
+    res.json({ campaigns: campaignsWithStatus });
+  } catch (error) {
+    console.error('Error fetching campaigns status:', error);
+    res.status(500).json({ error: 'Failed to fetch campaigns status' });
+  }
+});
+
 // Helper function to convert to CSV
 function convertToCSV(data) {
   const headers = [

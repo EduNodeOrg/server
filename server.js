@@ -26,6 +26,16 @@ const WebSocket = require('ws');
 const wss = new WebSocket.Server({ port: 5002 });
 
 const PORT = process.env.PORT || 5001 
+
+// Stripe webhook MUST be registered BEFORE bodyParser.json so we can verify
+// the signature against the raw request body.
+const { webhookHandler: stripeWebhookHandler } = require('./routes/stripe');
+app.post(
+  '/api/stripe/webhook',
+  express.raw({ type: 'application/json' }),
+  stripeWebhookHandler
+);
+
 // Increase the maximum size limit to 10MB
 app.use(bodyParser.json({ limit: '20mb' }));
 
@@ -43,15 +53,18 @@ console.log('session set successfully');
 
 
 
-const allowedOrigins = ['https://edunode.org', 'https://www.edunode.org', 'http://localhost:3000', 'https://edunode.herokuapp.com', 'http://localhost:5173', 'https://edunode.herokuapp.com/api', 'http://localhost:5000', 'http://localhost:5001'];
+const allowedOrigins = ['https://edunode.org', 'https://www.edunode.org', 'http://localhost:3000', 'https://edunode.herokuapp.com', 'http://localhost:5173', 'https://edunode.herokuapp.com/api', 'http://localhost:5000', 'http://localhost:5001', 'http://localhost:5500', 'http://localhost:5501'];
 
 app.use(cors({
   origin: function (origin, callback) {
     if (!origin || allowedOrigins.indexOf(origin) !== -1) {
-      callback(null, true);
-    } else {
-      callback(new Error('Not allowed by CORS'));
+      return callback(null, true);
     }
+    // Live Server, Vite, etc. on localhost or 127.0.0.1 (any port)
+    if (/^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(origin)) {
+      return callback(null, true);
+    }
+    callback(new Error('Not allowed by CORS'));
   },
   credentials: true,
   methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
@@ -163,6 +176,8 @@ const emailTemplates = require('./routes/emailTemplates')
 const emailUnsubscribe = require('./routes/emailUnsubscribe')
 const emailWebhooks = require('./routes/emailWebhooks')
 const emailAnalytics = require('./routes/emailAnalytics')
+const emailCRM = require('./routes/emailCRM')
+const stripeRoutes = require('./routes/stripe')
 
 app.use('/api/gcallback', gcallback);
 app.use('/api/search', search);
@@ -216,6 +231,8 @@ app.use("/api/email/templates", emailTemplates);
 app.use("/api/email/unsubscribe", emailUnsubscribe);
 app.use("/api/email/webhooks", emailWebhooks);
 app.use("/api/email/analytics", emailAnalytics);
+app.use("/api/email/crm", emailCRM);
+app.use("/api/stripe", stripeRoutes);
 
 // Serve static files from public directory
 app.use(express.static('public'));

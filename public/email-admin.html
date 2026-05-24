@@ -242,6 +242,128 @@
             border-radius: 6px;
             margin-bottom: 20px;
         }
+        
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .modal-content {
+            background: white;
+            border-radius: 10px;
+            width: 95%;
+            max-width: 1000px;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 30px;
+            border-bottom: 1px solid #eee;
+            background: #f8f9fa;
+            border-radius: 10px 10px 0 0;
+            flex-shrink: 0;
+        }
+        
+        .modal-body {
+            padding: 30px;
+            overflow-y: auto;
+            flex-grow: 1;
+        }
+        
+        .preview-content {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            overflow: hidden;
+            background: #f9f9f9;
+        }
+        
+        .preview-pane {
+            height: 60vh;
+            overflow-y: auto;
+        }
+        
+        .modal-header h2 {
+            margin: 0;
+            color: #333;
+        }
+        
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: #666;
+            padding: 0;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: background 0.3s ease;
+        }
+        
+        .modal-close:hover {
+            background: #e9ecef;
+        }
+        
+        .modal-body {
+            padding: 30px;
+        }
+        
+        .preview-tabs {
+            display: flex;
+            margin-bottom: 20px;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        .preview-tab {
+            padding: 10px 20px;
+            border: none;
+            background: none;
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            transition: all 0.3s ease;
+        }
+        
+        .preview-tab:hover {
+            color: #007bff;
+        }
+        
+        .preview-tab.active {
+            color: #007bff;
+            border-bottom-color: #007bff;
+        }
+        
+        .preview-info {
+            margin-bottom: 20px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 6px;
+        }
+        
+        .preview-pane {
+            display: none;
+        }
+        
+        .preview-pane.active {
+            display: block;
+        }
     </style>
 </head>
 <body>
@@ -256,6 +378,7 @@
             <button class="tab" onclick="showTab('campaigns')">Campaigns</button>
             <button class="tab" onclick="showTab('templates')">Templates</button>
             <button class="tab" onclick="showTab('analytics')">Analytics</button>
+            <button class="tab" onclick="showTab('crm')">CRM</button>
         </div>
 
         <!-- Overview Tab -->
@@ -287,9 +410,10 @@
                     
                     <div class="form-group">
                         <label for="campaignTemplate">Template</label>
-                        <select id="campaignTemplate" required>
+                        <select id="campaignTemplate" required onchange="onTemplateChange()">
                             <option value="">Select a template</option>
                         </select>
+                    </div>
                     </div>
                     
                     <div class="form-group">
@@ -323,18 +447,101 @@
             </div>
             
             <div class="card">
+                <h3>Campaign Email Status</h3>
+                <div id="campaignEmailStatus" class="loading">Loading campaign email status...</div>
+            </div>
+            
+            <div class="card">
                 <h3>Top Performing Campaigns</h3>
                 <div id="topCampaigns" class="loading">Loading top campaigns...</div>
+            </div>
+        </div>
+
+        <!-- CRM Tab -->
+        <div id="crm" class="tab-content">
+            <div class="stats-grid" id="crmStatsGrid">
+                <div class="loading">Loading CRM statistics...</div>
+            </div>
+            
+            <div class="card">
+                <h3>Quick Actions</h3>
+                <div style="display: flex; gap: 10px; margin-bottom: 20px;">
+                    <button class="btn" onclick="showNewContactForm()">+ New Contact</button>
+                    <button class="btn btn-success" onclick="showNewLeadForm()">+ New Lead</button>
+                    <button class="btn" onclick="showImportContacts()">Import Contacts</button>
+                </div>
+            </div>
+            
+            <div class="card">
+                <h3>Lead Pipeline</h3>
+                <div id="leadPipeline" class="loading">Loading lead pipeline...</div>
+            </div>
+            
+            <div class="card">
+                <h3>Recent Activities</h3>
+                <div id="recentActivities" class="loading">Loading recent activities...</div>
+            </div>
+            
+            <div class="card" id="contactsSection" style="display: none;">
+                <h3>Contacts <button class="btn" onclick="hideContacts()" style="float: right; font-size: 14px;">×</button></h3>
+                <div style="margin-bottom: 15px;">
+                    <input type="text" id="contactsSearch" placeholder="Search by name, email, university, or skills..." 
+                        style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px; font-size: 14px;"
+                        oninput="searchContacts(this.value)">
+                </div>
+                <div id="contactsList" class="loading">Loading contacts...</div>
+                <div id="contactsPagination" style="text-align: center; margin-top: 20px; display: none;">
+                    <button class="btn" onclick="loadMoreContacts()" id="loadMoreBtn">Load More</button>
+                    <span id="contactsCount" style="margin-left: 10px; color: #666;"></span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Preview Modal -->
+    <div id="previewModal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Email Template Preview</h2>
+                <button class="modal-close" onclick="closePreviewModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="preview-tabs">
+                    <button class="preview-tab active" onclick="showPreviewTab('html')">HTML Preview</button>
+                    <button class="preview-tab" onclick="showPreviewTab('text')">Text Preview</button>
+                </div>
+                <div class="preview-info">
+                    <strong>Subject:</strong> <span id="previewSubject"></span>
+                </div>
+                <div class="preview-content">
+                    <div id="htmlPreview" class="preview-pane active">
+                        <iframe id="previewFrame" style="width: 100%; height: 100%; border: none;"></iframe>
+                    </div>
+                    <div id="textPreview" class="preview-pane">
+                        <pre id="textContent" style="white-space: pre-wrap; background: #f8f9fa; padding: 15px; border-radius: 4px; font-family: monospace; height: 100%; overflow-y: auto;"></pre>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 
     <script>
-        const API_BASE = '/api/email';
-        let currentTab = 'overview';
+        document.addEventListener('DOMContentLoaded', function() {
+            // Live Server / other dev static hosts don't have the API — use Express (5001)
+            const API_ORIGIN = (() => {
+                const apiPort = '5001';
+                const onApiServer = location.port === apiPort || location.port === '';
+                if (onApiServer) return '';
+                if (location.hostname === 'localhost' || location.hostname === '127.0.0.1') {
+                    return `${location.protocol}//${location.hostname}:${apiPort}`;
+                }
+                return '';
+            })();
+            const API_BASE = `${API_ORIGIN}/api/email`;
+            let currentTab = 'overview';
 
         // Tab switching
-        function showTab(tabName) {
+        window.showTab = function(tabName) {
             // Hide all tabs
             document.querySelectorAll('.tab-content').forEach(tab => {
                 tab.classList.remove('active');
@@ -367,6 +574,9 @@
                     break;
                 case 'analytics':
                     await loadAnalytics();
+                    break;
+                case 'crm':
+                    await loadCRM();
                     break;
             }
         }
@@ -442,7 +652,7 @@
                             <p>Sent: ${campaign.analytics.sent} | Opened: ${campaign.analytics.opened} | Clicked: ${campaign.analytics.clicked}</p>
                         </div>
                         <div class="campaign-actions">
-                            <button class="btn" onclick="viewCampaign('${campaign._id}')">View</button>
+                            <button class="btn" onclick="editCampaign('${campaign._id}')">View</button>
                             ${campaign.status === 'draft' ? `<button class="btn btn-success" onclick="sendCampaign('${campaign._id}')">Send</button>` : ''}
                             ${campaign.status === 'draft' ? `<button class="btn btn-danger" onclick="deleteCampaign('${campaign._id}')">Delete</button>` : ''}
                         </div>
@@ -474,8 +684,8 @@
                     <div class="campaign-item">
                         <div class="campaign-info">
                             <h4>${template.name}</h4>
-                            <p>${template.description || 'No description'} - Category: ${template.category}</p>
-                            <p>Variables: ${template.variables.length}</p>
+                            <p>${template.description || 'No description'}</p>
+                            <p>Category: ${template.category} | Variables: ${template.variables.length}</p>
                         </div>
                         <div class="campaign-actions">
                             <button class="btn" onclick="previewTemplate('${template._id}')">Preview</button>
@@ -516,6 +726,50 @@
                     </div>
                 `;
 
+                // Load campaign email status
+                const statusResponse = await fetch(`${API_BASE}/analytics/campaigns-status`);
+                const statusData = await statusResponse.json();
+                
+                const statusColors = {
+                    sent: '#28a745',
+                    delivered: '#17a2b8',
+                    opened: '#ffc107',
+                    clicked: '#007bff',
+                    bounced: '#dc3545',
+                    failed: '#dc3545',
+                    unsubscribed: '#6c757d',
+                    complained: '#fd7e14',
+                    queued: '#6c757d'
+                };
+                
+                document.getElementById('campaignEmailStatus').innerHTML = statusData.campaigns.length === 0 
+                    ? '<div style="padding: 20px; text-align: center; color: #666;">No sent campaigns found</div>'
+                    : statusData.campaigns.map(campaign => {
+                        const breakdown = campaign.statusBreakdown || {};
+                        const total = Object.values(breakdown).reduce((a, b) => a + b, 0);
+                        
+                        return `
+                    <div class="campaign-item" style="margin-bottom: 20px;">
+                        <div class="campaign-info">
+                            <h4>${campaign.name}</h4>
+                            <p>${campaign.subject}</p>
+                            <p>Sent: ${new Date(campaign.sentAt).toLocaleDateString()}</p>
+                        </div>
+                        <div style="margin-top: 10px;">
+                            <div style="display: flex; flex-wrap: wrap; gap: 8px;">
+                                ${Object.entries(breakdown).map(([status, count]) => `
+                                    <span style="background: ${statusColors[status] || '#6c757d'}; color: white; padding: 4px 10px; border-radius: 12px; font-size: 12px;">
+                                        ${status}: ${count}
+                                    </span>
+                                `).join('')}
+                                <span style="background: #333; color: white; padding: 4px 10px; border-radius: 12px; font-size: 12px; font-weight: bold;">
+                                    Total: ${total}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                `}).join('');
+
                 // Load top campaigns
                 const topResponse = await fetch(`${API_BASE}/analytics/top-campaigns?limit=5`);
                 const topData = await topResponse.json();
@@ -538,6 +792,77 @@
             }
         }
 
+        // Load CRM data
+        async function loadCRM() {
+            try {
+                console.log('Loading CRM data...');
+                
+                // Load CRM statistics
+                const statsResponse = await fetch(`${API_BASE}/crm/stats`);
+                const stats = await statsResponse.json();
+                
+                document.getElementById('crmStatsGrid').innerHTML = `
+                    <div class="stat-card" style="cursor: pointer;" onclick="loadContacts()">
+                        <div class="stat-number">${stats.totalContacts}</div>
+                        <div class="stat-label">Total Contacts</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">${stats.activeLeads}</div>
+                        <div class="stat-label">Active Leads</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">${stats.opportunities}</div>
+                        <div class="stat-label">Opportunities</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">${stats.wonDeals}</div>
+                        <div class="stat-label">Won Deals</div>
+                    </div>
+                `;
+
+                // Load lead pipeline
+                const pipelineResponse = await fetch(`${API_BASE}/crm/pipeline`);
+                const pipeline = await pipelineResponse.json();
+                
+                document.getElementById('leadPipeline').innerHTML = `
+                    <div style="display: flex; flex-direction: column; gap: 15px;">
+                        ${pipeline.stages.map(stage => `
+                            <div style="background: #f8f9fa; padding: 15px; border-radius: 6px; border-left: 4px solid ${stage.color};">
+                                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                                    <strong>${stage.name}</strong>
+                                    <span style="background: ${stage.color}; color: white; padding: 2px 8px; border-radius: 4px; font-size: 12px;">${stage.count}</span>
+                                </div>
+                                <div style="background: white; height: 8px; border-radius: 4px; overflow: hidden;">
+                                    <div style="background: ${stage.color}; height: 100%; width: ${stage.percentage}%; transition: width 0.3s ease;"></div>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                `;
+
+                // Load recent activities
+                const activitiesResponse = await fetch(`${API_BASE}/crm/activities?limit=10`);
+                const activities = await activitiesResponse.json();
+                
+                document.getElementById('recentActivities').innerHTML = activities.map(activity => `
+                    <div class="campaign-item">
+                        <div class="campaign-info">
+                            <h4>${activity.title}</h4>
+                            <p>${activity.description}</p>
+                            <p style="color: #666; font-size: 0.9em;">${new Date(activity.createdAt).toLocaleString()}</p>
+                        </div>
+                        <div class="campaign-actions">
+                            <span class="status-badge status-${activity.type}">${activity.type}</span>
+                        </div>
+                    </div>
+                `).join('');
+                
+            } catch (error) {
+                console.error('Error loading CRM data:', error);
+                showError('Failed to load CRM data');
+            }
+        }
+
         // Campaign form submission
         document.getElementById('campaignForm').addEventListener('submit', async (e) => {
             e.preventDefault();
@@ -552,7 +877,7 @@
                         criteria: { roles: ['Student'] }
                     }
                 ],
-                scheduledAt: document.getElementById('campaignSchedule').value || null,
+                scheduledAt: document.getElementById('campaignSchedule').value,
                 settings: {
                     trackOpens: true,
                     trackClicks: true,
@@ -586,33 +911,392 @@
         });
 
         // Utility functions
-        function viewCampaign(campaignId) {
-            // This would open a detailed view of the campaign
-            alert(`View campaign ${campaignId} - Detailed view to be implemented`);
+        window.viewCampaign = function(campaignId) {
+            // Show campaign details modal
+            showCampaignDetails(campaignId);
         }
 
-        async function sendCampaign(campaignId) {
-            if (confirm('Are you sure you want to send this campaign?')) {
-                try {
-                    const response = await fetch(`${API_BASE}/campaigns/${campaignId}/send`, {
-                        method: 'POST'
-                    });
+        function showCampaignDetails(campaignId) {
+            // For now, show basic info - can be expanded later
+            const campaignInfo = `
+                <h3>Campaign Details</h3>
+                <p><strong>Campaign ID:</strong> ${campaignId}</p>
+                <p><strong>Status:</strong> <span class="status-badge status-draft">Loading...</span></p>
+                <div style="margin-top: 20px;">
+                    <button class="btn" onclick="closeCampaignDetails()">Close</button>
+                    <button class="btn btn-success" onclick="editCampaign('${campaignId}')">Edit Campaign</button>
+                    ${campaignId ? `<button class="btn btn-danger" onclick="deleteCampaign('${campaignId}')">Delete Campaign</button>` : ''}
+                </div>
+            `;
+            
+            // Create modal
+            const modal = document.createElement('div');
+            modal.className = 'modal';
+            modal.style.display = 'flex';
+            modal.innerHTML = `
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h2>Campaign Details</h2>
+                        <button class="modal-close" onclick="closeCampaignDetails()">&times;</button>
+                    </div>
+                    <div class="modal-body">
+                        ${campaignInfo}
+                    </div>
+                </div>
+            `;
+            
+            document.body.appendChild(modal);
+        }
 
-                    if (response.ok) {
-                        showSuccess('Campaign sending started!');
-                        loadCampaigns();
-                    } else {
-                        const error = await response.json();
-                        showError(error.error || 'Failed to send campaign');
-                    }
-                } catch (error) {
-                    console.error('Error sending campaign:', error);
-                    showError('Failed to send campaign');
-                }
+        function closeCampaignDetails() {
+            const modal = document.querySelector('.modal');
+            if (modal) {
+                modal.remove();
             }
         }
 
-        async function deleteCampaign(campaignId) {
+        window.editCampaign = function(campaignId) {
+            showCampaignEditor(campaignId);
+        }
+
+        function showCampaignEditor(campaignId) {
+            // Create campaign editor modal
+            const modal = document.createElement('div');
+            modal.className = 'modal';
+            modal.innerHTML = `
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h2>Edit Campaign</h2>
+                        <button class="modal-close" onclick="closeCampaignEditor()">&times;</button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="editCampaignForm">
+                            <div class="form-group">
+                                <label for="editCampaignName">Campaign Name</label>
+                                <input type="text" id="editCampaignName" required>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="editCampaignSubject">Subject</label>
+                                <input type="text" id="editCampaignSubject" required>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="editCampaignTemplate">Template</label>
+                                <select id="editCampaignTemplate" required onchange="loadTemplateContentForEdit(this.value)">
+                                    <option value="">Select a template</option>
+                                </select>
+                            </div>
+                            
+                            <div class="form-group" id="templateContentGroup" style="display: none;">
+                                <label for="editTemplateContent">Template Content (HTML)</label>
+                                <textarea id="editTemplateContent" rows="15" style="width: 100%; font-family: monospace; font-size: 12px; resize: vertical;"></textarea>
+                                <small style="color: #666;">Edit the HTML template content directly. Variables like {{user.name}} will be replaced when sending.</small>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="editCampaignSchedule">Schedule (optional)</label>
+                                <input type="datetime-local" id="editCampaignSchedule">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="editCampaignStatus">Status</label>
+                                <select id="editCampaignStatus">
+                                    <option value="draft">Draft</option>
+                                    <option value="scheduled">Scheduled</option>
+                                    <option value="sending">Sending</option>
+                                    <option value="sent">Sent</option>
+                                    <option value="paused">Paused</option>
+                                    <option value="cancelled">Cancelled</option>
+                                </select>
+                            </div>
+                            
+                            <div style="display: flex; gap: 10px; margin-top: 20px;">
+                                <button type="button" class="btn" onclick="closeCampaignEditor()">Cancel</button>
+                                <button type="submit" class="btn btn-success">Save Changes</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            `;
+            
+            document.body.appendChild(modal);
+            
+            // Load campaign data for editing
+            loadCampaignForEditing(campaignId);
+        }
+
+        window.closeCampaignEditor = function() {
+            const modal = document.querySelector('.modal');
+            if (modal) {
+                modal.remove();
+            }
+        }
+
+        let currentTemplateData = null;
+
+        window.loadTemplateContentForEdit = async function(templateId) {
+            if (!templateId) {
+                document.getElementById('templateContentGroup').style.display = 'none';
+                document.getElementById('editTemplateContent').value = '';
+                currentTemplateData = null;
+                return;
+            }
+            
+            try {
+                const response = await fetch(`${API_BASE}/templates/${templateId}`);
+                if (!response.ok) throw new Error('Failed to load template');
+                
+                currentTemplateData = await response.json();
+                
+                // Show the content area and populate it
+                document.getElementById('templateContentGroup').style.display = 'block';
+                document.getElementById('editTemplateContent').value = currentTemplateData.htmlContent || '';
+                
+                // If subject is empty, auto-fill from template
+                const subjectField = document.getElementById('editCampaignSubject');
+                if (!subjectField.value && currentTemplateData.subject) {
+                    subjectField.value = currentTemplateData.subject;
+                }
+            } catch (error) {
+                console.error('Error loading template content:', error);
+                showError('Failed to load template content');
+            }
+        }
+
+        async function loadCampaignForEditing(campaignId) {
+            try {
+                const response = await fetch(`${API_BASE}/campaigns/${campaignId}`);
+                
+                if (!response.ok) {
+                    throw new Error(`Failed to load campaign: ${response.status}`);
+                }
+                
+                const campaign = await response.json();
+                
+                // Populate form fields
+                document.getElementById('editCampaignName').value = campaign.name || '';
+                document.getElementById('editCampaignSubject').value = campaign.subject || '';
+                document.getElementById('editCampaignSchedule').value = campaign.scheduledAt ? 
+                    new Date(campaign.scheduledAt).toISOString().slice(0, 16) : '';
+                document.getElementById('editCampaignStatus').value = campaign.status || 'draft';
+                
+                // Load templates for dropdown
+                const templatesResponse = await fetch(`${API_BASE}/templates`);
+                const templatesData = await templatesResponse.json();
+                
+                const templateSelect = document.getElementById('editCampaignTemplate');
+                templateSelect.innerHTML = '<option value="">Select a template</option>' + 
+                    templatesData.templates.map(template => 
+                        `<option value="${template._id}">${template.name}</option>`
+                    ).join('');
+                
+                // Extract template ID (could be string or populated object)
+                const templateId = typeof campaign.templateId === 'object' ? campaign.templateId._id : campaign.templateId;
+                
+                // Set template and load its content
+                templateSelect.value = templateId || '';
+                if (templateId) {
+                    await loadTemplateContentForEdit(templateId);
+                    // Override with campaign's custom content if it has any
+                    if (campaign.customTemplateContent) {
+                        document.getElementById('editTemplateContent').value = campaign.customTemplateContent;
+                    }
+                }
+                
+                // Handle form submission
+                document.getElementById('editCampaignForm').addEventListener('submit', async (e) => {
+                    e.preventDefault();
+                    
+                    const templateContentEl = document.getElementById('editTemplateContent');
+                    const updatedData = {
+                        name: document.getElementById('editCampaignName').value,
+                        subject: document.getElementById('editCampaignSubject').value,
+                        templateId: document.getElementById('editCampaignTemplate').value,
+                        scheduledAt: document.getElementById('editCampaignSchedule').value,
+                        status: document.getElementById('editCampaignStatus').value,
+                        customTemplateContent: templateContentEl && templateContentEl.value !== (currentTemplateData?.htmlContent || '') ? templateContentEl.value : undefined
+                    };
+                    
+                    try {
+                        const response = await fetch(`${API_BASE}/campaigns/${campaignId}`, {
+                            method: 'PUT',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify(updatedData)
+                        });
+
+                        if (response.ok) {
+                            showSuccess('Campaign updated successfully!');
+                            closeCampaignEditor();
+                            loadCampaigns(); // Refresh campaigns list
+                        } else {
+                            const error = await response.json();
+                            showError(error.error || 'Failed to update campaign');
+                        }
+                    } catch (error) {
+                        console.error('Error updating campaign:', error);
+                        showError('Failed to update campaign');
+                    }
+                });
+                
+            } catch (error) {
+                console.error('Error loading campaign for editing:', error);
+                showError('Failed to load campaign');
+            }
+        }
+
+        let currentSendCampaignId = null;
+        let selectedContacts = new Set();
+
+        window.sendCampaign = async function(campaignId) {
+            currentSendCampaignId = campaignId;
+            selectedContacts.clear();
+            await showSendCampaignModal(campaignId);
+        }
+
+        window.showSendCampaignModal = async function(campaignId) {
+            // Create modal
+            const modal = document.createElement('div');
+            modal.className = 'modal';
+            modal.id = 'sendCampaignModal';
+            modal.innerHTML = `
+                <div class="modal-content" style="max-width: 900px;">
+                    <div class="modal-header">
+                        <h2>Send Campaign - Select Recipients</h2>
+                        <button class="modal-close" onclick="closeSendCampaignModal()">&times;</button>
+                    </div>
+                    <div class="modal-body">
+                        <div style="margin-bottom: 20px; display: flex; gap: 10px; align-items: center;">
+                            <button class="btn btn-success" onclick="selectAllContacts()">Select All</button>
+                            <button class="btn" onclick="deselectAllContacts()">Deselect All</button>
+                            <span id="selectedCount" style="margin-left: auto; font-weight: bold;">0 selected</span>
+                        </div>
+                        <div id="contactsListForSend" style="max-height: 400px; overflow-y: auto; border: 1px solid #ddd; border-radius: 8px;">
+                            <div class="loading">Loading contacts...</div>
+                        </div>
+                        <div style="margin-top: 20px; display: flex; gap: 10px; justify-content: flex-end;">
+                            <button class="btn" onclick="closeSendCampaignModal()">Cancel</button>
+                            <button class="btn btn-success" onclick="confirmSendCampaign()">Send Campaign</button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(modal);
+            
+            // Load contacts
+            await loadContactsForSend();
+        }
+
+        window.closeSendCampaignModal = function() {
+            const modal = document.getElementById('sendCampaignModal');
+            if (modal) modal.remove();
+            currentSendCampaignId = null;
+            selectedContacts.clear();
+        }
+
+        window.loadContactsForSend = async function() {
+            try {
+                const response = await fetch(`${API_BASE}/crm/contacts?limit=1000`);
+                const data = await response.json();
+                
+                const container = document.getElementById('contactsListForSend');
+                
+                if (!data.contacts || data.contacts.length === 0) {
+                    container.innerHTML = '<div style="padding: 20px; text-align: center; color: #666;">No contacts found</div>';
+                    return;
+                }
+                
+                container.innerHTML = data.contacts.map(contact => `
+                    <div class="contact-item-for-send" style="padding: 12px 15px; border-bottom: 1px solid #eee; display: flex; align-items: center; gap: 12px; cursor: pointer; hover: background: #f5f5f5;" onclick="toggleContactSelection('${contact._id}', this)">
+                        <input type="checkbox" class="contact-checkbox" data-contact-id="${contact._id}" style="cursor: pointer;" onclick="event.stopPropagation(); toggleContactSelection('${contact._id}', this.parentElement)">
+                        <div style="flex: 1;">
+                            <div style="font-weight: 500;">${contact.name || 'No Name'}</div>
+                            <div style="font-size: 13px; color: #666;">${contact.email}</div>
+                        </div>
+                        <div style="font-size: 12px; color: #999;">${contact.role || 'User'}</div>
+                    </div>
+                `).join('');
+                
+                updateSelectedCount();
+            } catch (error) {
+                console.error('Error loading contacts:', error);
+                document.getElementById('contactsListForSend').innerHTML = '<div style="padding: 20px; text-align: center; color: red;">Failed to load contacts</div>';
+            }
+        }
+
+        window.toggleContactSelection = function(contactId, rowElement) {
+            const checkbox = rowElement.querySelector('.contact-checkbox');
+            checkbox.checked = !checkbox.checked;
+            
+            if (checkbox.checked) {
+                selectedContacts.add(contactId);
+                rowElement.style.background = '#e3f2fd';
+            } else {
+                selectedContacts.delete(contactId);
+                rowElement.style.background = '';
+            }
+            
+            updateSelectedCount();
+        }
+
+        window.selectAllContacts = function() {
+            const checkboxes = document.querySelectorAll('.contact-checkbox');
+            checkboxes.forEach(cb => {
+                cb.checked = true;
+                cb.parentElement.style.background = '#e3f2fd';
+                selectedContacts.add(cb.dataset.contactId);
+            });
+            updateSelectedCount();
+        }
+
+        window.deselectAllContacts = function() {
+            const checkboxes = document.querySelectorAll('.contact-checkbox');
+            checkboxes.forEach(cb => {
+                cb.checked = false;
+                cb.parentElement.style.background = '';
+            });
+            selectedContacts.clear();
+            updateSelectedCount();
+        }
+
+        window.updateSelectedCount = function() {
+            document.getElementById('selectedCount').textContent = `${selectedContacts.size} selected`;
+        }
+
+        window.confirmSendCampaign = async function() {
+            if (selectedContacts.size === 0) {
+                showError('Please select at least one contact');
+                return;
+            }
+            
+            if (!confirm(`Send campaign to ${selectedContacts.size} contacts?`)) {
+                return;
+            }
+            
+            try {
+                const response = await fetch(`${API_BASE}/campaigns/${currentSendCampaignId}/send`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ contactIds: Array.from(selectedContacts) })
+                });
+
+                if (response.ok) {
+                    showSuccess(`Campaign sending to ${selectedContacts.size} contacts!`);
+                    closeSendCampaignModal();
+                    loadCampaigns();
+                } else {
+                    const error = await response.json();
+                    showError(error.error || 'Failed to send campaign');
+                }
+            } catch (error) {
+                console.error('Error sending campaign:', error);
+                showError('Failed to send campaign');
+            }
+        }
+
+        window.deleteCampaign = async function(campaignId) {
             if (confirm('Are you sure you want to delete this campaign?')) {
                 try {
                     const response = await fetch(`${API_BASE}/campaigns/${campaignId}`, {
@@ -633,9 +1317,448 @@
             }
         }
 
-        function previewTemplate(templateId) {
-            // This would open a preview of the template
-            alert(`Preview template ${templateId} - Preview to be implemented`);
+        window.previewTemplate = async function(templateId) {
+            try {
+                console.log('Previewing template:', templateId);
+                
+                const response = await fetch(`${API_BASE}/templates/${templateId}/preview`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        sampleData: {
+                            user: {
+                                name: 'John Doe',
+                                email: 'john@example.com',
+                                role: 'Student',
+                                university: 'EduNode University',
+                                skills: ['JavaScript', 'Web Development'],
+                                points: 1500
+                            },
+                            campaign: {
+                                name: 'Sample Campaign',
+                                subject: 'Sample Subject'
+                            },
+                            weeklyStats: {
+                                coursesCompleted: 3,
+                                newConnections: 5,
+                                pointsEarned: 150
+                            },
+                            achievement: {
+                                name: 'First Course Completed',
+                                description: 'Congratulations on completing your first course!',
+                                points: 100
+                            }
+                        }
+                    })
+                });
+
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    console.error('Preview error response:', errorText);
+                    throw new Error(`Failed to preview template: ${response.status}`);
+                }
+
+                const previewData = await response.json();
+                console.log('Preview data:', previewData);
+                
+                // Show modal first
+                document.getElementById('previewModal').style.display = 'flex';
+                
+                // Update modal content
+                document.getElementById('previewSubject').textContent = previewData.subject;
+                
+                // Update HTML preview
+                const previewFrame = document.getElementById('previewFrame');
+                const frameDoc = previewFrame.contentDocument || previewFrame.contentWindow.document;
+                frameDoc.open();
+                frameDoc.write(previewData.html);
+                frameDoc.close();
+                
+                // Update text preview
+                document.getElementById('textContent').textContent = previewData.text;
+                
+                // Show HTML tab by default
+                showPreviewTab('html');
+                
+            } catch (error) {
+                console.error('Error previewing template:', error);
+                showError('Failed to preview template: ' + error.message);
+            }
+        }
+
+        window.closePreviewModal = function() {
+            document.getElementById('previewModal').style.display = 'none';
+        }
+
+        window.showPreviewTab = function(tabName) {
+            // Hide all preview panes
+            document.querySelectorAll('.preview-pane').forEach(pane => {
+                pane.classList.remove('active');
+            });
+            
+            // Remove active class from all tabs
+            document.querySelectorAll('.preview-tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Show selected pane
+            document.getElementById(`${tabName}Preview`).classList.add('active');
+            
+            // Add active class to clicked tab
+            event.target.classList.add('active');
+        }
+
+        // Close modal when clicking outside
+        document.getElementById('previewModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closePreviewModal();
+            }
+        });
+
+        // Close modal with Escape key
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                closePreviewModal();
+            }
+        });
+
+        // CRM Action Functions
+        function showNewContactForm() {
+            alert('New Contact Form - To be implemented');
+        }
+
+        function showNewLeadForm() {
+            alert('New Lead Form - To be implemented');
+        }
+
+        function showImportContacts() {
+            alert('Import Contacts - To be implemented');
+        }
+
+        // Load and display contacts
+        let currentContactsPage = 1;
+        let allContacts = [];
+        let currentSearchQuery = '';
+        
+        window.loadContacts = async function(loadMore = false) {
+            try {
+                console.log('Loading contacts...');
+                
+                const limit = loadMore ? 20 : 50; // Load more on "Load More", initial load 50
+                const page = loadMore ? currentContactsPage : 1;
+                
+                const searchParam = currentSearchQuery ? `&search=${encodeURIComponent(currentSearchQuery)}` : '';
+                const response = await fetch(`${API_BASE}/crm/contacts?limit=${limit}&page=${page}${searchParam}`);
+                const data = await response.json();
+                
+                if (!loadMore) {
+                    allContacts = data.contacts;
+                    document.getElementById('contactsSection').style.display = 'block';
+                    document.getElementById('contactsPagination').style.display = 'block';
+                    currentContactsPage = 1;
+                } else {
+                    allContacts = [...allContacts, ...data.contacts];
+                    currentContactsPage++;
+                }
+                
+                document.getElementById('contactsList').innerHTML = allContacts.map(contact => `
+                    <div class="campaign-item">
+                        <div class="campaign-info">
+                            <h4>${contact.name}</h4>
+                            <p>${contact.email} | ${contact.role} | ${contact.university || 'No University'}</p>
+                            <p>Skills: ${contact.skills && contact.skills.length > 0 ? contact.skills.join(', ') : 'No skills listed'}</p>
+                            <p style="color: #666; font-size: 0.9em;">Points: ${contact.Points || 0} | Rating: ${contact.rating || 'Not rated'}</p>
+                        </div>
+                        <div class="campaign-actions">
+                            <button class="btn" onclick="viewContact('${contact._id}')">View</button>
+                            <button class="btn btn-success" onclick="emailContact('${contact._id}')">Email</button>
+                            <button class="btn btn-danger" onclick="deleteContact('${contact._id}')">Delete</button>
+                        </div>
+                    </div>
+                `).join('');
+                
+                // Update pagination info
+                document.getElementById('contactsCount').textContent = 
+                    `Showing ${allContacts.length} of ${data.pagination.total} contacts`;
+                
+                // Hide/show load more button
+                const loadMoreBtn = document.getElementById('loadMoreBtn');
+                if (allContacts.length >= data.pagination.total) {
+                    loadMoreBtn.style.display = 'none';
+                } else {
+                    loadMoreBtn.style.display = 'inline-block';
+                }
+                
+                // Scroll to contacts section
+                if (!loadMore) {
+                    document.getElementById('contactsSection').scrollIntoView({ behavior: 'smooth' });
+                }
+                
+            } catch (error) {
+                console.error('Error loading contacts:', error);
+                showError('Failed to load contacts');
+            }
+        }
+
+        window.loadMoreContacts = function() {
+            loadContacts(true);
+        }
+        
+        window.searchContacts = function(query) {
+            currentSearchQuery = query;
+            currentContactsPage = 1;
+            loadContacts(false);
+        }
+
+        window.hideContacts = function() {
+            document.getElementById('contactsSection').style.display = 'none';
+            currentSearchQuery = '';
+            document.getElementById('contactsSearch').value = '';
+        }
+
+        window.viewContact = async function(contactId) {
+            try {
+                const response = await fetch(`${API_BASE}/crm/contacts/${contactId}`);
+                if (!response.ok) throw new Error('Failed to fetch contact');
+                const contact = await response.json();
+                
+                const modal = document.createElement('div');
+                modal.className = 'modal';
+                modal.id = 'viewContactModal';
+                modal.innerHTML = `
+                    <div class="modal-content" style="max-width: 600px;">
+                        <div class="modal-header">
+                            <h2>Contact Details</h2>
+                            <button class="modal-close" onclick="closeViewContactModal()">&times;</button>
+                        </div>
+                        <div class="modal-body">
+                            <div style="display: grid; gap: 15px;">
+                                <div style="display: flex; border-bottom: 1px solid #eee; padding: 10px 0;">
+                                    <div style="width: 120px; font-weight: bold; color: #666;">Name:</div>
+                                    <div>${contact.name || contact.userName || contact.firstName + ' ' + contact.lastName || 'N/A'}</div>
+                                </div>
+                                <div style="display: flex; border-bottom: 1px solid #eee; padding: 10px 0;">
+                                    <div style="width: 120px; font-weight: bold; color: #666;">Email:</div>
+                                    <div>${contact.email || 'N/A'}</div>
+                                </div>
+                                <div style="display: flex; border-bottom: 1px solid #eee; padding: 10px 0;">
+                                    <div style="width: 120px; font-weight: bold; color: #666;">Role:</div>
+                                    <div>${contact.role || 'N/A'}</div>
+                                </div>
+                                <div style="display: flex; border-bottom: 1px solid #eee; padding: 10px 0;">
+                                    <div style="width: 120px; font-weight: bold; color: #666;">University:</div>
+                                    <div>${contact.university || 'N/A'}</div>
+                                </div>
+                                <div style="display: flex; border-bottom: 1px solid #eee; padding: 10px 0;">
+                                    <div style="width: 120px; font-weight: bold; color: #666;">Points:</div>
+                                    <div>${contact.Points || 0}</div>
+                                </div>
+                                <div style="display: flex; border-bottom: 1px solid #eee; padding: 10px 0;">
+                                    <div style="width: 120px; font-weight: bold; color: #666;">Rating:</div>
+                                    <div>${contact.rating || 0}</div>
+                                </div>
+                                <div style="display: flex; border-bottom: 1px solid #eee; padding: 10px 0;">
+                                    <div style="width: 120px; font-weight: bold; color: #666;">Skills:</div>
+                                    <div>${contact.skills?.join(', ') || 'None listed'}</div>
+                                </div>
+                                <div style="display: flex; border-bottom: 1px solid #eee; padding: 10px 0;">
+                                    <div style="width: 120px; font-weight: bold; color: #666;">Created:</div>
+                                    <div>${contact.createdAt ? new Date(contact.createdAt).toLocaleString() : 'N/A'}</div>
+                                </div>
+                                <div style="display: flex; padding: 10px 0;">
+                                    <div style="width: 120px; font-weight: bold; color: #666;">Last Email:</div>
+                                    <div>${contact.lastEmailSent ? new Date(contact.lastEmailSent).toLocaleString() : 'Never'}</div>
+                                </div>
+                            </div>
+                            <div style="margin-top: 20px; display: flex; gap: 10px; justify-content: flex-end;">
+                                <button class="btn" onclick="closeViewContactModal()">Close</button>
+                                <button class="btn btn-success" onclick="closeViewContactModal(); emailContact('${contactId}')">Send Email</button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                document.body.appendChild(modal);
+            } catch (error) {
+                console.error('Error viewing contact:', error);
+                showError('Failed to load contact details');
+            }
+        }
+
+        window.closeViewContactModal = function() {
+            const modal = document.getElementById('viewContactModal');
+            if (modal) modal.remove();
+        }
+
+        let currentEmailContactId = null;
+        let emailTemplateData = null;
+
+        window.emailContact = async function(contactId) {
+            currentEmailContactId = contactId;
+            emailTemplateData = null;
+            
+            try {
+                // Get contact details
+                const contactResponse = await fetch(`${API_BASE}/crm/contacts/${contactId}`);
+                if (!contactResponse.ok) throw new Error('Failed to fetch contact');
+                const contact = await contactResponse.json();
+                
+                // Get templates list
+                const templatesResponse = await fetch(`${API_BASE}/templates?limit=100`);
+                const templatesData = await templatesResponse.json();
+                
+                const modal = document.createElement('div');
+                modal.className = 'modal';
+                modal.id = 'emailContactModal';
+                modal.innerHTML = `
+                    <div class="modal-content" style="max-width: 800px;">
+                        <div class="modal-header">
+                            <h2>Send Email to ${contact.name || contact.email}</h2>
+                            <button class="modal-close" onclick="closeEmailContactModal()">&times;</button>
+                        </div>
+                        <div class="modal-body">
+                            <div style="margin-bottom: 15px;">
+                                <label style="display: block; margin-bottom: 5px; font-weight: 500;">To:</label>
+                                <input type="text" id="emailTo" value="${contact.email}" readonly style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; background: #f5f5f5;">
+                            </div>
+                            
+                            <div style="margin-bottom: 15px;">
+                                <label style="display: block; margin-bottom: 5px; font-weight: 500;">Template (optional):</label>
+                                <select id="emailTemplateSelect" onchange="loadTemplateForEmail(this.value)" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
+                                    <option value="">-- Select a template --</option>
+                                    ${templatesData.templates?.map(t => `<option value="${t._id}">${t.name}</option>`).join('') || ''}
+                                </select>
+                            </div>
+                            
+                            <div style="margin-bottom: 15px;">
+                                <label style="display: block; margin-bottom: 5px; font-weight: 500;">Subject:</label>
+                                <input type="text" id="emailSubject" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
+                            </div>
+                            
+                            <div style="margin-bottom: 20px;">
+                                <label style="display: block; margin-bottom: 5px; font-weight: 500;">Message (HTML):</label>
+                                <textarea id="emailContent" rows="12" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; font-family: monospace;"></textarea>
+                            </div>
+                            
+                            <div style="display: flex; gap: 10px; justify-content: flex-end;">
+                                <button class="btn" onclick="closeEmailContactModal()">Cancel</button>
+                                <button class="btn btn-success" onclick="sendEmailToContact()">Send Email</button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                document.body.appendChild(modal);
+            } catch (error) {
+                console.error('Error opening email composer:', error);
+                showError('Failed to open email composer');
+            }
+        }
+
+        window.closeEmailContactModal = function() {
+            const modal = document.getElementById('emailContactModal');
+            if (modal) modal.remove();
+            currentEmailContactId = null;
+            emailTemplateData = null;
+        }
+
+        window.loadTemplateForEmail = async function(templateId) {
+            if (!templateId) {
+                emailTemplateData = null;
+                return;
+            }
+            
+            try {
+                const response = await fetch(`${API_BASE}/templates/${templateId}`);
+                if (!response.ok) throw new Error('Failed to fetch template');
+                emailTemplateData = await response.json();
+                
+                document.getElementById('emailSubject').value = emailTemplateData.subject || '';
+                document.getElementById('emailContent').value = emailTemplateData.htmlContent || '';
+            } catch (error) {
+                console.error('Error loading template:', error);
+                showError('Failed to load template');
+            }
+        }
+
+        window.sendEmailToContact = async function() {
+            const to = document.getElementById('emailTo').value;
+            const subject = document.getElementById('emailSubject').value;
+            const content = document.getElementById('emailContent').value;
+            
+            if (!subject || !content) {
+                showError('Please fill in both subject and message');
+                return;
+            }
+            
+            try {
+                const response = await fetch(`${API_BASE}/campaigns/send-single`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        to: to,
+                        subject: subject,
+                        htmlContent: content,
+                        contactId: currentEmailContactId
+                    })
+                });
+                
+                if (response.ok) {
+                    showSuccess('Email sent successfully!');
+                    closeEmailContactModal();
+                } else {
+                    const error = await response.json();
+                    showError(error.error || 'Failed to send email');
+                }
+            } catch (error) {
+                console.error('Error sending email:', error);
+                showError('Failed to send email');
+            }
+        }
+
+        window.deleteContact = function(contactId) {
+            if (confirm('Are you sure you want to delete this contact? This action cannot be undone.')) {
+                deleteContactFromServer(contactId);
+            }
+        }
+
+        window.deleteContactFromServer = async function(contactId) {
+            try {
+                const response = await fetch(`${API_BASE}/crm/contacts/${contactId}`, {
+                    method: 'DELETE'
+                });
+
+                if (response.ok) {
+                    showSuccess('Contact deleted successfully!');
+                    loadContacts(); // Reload contacts list
+                } else {
+                    const error = await response.json();
+                    showError(error.error || 'Failed to delete contact');
+                }
+            } catch (error) {
+                console.error('Error deleting contact:', error);
+                showError('Failed to delete contact');
+            }
+        }
+
+        function onTemplateChange() {
+            const templateSelect = document.getElementById('campaignTemplate');
+            const selectedTemplate = templateSelect.value;
+            
+            // Enable/disable form fields based on template selection
+            const nameField = document.getElementById('campaignName');
+            const subjectField = document.getElementById('campaignSubject');
+            const scheduleField = document.getElementById('campaignSchedule');
+            
+            if (selectedTemplate) {
+                nameField.disabled = false;
+                subjectField.disabled = false;
+                scheduleField.disabled = false;
+            } else {
+                nameField.disabled = true;
+                subjectField.disabled = true;
+                scheduleField.disabled = true;
+            }
         }
 
         function showError(message) {
@@ -661,8 +1784,7 @@
         }
 
         // Initialize
-        document.addEventListener('DOMContentLoaded', () => {
-            loadOverview();
+        loadOverview();
         });
     </script>
 </body>

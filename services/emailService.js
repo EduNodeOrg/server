@@ -129,11 +129,55 @@ class EmailService {
     }
   }
 
+  async sendEmail({ to, subject, html, text, from, userId, campaignId = null }) {
+    try {
+      const emailData = {
+        from: from || 'EduNode <hi@edunode.org>',
+        to: to,
+        subject: subject,
+        html: html,
+        text: text || '',
+        'o:tracking': true,
+        'o:tracking-clicks': true
+      };
+
+      const result = await mg.messages.create(domain, emailData);
+      
+      // Create email log entry for analytics tracking
+      const emailLogData = {
+        userId: userId,
+        email: to,
+        messageId: result.id,
+        status: 'sent',
+        sentAt: new Date(),
+        events: [{
+          eventType: 'sent',
+          timestamp: new Date()
+        }]
+      };
+      
+      if (campaignId) {
+        emailLogData.campaignId = campaignId;
+      }
+      
+      const emailLog = new EmailLog(emailLogData);
+      await emailLog.save();
+      
+      return {
+        messageId: result.id,
+        status: 'sent'
+      };
+    } catch (error) {
+      console.error('Error sending email:', error);
+      throw error;
+    }
+  }
+
   async renderTemplate(template, data) {
     const { htmlContent, textContent } = template;
     
     const renderString = (str, data) => {
-      return str.replace(/\{\{(\w+)\}\}/g, (match, key) => {
+      return str.replace(/\{\{([\w.]+)\}\}/g, (match, key) => {
         const keys = key.split('.');
         let value = data;
         for (const k of keys) {

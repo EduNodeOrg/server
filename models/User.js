@@ -179,6 +179,28 @@ const UserSchema = new mongoose.Schema({
     type: String,
     enum: ['daily', 'weekly', 'monthly', 'never'],
     default: 'weekly'
+  },
+  stripeCustomerId: {
+    type: String,
+    required: false
+  },
+  subscriptionId: {
+    type: String,
+    required: false
+  },
+  subscriptionStatus: {
+    type: String,
+    enum: ['active', 'canceled', 'past_due', 'incomplete', 'incomplete_expired', 'trialing', 'unpaid', 'none'],
+    default: 'none'
+  },
+  subscriptionPlan: {
+    type: String,
+    enum: ['free', 'pro'],
+    default: 'free'
+  },
+  currentPeriodEnd: {
+    type: Date,
+    required: false
   }
 
 

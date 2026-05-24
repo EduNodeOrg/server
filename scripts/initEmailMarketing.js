@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 const dotenv = require('dotenv');
 const templateService = require('../services/templateService');
+const TemplateServiceMonthly = require('../services/templateServiceMonthly');
 const EmailTemplate = require('../models/EmailTemplate');
 const Campaign = require('../models/Campaign');
 const User = require('../models/User');
@@ -17,9 +18,10 @@ async function initializeEmailMarketing() {
     });
     console.log('Connected to MongoDB');
 
-    console.log('Creating default email templates...');
-    const templates = await templateService.createDefaultTemplates();
-    console.log(`Created ${templates.length} default templates`);
+    console.log('// Create default templates');
+    const createdTemplates = await templateService.createDefaultTemplates();
+    const monthlyTemplates = await TemplateServiceMonthly.createDefaultTemplates();
+    console.log(`Created ${createdTemplates.length + monthlyTemplates.length} default templates`);
 
     // Create sample campaigns after templates are created
     await createSampleCampaigns();

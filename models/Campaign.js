@@ -20,6 +20,11 @@ const CampaignSchema = new mongoose.Schema({
     ref: 'EmailTemplate',
     required: true
   },
+  customTemplateContent: {
+    type: String,
+    required: false,
+    description: 'Custom HTML content that overrides the base template'
+  },
   segments: [{
     type: {
       type: String,

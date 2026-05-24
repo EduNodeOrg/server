@@ -70,7 +70,7 @@ router.get('/:id', async (req, res) => {
 });
 
 // Create new campaign
-router.post('/', auth, async (req, res) => {
+router.post('/', async (req, res) => {
   try {
     const {
       name,
@@ -94,7 +94,7 @@ router.post('/', auth, async (req, res) => {
       segments,
       scheduledAt,
       settings,
-      createdBy: req.user.id
+      createdBy: '507f1f77bcf86cd799439011' // Default system user ObjectId
     });
 
     await campaign.save();
@@ -111,17 +111,12 @@ router.post('/', auth, async (req, res) => {
 });
 
 // Update campaign
-router.put('/:id', auth, async (req, res) => {
+router.put('/:id', async (req, res) => {
   try {
     const campaign = await Campaign.findById(req.params.id);
     
     if (!campaign) {
       return res.status(404).json({ error: 'Campaign not found' });
-    }
-
-    // Check if user can edit this campaign
-    if (campaign.createdBy.toString() !== req.user.id && req.user.role !== 'admin') {
-      return res.status(403).json({ error: 'Not authorized to edit this campaign' });
     }
 
     // Don't allow editing sent campaigns
@@ -130,6 +125,12 @@ router.put('/:id', auth, async (req, res) => {
     }
 
     const updates = req.body;
+    
+    // Handle customTemplateContent - set to null if undefined to clear any previous custom content
+    if (updates.customTemplateContent === undefined) {
+      updates.customTemplateContent = null;
+    }
+    
     Object.assign(campaign, updates);
     await campaign.save();
 
@@ -145,7 +146,7 @@ router.put('/:id', auth, async (req, res) => {
 });
 
 // Delete campaign
-router.delete('/:id', auth, async (req, res) => {
+router.delete('/:id', async (req, res) => {
   try {
     const campaign = await Campaign.findById(req.params.id);
     
@@ -153,12 +154,6 @@ router.delete('/:id', auth, async (req, res) => {
       return res.status(404).json({ error: 'Campaign not found' });
     }
 
-    // Check if user can delete this campaign
-    if (campaign.createdBy.toString() !== req.user.id && req.user.role !== 'admin') {
-      return res.status(403).json({ error: 'Not authorized to delete this campaign' });
-    }
-
-    // Don't allow deleting sent campaigns
     if (campaign.status === 'sent') {
       return res.status(400).json({ error: 'Cannot delete sent campaign' });
     }
@@ -172,7 +167,7 @@ router.delete('/:id', auth, async (req, res) => {
 });
 
 // Send campaign
-router.post('/:id/send', auth, async (req, res) => {
+router.post('/:id/send', async (req, res) => {
   try {
     const campaign = await Campaign.findById(req.params.id).populate('templateId');
     
@@ -180,21 +175,36 @@ router.post('/:id/send', auth, async (req, res) => {
       return res.status(404).json({ error: 'Campaign not found' });
     }
 
-    // Check if user can send this campaign
-    if (campaign.createdBy.toString() !== req.user.id && req.user.role !== 'admin') {
-      return res.status(403).json({ error: 'Not authorized to send this campaign' });
-    }
-
     // Don't allow sending already sent campaigns
     if (campaign.status === 'sent' || campaign.status === 'sending') {
       return res.status(400).json({ error: 'Campaign already sent or currently sending' });
     }
 
-    // Get segmented users
-    const { userIds, totalRecipients } = await getSegmentedUsers(campaign.segments);
-    
-    if (userIds.length === 0) {
-      return res.status(400).json({ error: 'No users found for the selected segments' });
+    let userIds = [];
+    let totalRecipients = 0;
+
+    // If specific contactIds are provided, use those
+    if (req.body.contactIds && Array.isArray(req.body.contactIds) && req.body.contactIds.length > 0) {
+      // Validate and convert contactIds to ObjectIds
+      const mongoose = require('mongoose');
+      userIds = req.body.contactIds
+        .filter(id => mongoose.Types.ObjectId.isValid(id))
+        .map(id => new mongoose.Types.ObjectId(id));
+      
+      totalRecipients = userIds.length;
+      
+      if (userIds.length === 0) {
+        return res.status(400).json({ error: 'No valid contacts provided' });
+      }
+    } else {
+      // Otherwise use segmented users
+      const segmented = await getSegmentedUsers(campaign.segments);
+      userIds = segmented.userIds;
+      totalRecipients = segmented.totalRecipients;
+      
+      if (userIds.length === 0) {
+        return res.status(400).json({ error: 'No users found for the selected segments' });
+      }
     }
 
     // Update campaign with recipient count
@@ -356,5 +366,77 @@ async function getSegmentedUsers(segments) {
     totalRecipients: users.length
   };
 }
+
+// Send single email to contact
+router.post('/send-single', async (req, res) => {
+  try {
+    const { to, subject, htmlContent, contactId } = req.body;
+    
+    if (!to || !subject || !htmlContent) {
+      return res.status(400).json({ error: 'Missing required fields: to, subject, htmlContent' });
+    }
+    
+    // Check if email is unsubscribed
+    const isUnsubscribed = await Unsubscribe.findOne({ email: to });
+    if (isUnsubscribed) {
+      return res.status(400).json({ error: 'This email has unsubscribed from marketing emails' });
+    }
+    
+    // Get contact data for template rendering
+    let user = null;
+    if (contactId) {
+      user = await User.findById(contactId).select('name userName firstName lastName email role university skills Points rating');
+    }
+    
+    // Render template with user data
+    let renderedHtml = htmlContent;
+    let renderedSubject = subject;
+    if (user) {
+      const userData = {
+        name: user.name || user.userName || `${user.firstName || ''} ${user.lastName || ''}`.trim() || 'Valued User',
+        email: user.email,
+        role: user.role,
+        university: user.university,
+        skills: user.skills,
+        points: user.Points,
+        rating: user.rating
+      };
+      
+      // Replace template variables
+      renderedHtml = htmlContent.replace(/\{\{user\.(\w+)\}\}/g, (match, key) => {
+        return userData[key] !== undefined ? userData[key] : match;
+      });
+      
+      renderedSubject = subject.replace(/\{\{user\.(\w+)\}\}/g, (match, key) => {
+        return userData[key] !== undefined ? userData[key] : match;
+      });
+    }
+    
+    // Send email using email service
+    const result = await emailService.sendEmail({
+      to: to,
+      subject: renderedSubject,
+      html: renderedHtml,
+      from: process.env.FROM_EMAIL || 'noreply@edunode.org',
+      userId: contactId  // Pass contactId as userId for email logging
+    });
+    
+    // Update user's lastEmailSent if contactId provided
+    if (contactId) {
+      await User.findByIdAndUpdate(contactId, {
+        lastEmailSent: new Date()
+      });
+    }
+    
+    res.json({ 
+      message: 'Email sent successfully',
+      messageId: result.messageId 
+    });
+    
+  } catch (error) {
+    console.error('Error sending single email:', error);
+    res.status(500).json({ error: 'Failed to send email' });
+  }
+});
 
 module.exports = router;
