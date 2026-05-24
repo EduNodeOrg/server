@@ -78,6 +78,8 @@ router.post('/', function (req, res) {
                 { expiresIn: 3600 },
                 (err, token) => {
                   if (err) throw err;
+                  console.log('[emailLogin] issuing token for user id:', user.id);
+                  console.log('[emailLogin] token payload being signed:', { id: user.id });
                   res.json({
                     token,
                     user
