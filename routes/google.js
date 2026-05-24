@@ -28,6 +28,7 @@ router.post('/', function (req, res) {
       if (user) {
         // Store user data in the session
         const sessionUser = {
+          id: user._id,
           name: name,
           email: req.body.email,
         };
@@ -46,12 +47,22 @@ router.post('/', function (req, res) {
             res.status(500).json({ error: 'Error sending email' });
           } else {
             console.log('Email sent successfully:', body);
-            res.json({ msg: 'Email sent' });
           }
         });
 
-
-        res.json({ user, msg: "User already exists, welcome back" });
+        // Generate JWT token for existing user
+        jwt.sign(
+          { id: user._id }, process.env.JWT_SECRET,
+          { expiresIn: 3600 },
+          (err, token) => {
+            if (err) throw err;
+            res.json({
+              token,
+              user,
+              msg: "User already exists, welcome back"
+            });
+          }
+        );
 
 
 
@@ -64,6 +75,7 @@ router.post('/', function (req, res) {
           .then(() => {
 
             const sessionUser = {
+              id: newUser._id,
               name: name,
               email: req.body.email,
             };
@@ -88,7 +100,7 @@ router.post('/', function (req, res) {
 
             // Generate JWT token and send it in response
             jwt.sign(
-              { id: newUser.id }, process.env.JWT_SECRET,
+              { id: newUser._id }, process.env.JWT_SECRET,
               { expiresIn: 3600 },
               (err, token) => {
                 if (err) throw err;

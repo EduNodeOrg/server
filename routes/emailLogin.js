@@ -45,7 +45,7 @@ router.post('/', function (req, res) {
 
               // Register session
               const sessionUser = {
-                id: user.id,
+                id: user._id,
                 email: req.body.email,
               };
 
@@ -74,12 +74,12 @@ router.post('/', function (req, res) {
 
 
               jwt.sign(
-                { id: user.id }, process.env.JWT_SECRET,
+                { id: user._id }, process.env.JWT_SECRET,
                 { expiresIn: 3600 },
                 (err, token) => {
                   if (err) throw err;
-                  console.log('[emailLogin] issuing token for user id:', user.id);
-                  console.log('[emailLogin] token payload being signed:', { id: user.id });
+                  console.log('[emailLogin] issuing token for user id:', user._id);
+                  console.log('[emailLogin] token payload being signed:', { id: user._id });
                   res.json({
                     token,
                     user
