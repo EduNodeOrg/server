@@ -232,6 +232,72 @@ app.use("/api/email/unsubscribe", emailUnsubscribe);
 app.use("/api/email/webhooks", emailWebhooks);
 app.use("/api/email/analytics", emailAnalytics);
 app.use("/api/email/crm", emailCRM);
+
+// Handle unsubscribe at root level for Mailgun redirects
+app.get("/unsubscribe", async (req, res) => {
+  try {
+    const { email, campaign, reason = 'user_request' } = req.query;
+
+    if (!email) {
+      return res.status(400).send('Email parameter is required');
+    }
+
+    const emailService = require('./services/emailService');
+    await emailService.unsubscribeUser(email, campaign, reason);
+
+    res.send(`
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <title>Unsubscribed - EduNode</title>
+        <style>
+          body {
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 20px;
+            text-align: center;
+          }
+          .container {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 30px;
+            background-color: #f9f9f9;
+          }
+          h1 {
+            color: #333;
+            margin-bottom: 20px;
+          }
+          p {
+            color: #666;
+            line-height: 1.6;
+            margin-bottom: 15px;
+          }
+          .logo {
+            font-size: 24px;
+            font-weight: bold;
+            color: #007bff;
+            margin-bottom: 30px;
+          }
+        </style>
+      </head>
+      <body>
+        <div class="container">
+          <div class="logo">EduNode</div>
+          <h1>Successfully Unsubscribed</h1>
+          <p>You have been successfully unsubscribed from our email marketing communications.</p>
+          <p>We're sorry to see you go! You can always manage your email preferences from your profile settings if you decide to re-subscribe in the future.</p>
+          <p>If you unsubscribed by accident or have any questions, please contact our support team.</p>
+          <p>Thank you for being part of the EduNode community!</p>
+        </div>
+      </body>
+      </html>
+    `);
+  } catch (error) {
+    console.error('Error processing unsubscribe:', error);
+    res.status(500).send('An error occurred while processing your request');
+  }
+});
 app.use("/api/stripe", stripeRoutes);
 
 // Serve static files from public directory
@@ -240,6 +306,16 @@ app.use(express.static('public'));
 // Serve email marketing admin interface
 app.get("/admin/email", (req, res) => {
   res.sendFile(__dirname + '/public/email-admin.html');
+});
+
+// Serve forgot password page
+app.get("/forgot_password", (req, res) => {
+  res.sendFile(__dirname + '/public/forgot-password.html');
+});
+
+// Serve reset password page
+app.get("/reset/:id", (req, res) => {
+  res.sendFile(__dirname + '/public/reset-password.html');
 });
 
 // Set the time zone to Europe/Vienna

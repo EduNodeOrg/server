@@ -4,68 +4,53 @@ const nodemailer = require("nodemailer");
 const User = require('../models/User');
 const dotenv = require('dotenv');
 
-router.post("/", (req, res, next) => {
-
-User.findOne({email: req.body.email})
-.then(user => {
-  
-  if(user) {
-    const id = user._id
-    const request = {
-      id,
-      email: req.body.email
-    }
-    main(request)
-  }}).catch(err => {
-  console.log(err)
-})
-  
-
-async function main(request) {
+router.post("/", async (req, res, next) => {
+  try {
+    const user = await User.findOne({email: req.body.email});
+    
+    if(user) {
+      const id = user._id;
+      const request = {
+        id,
+        email: req.body.email
+      };
+      
       let transporter = nodemailer.createTransport({
-       host: "smtp.gmail.com",
-       port: 465,
-       secure: true, // true for 465, false for other ports
-       auth: {
-         type: "login",
-         user: process.env.EDUNODE_GMAIL_EMAIL,
-         pass: process.env.EDUNODE_GMAIL_PASS
-       }
+        host: "smtp.gmail.com",
+        port: 465,
+        secure: true,
+        auth: {
+          type: "login",
+          user: process.env.EDUNODE_GMAIL_EMAIL,
+          pass: process.env.EDUNODE_GMAIL_PASS
+        }
       });
       
-    // let email = req.body.email
-    // const confirmationCode = user.confirmationCode
-      
       let emailInfo = {
-       from: '"EduNode" <edunodeapp@gmail.com>', // sender address
-       to: request.email, // list of receivers
-       subject: "Reset Password", // Subject line
-       text: "Reset Password :)", // plain text body
-       html: `Please click here to reset your password: <b>https://edunode.org/reset/${id}</b>` 
-      }
-      
+        from: '"EduNode" <edunodeapp@gmail.com>',
+        to: request.email,
+        subject: "Reset Password",
+        text: "Reset Password :)",
+        html: `Please click here to reset your password: <b>https://edunode.org/reset/${id}</b>`
+      };
       
       let info = await transporter.sendMail(emailInfo);
-      
-       
-      // send mail with defined transport object
-      
-      
       console.log("Message sent: %s", info.messageId);
-
       
       res.json({  
         msg: "email sent",
- 
-      })
-
-       
+      });
+    } else {
+      res.json({
+        msg: "If an account with that email exists, a password reset link has been sent."
+      });
     }
-  
- 
-}
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
 
- ); 
 
 
 

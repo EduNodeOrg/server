@@ -251,9 +251,13 @@
             height: 100%;
             background: rgba(0, 0, 0, 0.5);
             z-index: 1000;
-            display: flex;
+            display: none;
             align-items: center;
             justify-content: center;
+        }
+        
+        .modal.show {
+            display: flex !important;
         }
         
         .modal-content {
@@ -410,7 +414,7 @@
                     
                     <div class="form-group">
                         <label for="campaignTemplate">Template</label>
-                        <select id="campaignTemplate" required onchange="onTemplateChange()">
+                        <select id="campaignTemplate" required>
                             <option value="">Select a template</option>
                         </select>
                     </div>
@@ -499,7 +503,7 @@
     </div>
 
     <!-- Preview Modal -->
-    <div id="previewModal" class="modal" style="display: none;">
+    <div id="previewModal" class="modal" style="z-index: 2000;">
         <div class="modal-content">
             <div class="modal-header">
                 <h2>Email Template Preview</h2>
@@ -916,40 +920,99 @@
             showCampaignDetails(campaignId);
         }
 
-        function showCampaignDetails(campaignId) {
-            // For now, show basic info - can be expanded later
-            const campaignInfo = `
-                <h3>Campaign Details</h3>
-                <p><strong>Campaign ID:</strong> ${campaignId}</p>
-                <p><strong>Status:</strong> <span class="status-badge status-draft">Loading...</span></p>
-                <div style="margin-top: 20px;">
-                    <button class="btn" onclick="closeCampaignDetails()">Close</button>
-                    <button class="btn btn-success" onclick="editCampaign('${campaignId}')">Edit Campaign</button>
-                    ${campaignId ? `<button class="btn btn-danger" onclick="deleteCampaign('${campaignId}')">Delete Campaign</button>` : ''}
-                </div>
-            `;
-            
-            // Create modal
+        window.showCampaignDetails = function(campaignId) {
+            // Create modal with loading state
             const modal = document.createElement('div');
             modal.className = 'modal';
-            modal.style.display = 'flex';
+            modal.id = 'campaignDetailsModal';
             modal.innerHTML = `
                 <div class="modal-content">
                     <div class="modal-header">
                         <h2>Campaign Details</h2>
                         <button class="modal-close" onclick="closeCampaignDetails()">&times;</button>
                     </div>
-                    <div class="modal-body">
-                        ${campaignInfo}
+                    <div class="modal-body" id="campaignDetailsBody">
+                        <div class="loading">Loading campaign details...</div>
                     </div>
                 </div>
             `;
             
             document.body.appendChild(modal);
+            
+            // Show modal using CSS class
+            modal.classList.add('show');
+            
+            // Fetch campaign details from the server
+            fetch(`${API_BASE}/campaigns/${campaignId}`)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`Failed to fetch campaign: ${response.status}`);
+                    }
+                    return response.json();
+                })
+                .then(campaign => {
+                    
+                    const campaignInfo = `
+                        <div style="display: grid; gap: 15px;">
+                            <div style="display: flex; border-bottom: 1px solid #eee; padding: 10px 0;">
+                                <div style="width: 150px; font-weight: bold; color: #666;">Name:</div>
+                                <div>${campaign.name || 'N/A'}</div>
+                            </div>
+                            <div style="display: flex; border-bottom: 1px solid #eee; padding: 10px 0;">
+                                <div style="width: 150px; font-weight: bold; color: #666;">Subject:</div>
+                                <div>${campaign.subject || 'N/A'}</div>
+                            </div>
+                            <div style="display: flex; border-bottom: 1px solid #eee; padding: 10px 0;">
+                                <div style="width: 150px; font-weight: bold; color: #666;">Status:</div>
+                                <div><span class="status-badge status-${campaign.status}">${campaign.status}</span></div>
+                            </div>
+                            <div style="display: flex; border-bottom: 1px solid #eee; padding: 10px 0;">
+                                <div style="width: 150px; font-weight: bold; color: #666;">Template:</div>
+                                <div>${campaign.templateId?.name || campaign.templateId || 'N/A'}</div>
+                            </div>
+                            <div style="display: flex; border-bottom: 1px solid #eee; padding: 10px 0;">
+                                <div style="width: 150px; font-weight: bold; color: #666;">Created:</div>
+                                <div>${campaign.createdAt ? new Date(campaign.createdAt).toLocaleString() : 'N/A'}</div>
+                            </div>
+                            <div style="display: flex; border-bottom: 1px solid #eee; padding: 10px 0;">
+                                <div style="width: 150px; font-weight: bold; color: #666;">Scheduled:</div>
+                                <div>${campaign.scheduledAt ? new Date(campaign.scheduledAt).toLocaleString() : 'Not scheduled'}</div>
+                            </div>
+                            <div style="display: flex; border-bottom: 1px solid #eee; padding: 10px 0;">
+                                <div style="width: 150px; font-weight: bold; color: #666;">Emails Sent:</div>
+                                <div>${campaign.analytics?.sent || 0}</div>
+                            </div>
+                            <div style="display: flex; border-bottom: 1px solid #eee; padding: 10px 0;">
+                                <div style="width: 150px; font-weight: bold; color: #666;">Opened:</div>
+                                <div>${campaign.analytics?.opened || 0}</div>
+                            </div>
+                            <div style="display: flex; border-bottom: 1px solid #eee; padding: 10px 0;">
+                                <div style="width: 150px; font-weight: bold; color: #666;">Clicked:</div>
+                                <div>${campaign.analytics?.clicked || 0}</div>
+                            </div>
+                        </div>
+                        <div style="margin-top: 20px;">
+                            <button class="btn" onclick="closeCampaignDetails()">Close</button>
+                            <button class="btn btn-success" onclick="closeCampaignDetails(); editCampaign('${campaignId}')">Edit Campaign</button>
+                            ${campaign.status === 'draft' ? `<button class="btn btn-danger" onclick="closeCampaignDetails(); deleteCampaign('${campaignId}')">Delete Campaign</button>` : ''}
+                        </div>
+                    `;
+                    
+                    document.getElementById('campaignDetailsBody').innerHTML = campaignInfo;
+                })
+                .catch(error => {
+                    console.error('Error fetching campaign details:', error);
+                    document.getElementById('campaignDetailsBody').innerHTML = `
+                        <div class="error">Failed to load campaign details: ${error.message}</div>
+                        <div style="margin-top: 20px;">
+                            <button class="btn" onclick="closeCampaignDetails()">Close</button>
+                        </div>
+                    `;
+                });
         }
 
-        function closeCampaignDetails() {
-            const modal = document.querySelector('.modal');
+        window.closeCampaignDetails = function() {
+            const modal = document.getElementById('campaignDetailsModal');
             if (modal) {
                 modal.remove();
             }
@@ -959,10 +1022,11 @@
             showCampaignEditor(campaignId);
         }
 
-        function showCampaignEditor(campaignId) {
+        window.showCampaignEditor = function(campaignId) {
             // Create campaign editor modal
             const modal = document.createElement('div');
             modal.className = 'modal';
+            modal.id = 'campaignEditorModal';
             modal.innerHTML = `
                 <div class="modal-content">
                     <div class="modal-header">
@@ -991,7 +1055,10 @@
                             <div class="form-group" id="templateContentGroup" style="display: none;">
                                 <label for="editTemplateContent">Template Content (HTML)</label>
                                 <textarea id="editTemplateContent" rows="15" style="width: 100%; font-family: monospace; font-size: 12px; resize: vertical;"></textarea>
-                                <small style="color: #666;">Edit the HTML template content directly. Variables like {{user.name}} will be replaced when sending.</small>
+                                <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 8px;">
+                                    <small style="color: #666;">Edit the HTML template content directly. Variables like {{user.name}} will be replaced when sending.</small>
+                                    <button type="button" id="previewTemplateBtn" class="btn" style="padding: 8px 16px; font-size: 14px;">Preview Template</button>
+                                </div>
                             </div>
                             
                             <div class="form-group">
@@ -1022,12 +1089,28 @@
             
             document.body.appendChild(modal);
             
+            // Show modal using CSS class
+            modal.classList.add('show');
+            
+            // Add event listener for preview button
+            const previewButton = modal.querySelector('#previewTemplateBtn');
+            if (previewButton) {
+                previewButton.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    console.log('Preview button clicked');
+                    window.previewEditedTemplate();
+                });
+            } else {
+                console.error('Preview button not found in modal');
+            }
+            
             // Load campaign data for editing
             loadCampaignForEditing(campaignId);
         }
 
         window.closeCampaignEditor = function() {
-            const modal = document.querySelector('.modal');
+            const modal = document.getElementById('campaignEditorModal');
             if (modal) {
                 modal.remove();
             }
@@ -1064,12 +1147,126 @@
             }
         }
 
+        window.previewEditedTemplate = async function() {
+            try {
+                const htmlContent = document.getElementById('editTemplateContent');
+                const subject = document.getElementById('editCampaignSubject');
+                
+                if (!htmlContent) {
+                    showError('Template content element not found');
+                    return;
+                }
+                
+                const contentValue = htmlContent.value;
+                const subjectValue = subject ? subject.value : '';
+                
+                if (!contentValue) {
+                    showError('No template content to preview');
+                    return;
+                }
+                
+                // Render template with sample data
+                const sampleData = {
+                    user: {
+                        name: 'John Doe',
+                        email: 'john@example.com',
+                        role: 'Student',
+                        university: 'EduNode University',
+                        skills: ['JavaScript', 'Web Development'],
+                        points: 1500
+                    },
+                    campaign: {
+                        name: 'Sample Campaign',
+                        subject: subject || 'Sample Subject'
+                    },
+                    weeklyStats: {
+                        coursesCompleted: 3,
+                        newConnections: 5,
+                        pointsEarned: 150
+                    },
+                    achievement: {
+                        name: 'First Course Completed',
+                        description: 'Congratulations on completing your first course!',
+                        points: 100
+                    }
+                };
+                
+                // Simple template variable replacement
+                const renderTemplate = (content, data) => {
+                    return content.replace(/\{\{([\w.]+)\}\}/g, (match, key) => {
+                        const keys = key.split('.');
+                        let value = data;
+                        for (const k of keys) {
+                            value = value?.[k];
+                        }
+                        return value !== undefined ? value : match;
+                    });
+                };
+                
+                const renderedHtml = renderTemplate(contentValue, sampleData);
+                const renderedSubject = renderTemplate(subjectValue, sampleData);
+                
+                // Show modal
+                const previewModal = document.getElementById('previewModal');
+                if (!previewModal) {
+                    console.error('previewModal element not found');
+                    showError('Preview modal not found');
+                    return;
+                }
+                
+                console.log('Adding show class to previewModal');
+                previewModal.classList.add('show');
+                console.log('previewModal classes:', previewModal.className);
+                console.log('previewModal computed display:', window.getComputedStyle(previewModal).display);
+                console.log('previewModal z-index:', window.getComputedStyle(previewModal).zIndex);
+                console.log('previewModal visibility:', window.getComputedStyle(previewModal).visibility);
+                console.log('previewModal opacity:', window.getComputedStyle(previewModal).opacity);
+                
+                // Update modal content
+                const previewSubject = document.getElementById('previewSubject');
+                if (previewSubject) {
+                    previewSubject.textContent = renderedSubject;
+                }
+                
+                // Update HTML preview
+                const previewFrame = document.getElementById('previewFrame');
+                if (!previewFrame) {
+                    console.error('previewFrame element not found');
+                    showError('Preview frame not found');
+                    return;
+                }
+                
+                const frameDoc = previewFrame.contentDocument || previewFrame.contentWindow.document;
+                frameDoc.open();
+                frameDoc.write(renderedHtml);
+                frameDoc.close();
+                
+                // Update text preview (strip HTML tags)
+                const textContentElement = document.getElementById('textContent');
+                if (textContentElement) {
+                    const textContent = renderedHtml.replace(/<[^>]*>/g, '').replace(/\s+/g, ' ').trim();
+                    textContentElement.textContent = textContent;
+                }
+                
+                // Show HTML tab by default
+                showPreviewTab('html');
+                
+                console.log('Preview rendered successfully');
+                
+            } catch (error) {
+                console.error('Error previewing edited template:', error);
+                showError('Failed to preview template: ' + error.message);
+            }
+        }
+
         async function loadCampaignForEditing(campaignId) {
             try {
                 const response = await fetch(`${API_BASE}/campaigns/${campaignId}`);
                 
                 if (!response.ok) {
-                    throw new Error(`Failed to load campaign: ${response.status}`);
+                    const errorText = await response.text();
+                    console.error('Campaign load error:', errorText);
+                    throw new Error(`Failed to load campaign: ${response.status} - ${errorText}`);
                 }
                 
                 const campaign = await response.json();
@@ -1080,6 +1277,40 @@
                 document.getElementById('editCampaignSchedule').value = campaign.scheduledAt ? 
                     new Date(campaign.scheduledAt).toISOString().slice(0, 16) : '';
                 document.getElementById('editCampaignStatus').value = campaign.status || 'draft';
+                
+                // Disable editing for sent campaigns
+                const isSent = campaign.status === 'sent';
+                const nameField = document.getElementById('editCampaignName');
+                const subjectField = document.getElementById('editCampaignSubject');
+                const templateField = document.getElementById('editCampaignTemplate');
+                const scheduleField = document.getElementById('editCampaignSchedule');
+                const statusField = document.getElementById('editCampaignStatus');
+                const saveButton = document.querySelector('#editCampaignForm button[type="submit"]');
+                
+                if (isSent) {
+                    nameField.disabled = true;
+                    subjectField.disabled = true;
+                    templateField.disabled = true;
+                    scheduleField.disabled = true;
+                    statusField.disabled = true;
+                    if (saveButton) {
+                        saveButton.disabled = true;
+                        saveButton.textContent = 'Cannot Edit Sent Campaign';
+                        saveButton.style.opacity = '0.5';
+                    }
+                    showError('This campaign has already been sent and cannot be edited. Create a new campaign instead.');
+                } else {
+                    nameField.disabled = false;
+                    subjectField.disabled = false;
+                    templateField.disabled = false;
+                    scheduleField.disabled = false;
+                    statusField.disabled = false;
+                    if (saveButton) {
+                        saveButton.disabled = false;
+                        saveButton.textContent = 'Save Changes';
+                        saveButton.style.opacity = '1';
+                    }
+                }
                 
                 // Load templates for dropdown
                 const templatesResponse = await fetch(`${API_BASE}/templates`);
@@ -1105,41 +1336,72 @@
                 }
                 
                 // Handle form submission
-                document.getElementById('editCampaignForm').addEventListener('submit', async (e) => {
-                    e.preventDefault();
-                    
-                    const templateContentEl = document.getElementById('editTemplateContent');
-                    const updatedData = {
-                        name: document.getElementById('editCampaignName').value,
-                        subject: document.getElementById('editCampaignSubject').value,
-                        templateId: document.getElementById('editCampaignTemplate').value,
-                        scheduledAt: document.getElementById('editCampaignSchedule').value,
-                        status: document.getElementById('editCampaignStatus').value,
-                        customTemplateContent: templateContentEl && templateContentEl.value !== (currentTemplateData?.htmlContent || '') ? templateContentEl.value : undefined
-                    };
-                    
-                    try {
-                        const response = await fetch(`${API_BASE}/campaigns/${campaignId}`, {
-                            method: 'PUT',
-                            headers: {
-                                'Content-Type': 'application/json',
-                            },
-                            body: JSON.stringify(updatedData)
-                        });
-
-                        if (response.ok) {
-                            showSuccess('Campaign updated successfully!');
-                            closeCampaignEditor();
-                            loadCampaigns(); // Refresh campaigns list
-                        } else {
-                            const error = await response.json();
-                            showError(error.error || 'Failed to update campaign');
+                const form = document.getElementById('editCampaignForm');
+                if (form) {
+                    form.addEventListener('submit', async (e) => {
+                        console.log('Form submitted');
+                        e.preventDefault();
+                        
+                        const currentStatus = document.getElementById('editCampaignStatus').value;
+                        console.log('Current status:', currentStatus);
+                        
+                        // Prevent editing sent campaigns
+                        if (currentStatus === 'sent') {
+                            console.log('Campaign is sent, blocking edit');
+                            showError('Cannot edit sent campaigns. Please create a new campaign instead.');
+                            return;
                         }
-                    } catch (error) {
-                        console.error('Error updating campaign:', error);
-                        showError('Failed to update campaign');
-                    }
-                });
+                        
+                        console.log('Building updated data');
+                        const templateContentEl = document.getElementById('editTemplateContent');
+                        const updatedData = {
+                            name: document.getElementById('editCampaignName').value,
+                            subject: document.getElementById('editCampaignSubject').value,
+                            templateId: document.getElementById('editCampaignTemplate').value,
+                            scheduledAt: document.getElementById('editCampaignSchedule').value,
+                            status: currentStatus,
+                            customTemplateContent: templateContentEl && templateContentEl.value !== (currentTemplateData?.htmlContent || '') ? templateContentEl.value : undefined
+                        };
+                        
+                        console.log('Updated data:', updatedData);
+                        
+                        try {
+                            console.log('Sending PUT request to:', `${API_BASE}/campaigns/${campaignId}`);
+                            const response = await fetch(`${API_BASE}/campaigns/${campaignId}`, {
+                                method: 'PUT',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                },
+                                body: JSON.stringify(updatedData)
+                            });
+
+                            console.log('Response status:', response.status);
+                            console.log('Response ok:', response.ok);
+
+                            if (response.ok) {
+                                showSuccess('Campaign updated successfully!');
+                                closeCampaignEditor();
+                                loadCampaigns(); // Refresh campaigns list
+                            } else {
+                                const errorText = await response.text();
+                                console.error('Campaign update error response:', errorText);
+                                let error;
+                                try {
+                                    error = JSON.parse(errorText);
+                                } catch {
+                                    error = { error: errorText };
+                                }
+                                showError(error.error || 'Failed to update campaign');
+                            }
+                        } catch (error) {
+                            console.error('Error updating campaign:', error);
+                            showError('Failed to update campaign');
+                        }
+                    });
+                    console.log('Form event listener attached');
+                } else {
+                    console.error('editCampaignForm not found');
+                }
                 
             } catch (error) {
                 console.error('Error loading campaign for editing:', error);
@@ -1185,6 +1447,9 @@
             `;
             document.body.appendChild(modal);
             
+            // Show modal using CSS class
+            modal.classList.add('show');
+            
             // Load contacts
             await loadContactsForSend();
         }
@@ -1227,16 +1492,30 @@
         }
 
         window.toggleContactSelection = function(contactId, rowElement) {
+            console.log('toggleContactSelection called with contactId:', contactId);
             const checkbox = rowElement.querySelector('.contact-checkbox');
-            checkbox.checked = !checkbox.checked;
-            
-            if (checkbox.checked) {
-                selectedContacts.add(contactId);
-                rowElement.style.background = '#e3f2fd';
-            } else {
-                selectedContacts.delete(contactId);
-                rowElement.style.background = '';
+            if (!checkbox) {
+                console.error('Checkbox not found in row element');
+                return;
             }
+            
+            // Check if already selected
+            const isSelected = selectedContacts.has(contactId);
+            console.log('Currently selected:', isSelected);
+            
+            // Toggle state
+            if (isSelected) {
+                selectedContacts.delete(contactId);
+                checkbox.checked = false;
+                rowElement.style.background = '';
+            } else {
+                selectedContacts.add(contactId);
+                checkbox.checked = true;
+                rowElement.style.background = '#e3f2fd';
+            }
+            
+            console.log('Checkbox checked after toggle:', checkbox.checked);
+            console.log('Selected count:', selectedContacts.size);
             
             updateSelectedCount();
         }
@@ -1319,8 +1598,6 @@
 
         window.previewTemplate = async function(templateId) {
             try {
-                console.log('Previewing template:', templateId);
-                
                 const response = await fetch(`${API_BASE}/templates/${templateId}/preview`, {
                     method: 'POST',
                     headers: {
@@ -1363,21 +1640,32 @@
                 const previewData = await response.json();
                 console.log('Preview data:', previewData);
                 
-                // Show modal first
-                document.getElementById('previewModal').style.display = 'flex';
+                // Show modal using CSS class
+                const previewModal = document.getElementById('previewModal');
+                if (previewModal) {
+                    previewModal.classList.add('show');
+                }
                 
                 // Update modal content
-                document.getElementById('previewSubject').textContent = previewData.subject;
+                const previewSubject = document.getElementById('previewSubject');
+                if (previewSubject) {
+                    previewSubject.textContent = previewData.subject;
+                }
                 
                 // Update HTML preview
                 const previewFrame = document.getElementById('previewFrame');
-                const frameDoc = previewFrame.contentDocument || previewFrame.contentWindow.document;
-                frameDoc.open();
-                frameDoc.write(previewData.html);
-                frameDoc.close();
+                if (previewFrame) {
+                    const frameDoc = previewFrame.contentDocument || previewFrame.contentWindow.document;
+                    frameDoc.open();
+                    frameDoc.write(previewData.html);
+                    frameDoc.close();
+                }
                 
                 // Update text preview
-                document.getElementById('textContent').textContent = previewData.text;
+                const textContent = document.getElementById('textContent');
+                if (textContent) {
+                    textContent.textContent = previewData.text;
+                }
                 
                 // Show HTML tab by default
                 showPreviewTab('html');
@@ -1389,7 +1677,10 @@
         }
 
         window.closePreviewModal = function() {
-            document.getElementById('previewModal').style.display = 'none';
+            const modal = document.getElementById('previewModal');
+            if (modal) {
+                modal.classList.remove('show');
+            }
         }
 
         window.showPreviewTab = function(tabName) {
@@ -1411,11 +1702,14 @@
         }
 
         // Close modal when clicking outside
-        document.getElementById('previewModal').addEventListener('click', function(e) {
-            if (e.target === this) {
-                closePreviewModal();
-            }
-        });
+        const previewModal = document.getElementById('previewModal');
+        if (previewModal) {
+            previewModal.addEventListener('click', function(e) {
+                if (e.target === this) {
+                    closePreviewModal();
+                }
+            });
+        }
 
         // Close modal with Escape key
         document.addEventListener('keydown', function(e) {
@@ -1425,15 +1719,15 @@
         });
 
         // CRM Action Functions
-        function showNewContactForm() {
+        window.showNewContactForm = function() {
             alert('New Contact Form - To be implemented');
         }
 
-        function showNewLeadForm() {
+        window.showNewLeadForm = function() {
             alert('New Lead Form - To be implemented');
         }
 
-        function showImportContacts() {
+        window.showImportContacts = function() {
             alert('Import Contacts - To be implemented');
         }
 
@@ -1466,14 +1760,14 @@
                 document.getElementById('contactsList').innerHTML = allContacts.map(contact => `
                     <div class="campaign-item">
                         <div class="campaign-info">
-                            <h4>${contact.name}</h4>
+                            <h4>${contact.name} ${contact.unsubscribed ? '<span class="status-badge status-cancelled" style="margin-left: 10px;">Unsubscribed</span>' : ''}</h4>
                             <p>${contact.email} | ${contact.role} | ${contact.university || 'No University'}</p>
                             <p>Skills: ${contact.skills && contact.skills.length > 0 ? contact.skills.join(', ') : 'No skills listed'}</p>
                             <p style="color: #666; font-size: 0.9em;">Points: ${contact.Points || 0} | Rating: ${contact.rating || 'Not rated'}</p>
                         </div>
                         <div class="campaign-actions">
                             <button class="btn" onclick="viewContact('${contact._id}')">View</button>
-                            <button class="btn btn-success" onclick="emailContact('${contact._id}')">Email</button>
+                            ${contact.unsubscribed ? '' : `<button class="btn btn-success" onclick="emailContact('${contact._id}')">Email</button>`}
                             <button class="btn btn-danger" onclick="deleteContact('${contact._id}')">Delete</button>
                         </div>
                     </div>
@@ -1580,6 +1874,9 @@
                     </div>
                 `;
                 document.body.appendChild(modal);
+                
+                // Show modal using CSS class
+                modal.classList.add('show');
             } catch (error) {
                 console.error('Error viewing contact:', error);
                 showError('Failed to load contact details');
@@ -1649,6 +1946,9 @@
                     </div>
                 `;
                 document.body.appendChild(modal);
+                
+                // Show modal using CSS class
+                modal.classList.add('show');
             } catch (error) {
                 console.error('Error opening email composer:', error);
                 showError('Failed to open email composer');
@@ -1761,7 +2061,7 @@
             }
         }
 
-        function showError(message) {
+        window.showError = function(message) {
             const errorDiv = document.createElement('div');
             errorDiv.className = 'error';
             errorDiv.textContent = message;
@@ -1772,7 +2072,7 @@
             }, 5000);
         }
 
-        function showSuccess(message) {
+        window.showSuccess = function(message) {
             const successDiv = document.createElement('div');
             successDiv.className = 'success';
             successDiv.textContent = message;

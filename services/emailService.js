@@ -78,8 +78,8 @@ class EmailService {
 
       // Add unsubscribe link if enabled
       if (campaign.settings.unsubscribeLink) {
-        emailData['h:List-Unsubscribe'] = `<https://edunode.org/api/email/unsubscribe?email=${encodeURIComponent(user.email)}&campaign=${campaignId}>`;
-        emailData['h:Unsubscribe-Link'] = `https://edunode.org/api/email/unsubscribe?email=${encodeURIComponent(user.email)}&campaign=${campaignId}`;
+        emailData['h:List-Unsubscribe'] = `<https://edunode.org/unsubscribe?email=${encodeURIComponent(user.email)}&campaign=${campaignId}>, <mailto:unsubscribe@edunode.org>`;
+        emailData['h:Unsubscribe-Link'] = `https://edunode.org/unsubscribe?email=${encodeURIComponent(user.email)}&campaign=${campaignId}`;
       }
 
       // Send email

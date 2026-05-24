@@ -30,15 +30,7 @@ function sendResetPasswordEmail(email, resetToken) {
     `,
     };
 
-    mg.messages.create(domain, data, function (error, body) {
-        if (error) {
-            console.log('Error sending email:', error);
-            res.status(500).json({ error: 'Error sending email' });
-        } else {
-            console.log('Email sent successfully:', body);
-            res.json({ msg: 'Email sent' });
-        }
-    });
+    return mg.messages.create(domain, data);
 }
 
 router.post('/reset-password', async (req, res) => {
@@ -60,7 +52,12 @@ router.post('/reset-password', async (req, res) => {
         await user.save();
 
         // Send reset password email
-        sendResetPasswordEmail(user.email, resetToken);
+        try {
+            await sendResetPasswordEmail(user.email, resetToken);
+            console.log('Email sent successfully');
+        } catch (emailError) {
+            console.log('Error sending email:', emailError);
+        }
 
         res.json({ msg: 'Reset password email sent' });
     } catch (err) {

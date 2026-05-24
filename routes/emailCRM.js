@@ -3,6 +3,7 @@ const router = express.Router();
 const User = require('../models/User');
 const Campaign = require('../models/Campaign');
 const EmailLog = require('../models/EmailLog');
+const Unsubscribe = require('../models/Unsubscribe');
 
 // Get CRM statistics
 router.get('/stats', async (req, res) => {
@@ -183,10 +184,20 @@ router.get('/contacts', async (req, res) => {
       .skip(skip)
       .limit(parseInt(limit));
 
+    // Get all unsubscribed emails
+    const unsubscribedEmails = await Unsubscribe.find({}, 'email');
+    const unsubscribedSet = new Set(unsubscribedEmails.map(u => u.email.toLowerCase()));
+
+    // Add unsubscribe status to each contact
+    const contactsWithStatus = contacts.map(contact => ({
+      ...contact.toObject(),
+      unsubscribed: unsubscribedSet.has(contact.email.toLowerCase())
+    }));
+
     const total = await User.countDocuments(query);
     
     res.json({
-      contacts,
+      contacts: contactsWithStatus,
       pagination: {
         page: parseInt(page),
         limit: parseInt(limit),
