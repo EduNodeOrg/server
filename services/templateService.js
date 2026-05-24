@@ -155,7 +155,7 @@ module.exports = class TemplateService {
     </div>
     <div class="footer">
         <p>This email was sent to {{user.email}} because you registered on EduNode.</p>
-        <p><a href="https://edunode.herokuapp.com/api/email/unsubscribe?email={{user.email}}">Unsubscribe</a></p>
+        <p><a href="${process.env.BASE_URL}/api/email/unsubscribe?email={{user.email}}">Unsubscribe</a></p>
     </div>
 </body>
 </html>`;
@@ -183,7 +183,7 @@ The EduNode Team
 
 ---
 This email was sent to {{user.email}} because you registered on EduNode.
-Unsubscribe: https://edunode.herokuapp.com/api/email/unsubscribe?email={{user.email}}`;
+Unsubscribe: ${process.env.BASE_URL}/api/email/unsubscribe?email={{user.email}}`;
   }
 
   async getDefaultWeeklyDigestTemplate() {
@@ -244,7 +244,7 @@ Unsubscribe: https://edunode.herokuapp.com/api/email/unsubscribe?email={{user.em
     </div>
     <div class="footer">
         <p>This email was sent to {{user.email}} as part of your weekly digest.</p>
-        <p><a href="https://edunode.herokuapp.com/api/email/unsubscribe?email={{user.email}}">Unsubscribe</a></p>
+        <p><a href="${process.env.BASE_URL}/api/email/unsubscribe?email={{user.email}}">Unsubscribe</a></p>
     </div>
 </body>
 </html>`;
@@ -274,7 +274,7 @@ The EduNode Team
 
 ---
 This email was sent to {{user.email}} as part of your weekly digest.
-Unsubscribe: https://edunode.herokuapp.com/api/email/unsubscribe?email={{user.email}}`;
+Unsubscribe: ${process.env.BASE_URL}/api/email/unsubscribe?email={{user.email}}`;
   }
 
   async getDefaultCourseRecommendationsTemplate() {
@@ -330,7 +330,7 @@ Unsubscribe: https://edunode.herokuapp.com/api/email/unsubscribe?email={{user.em
     </div>
     <div class="footer">
         <p>This email was sent to {{user.email}} based on your profile and interests.</p>
-        <p><a href="https://edunode.herokuapp.com/api/email/unsubscribe?email={{user.email}}">Unsubscribe</a></p>
+        <p><a href="${process.env.BASE_URL}/api/email/unsubscribe?email={{user.email}}">Unsubscribe</a></p>
     </div>
 </body>
 </html>`;
@@ -363,7 +363,7 @@ The EduNode Team
 
 ---
 This email was sent to {{user.email}} based on your profile and interests.
-Unsubscribe: https://edunode.herokuapp.com/api/email/unsubscribe?email={{user.email}}`;
+Unsubscribe: ${process.env.BASE_URL}/api/email/unsubscribe?email={{user.email}}`;
   }
 
   async getDefaultAchievementTemplate() {
@@ -404,7 +404,7 @@ Unsubscribe: https://edunode.herokuapp.com/api/email/unsubscribe?email={{user.em
     </div>
     <div class="footer">
         <p>This email was sent to {{user.email}} to celebrate your achievement.</p>
-        <p><a href="https://edunode.herokuapp.com/api/email/unsubscribe?email={{user.email}}">Unsubscribe</a></p>
+        <p><a href="${process.env.BASE_URL}/api/email/unsubscribe?email={{user.email}}">Unsubscribe</a></p>
     </div>
 </body>
 </html>`;
@@ -427,7 +427,7 @@ The EduNode Team
 
 ---
 This email was sent to {{user.email}} to celebrate your achievement.
-Unsubscribe: https://edunode.herokuapp.com/api/email/unsubscribe?email={{user.email}}`;
+Unsubscribe: ${process.env.BASE_URL}/api/email/unsubscribe?email={{user.email}}`;
   }
 
   async getDefaultReEngagementTemplate() {
@@ -473,7 +473,7 @@ Unsubscribe: https://edunode.herokuapp.com/api/email/unsubscribe?email={{user.em
     </div>
     <div class="footer">
         <p>This email was sent to {{user.email}} to welcome you back.</p>
-        <p><a href="https://edunode.herokuapp.com/api/email/unsubscribe?email={{user.email}}">Unsubscribe</a></p>
+        <p><a href="${process.env.BASE_URL}/api/email/unsubscribe?email={{user.email}}">Unsubscribe</a></p>
     </div>
 </body>
 </html>`;
@@ -501,7 +501,7 @@ The EduNode Team
 
 ---
 This email was sent to {{user.email}} to welcome you back.
-Unsubscribe: https://edunode.herokuapp.com/api/email/unsubscribe?email={{user.email}}`;
+Unsubscribe: ${process.env.BASE_URL}/api/email/unsubscribe?email={{user.email}}`;
   }
 }
 
