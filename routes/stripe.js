@@ -20,12 +20,12 @@ async function getUser(req) {
   const userId = req.user && (req.user.id || req.user._id);
   if (!userId) {
     console.warn('[stripe] getUser: missing user id in JWT payload', req.user);
-    return null;
+    throw new Error('Invalid token: missing user ID. Please log out and log back in.');
   }
   const user = await User.findById(userId);
   if (!user) {
     console.warn('[stripe] getUser: user not found in DB for id', userId);
-    return null;
+    throw new Error('User not found in database. Please log out and log back in.');
   }
   return user;
 }
@@ -36,7 +36,6 @@ async function getUser(req) {
 router.post('/create-checkout-session', auth, async (req, res) => {
   try {
     const user = await getUser(req);
-    if (!user) return res.status(404).json({ error: 'User not found' });
 
     const priceId = process.env.STRIPE_PRO_PRICE_ID;
     if (!priceId) {
@@ -84,7 +83,6 @@ router.post('/create-checkout-session', auth, async (req, res) => {
 router.post('/create-portal-session', auth, async (req, res) => {
   try {
     const user = await getUser(req);
-    if (!user) return res.status(404).json({ error: 'User not found' });
     if (!user.stripeCustomerId) {
       return res.status(400).json({ error: 'No Stripe customer for this user' });
     }
@@ -110,7 +108,6 @@ router.post('/create-portal-session', auth, async (req, res) => {
 router.get('/subscription-status', auth, async (req, res) => {
   try {
     const user = await getUser(req);
-    if (!user) return res.status(404).json({ error: 'User not found' });
 
     // If we have a stored subscriptionId, refresh from Stripe for accuracy
     if (user.subscriptionId) {
