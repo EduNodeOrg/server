@@ -1427,8 +1427,10 @@
                         `<option value="${template._id}">${template.name}</option>`
                     ).join('');
                 
-                // Extract template ID (could be string or populated object)
-                const templateId = typeof campaign.templateId === 'object' ? campaign.templateId._id : campaign.templateId;
+                // Extract template ID (could be string, populated object, or null)
+                const templateId = campaign.templateId 
+                    ? (typeof campaign.templateId === 'object' ? campaign.templateId._id : campaign.templateId)
+                    : '';
                 
                 // Set template and load its content
                 templateSelect.value = templateId || '';
