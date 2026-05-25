@@ -1,12 +1,13 @@
 const jwt = require("jsonwebtoken");
 
 function adminAuth(req, res, next) {
-  // Check for token in header, query parameter, or cookie
+  // Detect API requests: has x-auth-token header or originalUrl starts with /api/
+  const isApiRequest = req.header("x-auth-token") || req.originalUrl.startsWith('/api/');
+  
   const token = req.header("x-auth-token") || req.query.token;
 
   if (!token) {
-    // For HTML page requests, redirect to login
-    if (req.accepts('html') && !req.path.startsWith('/api/')) {
+    if (!isApiRequest) {
       return res.redirect('/admin/email/login');
     }
     return res.status(401).json({ error: "No token, authorization denied" });
@@ -16,7 +17,7 @@ function adminAuth(req, res, next) {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
     
     if (!decoded.isEmailAdmin) {
-      if (req.accepts('html') && !req.path.startsWith('/api/')) {
+      if (!isApiRequest) {
         return res.redirect('/admin/email/login');
       }
       return res.status(403).json({ error: "Admin access required" });
@@ -25,8 +26,7 @@ function adminAuth(req, res, next) {
     req.user = decoded;
     next();
   } catch (err) {
-    // Expired or invalid token — redirect to login
-    if (req.accepts('html') && !req.path.startsWith('/api/')) {
+    if (!isApiRequest) {
       return res.redirect('/admin/email/login');
     }
     return res.status(401).json({ error: "Token is not valid" });
