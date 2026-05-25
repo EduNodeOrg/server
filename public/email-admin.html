@@ -418,7 +418,6 @@
                             <option value="">Select a template</option>
                         </select>
                     </div>
-                    </div>
                     
                     <div class="form-group">
                         <label for="campaignSchedule">Schedule (optional)</label>
@@ -437,6 +436,41 @@
 
         <!-- Templates Tab -->
         <div id="templates" class="tab-content">
+            <div class="card">
+                <h3>Create New Template</h3>
+                <form id="newTemplateForm">
+                    <div class="form-group">
+                        <label for="templateName">Template Name</label>
+                        <input type="text" id="templateName" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="templateDescription">Description</label>
+                        <input type="text" id="templateDescription">
+                    </div>
+                    <div class="form-group">
+                        <label for="templateSubject">Email Subject</label>
+                        <input type="text" id="templateSubject" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="templateCategory">Category</label>
+                        <select id="templateCategory" required>
+                            <option value="welcome">Welcome</option>
+                            <option value="newsletter">Newsletter</option>
+                            <option value="course">Course</option>
+                            <option value="achievement">Achievement</option>
+                            <option value="re-engagement">Re-engagement</option>
+                            <option value="promotional">Promotional</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="templateHtmlContent">HTML Content</label>
+                        <textarea id="templateHtmlContent" rows="12" style="width: 100%; font-family: monospace; font-size: 12px; resize: vertical;" required></textarea>
+                        <small style="color: #666;">Use {{variable.name}} for dynamic content. Include {{unsubscribeUrl}} for the unsubscribe link.</small>
+                    </div>
+                    <button type="submit" class="btn">Create Template</button>
+                </form>
+            </div>
+
             <div class="card">
                 <h3>Email Templates</h3>
                 <div id="templatesList" class="loading">Loading templates...</div>
@@ -511,8 +545,8 @@
             </div>
             <div class="modal-body">
                 <div class="preview-tabs">
-                    <button class="preview-tab active" onclick="showPreviewTab('html')">HTML Preview</button>
-                    <button class="preview-tab" onclick="showPreviewTab('text')">Text Preview</button>
+                    <button class="preview-tab active" onclick="showPreviewTab('html', event)">HTML Preview</button>
+                    <button class="preview-tab" onclick="showPreviewTab('text', event)">Text Preview</button>
                 </div>
                 <div class="preview-info">
                     <strong>Subject:</strong> <span id="previewSubject"></span>
@@ -914,6 +948,41 @@
             }
         });
 
+        // New template form submission
+        document.getElementById('newTemplateForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const templateData = {
+                name: document.getElementById('templateName').value,
+                description: document.getElementById('templateDescription').value,
+                subject: document.getElementById('templateSubject').value,
+                category: document.getElementById('templateCategory').value,
+                htmlContent: document.getElementById('templateHtmlContent').value
+            };
+
+            try {
+                const response = await fetch(`${API_BASE}/templates`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(templateData)
+                });
+
+                if (response.ok) {
+                    showSuccess('Template created successfully!');
+                    document.getElementById('newTemplateForm').reset();
+                    loadTemplates();
+                } else {
+                    const error = await response.json();
+                    showError(error.error || 'Failed to create template');
+                }
+            } catch (error) {
+                console.error('Error creating template:', error);
+                showError('Failed to create template');
+            }
+        });
+
         // Utility functions
         window.viewCampaign = function(campaignId) {
             // Show campaign details modal
@@ -1188,7 +1257,8 @@
                         name: 'First Course Completed',
                         description: 'Congratulations on completing your first course!',
                         points: 100
-                    }
+                    },
+                    unsubscribeUrl: `${API_ORIGIN}/api/email/unsubscribe?email=${encodeURIComponent('john@example.com')}`
                 };
                 
                 // Simple template variable replacement
@@ -1683,7 +1753,7 @@
             }
         }
 
-        window.showPreviewTab = function(tabName) {
+        window.showPreviewTab = function(tabName, event) {
             // Hide all preview panes
             document.querySelectorAll('.preview-pane').forEach(pane => {
                 pane.classList.remove('active');
@@ -1698,7 +1768,16 @@
             document.getElementById(`${tabName}Preview`).classList.add('active');
             
             // Add active class to clicked tab
-            event.target.classList.add('active');
+            if (event && event.target) {
+                event.target.classList.add('active');
+            } else {
+                // Programmatic call — find the matching tab button
+                document.querySelectorAll('.preview-tab').forEach(tab => {
+                    if (tab.textContent.toLowerCase().includes(tabName)) {
+                        tab.classList.add('active');
+                    }
+                });
+            }
         }
 
         // Close modal when clicking outside
@@ -1767,7 +1846,9 @@
                         </div>
                         <div class="campaign-actions">
                             <button class="btn" onclick="viewContact('${contact._id}')">View</button>
-                            ${contact.unsubscribed ? '' : `<button class="btn btn-success" onclick="emailContact('${contact._id}')">Email</button>`}
+                            ${contact.unsubscribed 
+                                ? `<button class="btn btn-success" onclick="resubscribeContact('${contact._id}')">Re-subscribe</button>` 
+                                : `<button class="btn btn-success" onclick="emailContact('${contact._id}')">Email</button>`}
                             <button class="btn btn-danger" onclick="deleteContact('${contact._id}')">Delete</button>
                         </div>
                     </div>
@@ -2038,6 +2119,27 @@
             } catch (error) {
                 console.error('Error deleting contact:', error);
                 showError('Failed to delete contact');
+            }
+        }
+
+        window.resubscribeContact = async function(contactId) {
+            if (!confirm('Re-subscribe this contact to email communications?')) return;
+            try {
+                const response = await fetch(`${API_BASE}/crm/contacts/${contactId}/resubscribe`, {
+                    method: 'POST'
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    showSuccess(data.message || 'Contact re-subscribed successfully!');
+                    loadContacts();
+                } else {
+                    const error = await response.json();
+                    showError(error.error || 'Failed to re-subscribe contact');
+                }
+            } catch (error) {
+                console.error('Error re-subscribing contact:', error);
+                showError('Failed to re-subscribe contact');
             }
         }
 

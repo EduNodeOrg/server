@@ -57,9 +57,11 @@ class EmailService {
       }
 
       // Render template
+      const unsubscribeUrl = `${process.env.BASE_URL}/api/email/unsubscribe?email=${encodeURIComponent(user.email)}&campaign=${campaignId}`;
       const renderedEmail = await this.renderTemplate(campaign.templateId, {
         user,
         campaign,
+        unsubscribeUrl,
         ...templateData
       });
 
@@ -78,7 +80,6 @@ class EmailService {
 
       // Add unsubscribe link if enabled
       if (campaign.settings.unsubscribeLink) {
-        const unsubscribeUrl = `${process.env.BASE_URL}/api/email/unsubscribe?email=${encodeURIComponent(user.email)}&campaign=${campaignId}`;
         emailData['h:List-Unsubscribe'] = `<${unsubscribeUrl}>, <mailto:unsubscribe@edunode.org>`;
         emailData['h:Unsubscribe-Link'] = unsubscribeUrl;
         // Add direct unsubscribe link in HTML to bypass Mailgun tracking

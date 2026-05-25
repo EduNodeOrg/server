@@ -3,7 +3,9 @@ const TemplateServiceMonthly = require('./templateServiceMonthly');
 const fs = require('fs').promises;
 const path = require('path');
 
-module.exports = class TemplateService {
+const monthlyService = new TemplateServiceMonthly();
+
+class TemplateService {
   
   async createDefaultTemplates() {
     try {
@@ -79,8 +81,8 @@ module.exports = class TemplateService {
           description: 'Monthly summary of platform activity and highlights',
           subject: 'Your Monthly EduNode Digest',
           category: 'newsletter',
-          htmlContent: await this.getDefaultMonthlyDigestTemplate(),
-          textContent: await this.getDefaultMonthlyDigestTextTemplate(),
+          htmlContent: await monthlyService.getDefaultMonthlyDigestTemplate(),
+          textContent: await monthlyService.getDefaultMonthlyDigestTextTemplate(),
           variables: [
             { name: 'user.name', description: 'User\'s full name', type: 'string', required: true },
             { name: 'monthlyStats.coursesCompleted', description: 'Number of courses completed this month', type: 'number', required: false },
@@ -155,7 +157,7 @@ module.exports = class TemplateService {
     </div>
     <div class="footer">
         <p>This email was sent to {{user.email}} because you registered on EduNode.</p>
-        <p><a href="${process.env.BASE_URL}/api/email/unsubscribe?email={{user.email}}">Unsubscribe</a></p>
+        <p><a href="{{unsubscribeUrl}}">Unsubscribe</a></p>
     </div>
 </body>
 </html>`;
@@ -183,7 +185,7 @@ The EduNode Team
 
 ---
 This email was sent to {{user.email}} because you registered on EduNode.
-Unsubscribe: ${process.env.BASE_URL}/api/email/unsubscribe?email={{user.email}}`;
+Unsubscribe: {{unsubscribeUrl}}`;
   }
 
   async getDefaultWeeklyDigestTemplate() {
@@ -244,7 +246,7 @@ Unsubscribe: ${process.env.BASE_URL}/api/email/unsubscribe?email={{user.email}}`
     </div>
     <div class="footer">
         <p>This email was sent to {{user.email}} as part of your weekly digest.</p>
-        <p><a href="${process.env.BASE_URL}/api/email/unsubscribe?email={{user.email}}">Unsubscribe</a></p>
+        <p><a href="{{unsubscribeUrl}}">Unsubscribe</a></p>
     </div>
 </body>
 </html>`;
@@ -274,7 +276,7 @@ The EduNode Team
 
 ---
 This email was sent to {{user.email}} as part of your weekly digest.
-Unsubscribe: ${process.env.BASE_URL}/api/email/unsubscribe?email={{user.email}}`;
+Unsubscribe: {{unsubscribeUrl}}`;
   }
 
   async getDefaultCourseRecommendationsTemplate() {
@@ -330,7 +332,7 @@ Unsubscribe: ${process.env.BASE_URL}/api/email/unsubscribe?email={{user.email}}`
     </div>
     <div class="footer">
         <p>This email was sent to {{user.email}} based on your profile and interests.</p>
-        <p><a href="${process.env.BASE_URL}/api/email/unsubscribe?email={{user.email}}">Unsubscribe</a></p>
+        <p><a href="{{unsubscribeUrl}}">Unsubscribe</a></p>
     </div>
 </body>
 </html>`;
@@ -363,7 +365,7 @@ The EduNode Team
 
 ---
 This email was sent to {{user.email}} based on your profile and interests.
-Unsubscribe: ${process.env.BASE_URL}/api/email/unsubscribe?email={{user.email}}`;
+Unsubscribe: {{unsubscribeUrl}}`;
   }
 
   async getDefaultAchievementTemplate() {
@@ -404,7 +406,7 @@ Unsubscribe: ${process.env.BASE_URL}/api/email/unsubscribe?email={{user.email}}`
     </div>
     <div class="footer">
         <p>This email was sent to {{user.email}} to celebrate your achievement.</p>
-        <p><a href="${process.env.BASE_URL}/api/email/unsubscribe?email={{user.email}}">Unsubscribe</a></p>
+        <p><a href="{{unsubscribeUrl}}">Unsubscribe</a></p>
     </div>
 </body>
 </html>`;
@@ -427,7 +429,7 @@ The EduNode Team
 
 ---
 This email was sent to {{user.email}} to celebrate your achievement.
-Unsubscribe: ${process.env.BASE_URL}/api/email/unsubscribe?email={{user.email}}`;
+Unsubscribe: {{unsubscribeUrl}}`;
   }
 
   async getDefaultReEngagementTemplate() {
@@ -473,7 +475,7 @@ Unsubscribe: ${process.env.BASE_URL}/api/email/unsubscribe?email={{user.email}}`
     </div>
     <div class="footer">
         <p>This email was sent to {{user.email}} to welcome you back.</p>
-        <p><a href="${process.env.BASE_URL}/api/email/unsubscribe?email={{user.email}}">Unsubscribe</a></p>
+        <p><a href="{{unsubscribeUrl}}">Unsubscribe</a></p>
     </div>
 </body>
 </html>`;
@@ -501,7 +503,7 @@ The EduNode Team
 
 ---
 This email was sent to {{user.email}} to welcome you back.
-Unsubscribe: ${process.env.BASE_URL}/api/email/unsubscribe?email={{user.email}}`;
+Unsubscribe: {{unsubscribeUrl}}`;
   }
 }
 

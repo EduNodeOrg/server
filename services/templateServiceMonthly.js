@@ -73,7 +73,7 @@ class TemplateServiceMonthly {
     
     <div style="padding: 20px; text-align: center; font-size: 12px; color: #666; border-top: 1px solid #eee;">
         <p>This email was sent to {{user.email}} as part of your monthly digest.</p>
-        <p><a href="${process.env.BASE_URL}/api/email/unsubscribe?email={{user.email}}">Unsubscribe</a></p>
+        <p><a href="{{unsubscribeUrl}}">Unsubscribe</a></p>
     </div>
 </body>
 </html>
@@ -109,7 +109,7 @@ View your dashboard: https://edunode.org/dashboard
 
 ---
 This email was sent to {{user.email}} as part of your monthly digest.
-Unsubscribe: ${process.env.BASE_URL}/api/email/unsubscribe?email={{user.email}}
+Unsubscribe: {{unsubscribeUrl}}
   `;
   }
 }

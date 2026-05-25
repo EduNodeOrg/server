@@ -388,11 +388,17 @@ router.post('/send-single', async (req, res) => {
       user = await User.findById(contactId).select('name userName firstName lastName email role university skills Points rating');
     }
     
+    // Build template data with unsubscribe URL
+    const unsubscribeUrl = `${process.env.BASE_URL}/api/email/unsubscribe?email=${encodeURIComponent(to)}`;
+    
     // Render template with user data
     let renderedHtml = htmlContent;
     let renderedSubject = subject;
+    
+    const templateData = { unsubscribeUrl };
+    
     if (user) {
-      const userData = {
+      templateData.user = {
         name: user.name || user.userName || `${user.firstName || ''} ${user.lastName || ''}`.trim() || 'Valued User',
         email: user.email,
         role: user.role,
@@ -401,16 +407,22 @@ router.post('/send-single', async (req, res) => {
         points: user.Points,
         rating: user.rating
       };
-      
-      // Replace template variables
-      renderedHtml = htmlContent.replace(/\{\{user\.(\w+)\}\}/g, (match, key) => {
-        return userData[key] !== undefined ? userData[key] : match;
-      });
-      
-      renderedSubject = subject.replace(/\{\{user\.(\w+)\}\}/g, (match, key) => {
-        return userData[key] !== undefined ? userData[key] : match;
-      });
     }
+    
+    // Replace template variables (handles {{user.name}}, {{unsubscribeUrl}}, etc.)
+    const replaceVars = (str) => {
+      return str.replace(/\{\{([\w.]+)\}\}/g, (match, key) => {
+        const keys = key.split('.');
+        let value = templateData;
+        for (const k of keys) {
+          value = value?.[k];
+        }
+        return value !== undefined ? value : match;
+      });
+    };
+    
+    renderedHtml = replaceVars(renderedHtml);
+    renderedSubject = replaceVars(renderedSubject);
     
     // Send email using email service
     const result = await emailService.sendEmail({

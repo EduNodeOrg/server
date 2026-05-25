@@ -285,4 +285,30 @@ router.post('/import', async (req, res) => {
   }
 });
 
+// Re-subscribe a contact
+router.post('/contacts/:id/resubscribe', async (req, res) => {
+  try {
+    const contact = await User.findById(req.params.id);
+    
+    if (!contact) {
+      return res.status(404).json({ error: 'Contact not found' });
+    }
+
+    // Remove unsubscribe record
+    await Unsubscribe.deleteOne({ email: contact.email.toLowerCase() });
+
+    // Restore email preferences
+    await User.findByIdAndUpdate(req.params.id, {
+      'emailPreferences.marketing': true,
+      'emailPreferences.newsletters': true,
+      'emailPreferences.updates': true
+    });
+
+    res.json({ success: true, message: `${contact.email} has been re-subscribed` });
+  } catch (error) {
+    console.error('Error re-subscribing contact:', error);
+    res.status(500).json({ error: 'Failed to re-subscribe contact' });
+  }
+});
+
 module.exports = router;
