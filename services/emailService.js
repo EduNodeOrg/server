@@ -58,8 +58,15 @@ class EmailService {
 
       // Render template
       const unsubscribeUrl = `${process.env.BASE_URL}/api/email/unsubscribe?email=${encodeURIComponent(user.email)}&campaign=${campaignId}`;
+      
+      // Add name fallback to user object for template rendering
+      const userWithFallback = {
+        ...user,
+        name: user.name || user.userName || `${user.firstName || ''} ${user.lastName || ''}`.trim() || user.email || 'Valued User'
+      };
+      
       const renderedEmail = await this.renderTemplate(campaign.templateId, {
-        user,
+        user: userWithFallback,
         campaign,
         unsubscribeUrl,
         ...templateData

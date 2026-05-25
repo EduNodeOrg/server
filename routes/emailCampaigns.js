@@ -399,7 +399,7 @@ router.post('/send-single', async (req, res) => {
     
     if (user) {
       templateData.user = {
-        name: user.name || user.userName || `${user.firstName || ''} ${user.lastName || ''}`.trim() || 'Valued User',
+        name: user.name || user.userName || `${user.firstName || ''} ${user.lastName || ''}`.trim() || user.email || 'Valued User',
         email: user.email,
         role: user.role,
         university: user.university,
