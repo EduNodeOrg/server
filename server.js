@@ -226,12 +226,13 @@ app.use("/api/notif", notif);
 app.use("/api/game", game);
 app.use("/api/tutors", tutor);
 app.use("/api/messageNotif", messagesNotif);
-app.use("/api/email/campaigns", emailCampaigns);
-app.use("/api/email/templates", emailTemplates);
+const adminAuth = require('./middleware/adminAuth');
+app.use("/api/email/campaigns", adminAuth, emailCampaigns);
+app.use("/api/email/templates", adminAuth, emailTemplates);
 app.use("/api/email/unsubscribe", emailUnsubscribe);
 app.use("/api/email/webhooks", emailWebhooks);
-app.use("/api/email/analytics", emailAnalytics);
-app.use("/api/email/crm", emailCRM);
+app.use("/api/email/analytics", adminAuth, emailAnalytics);
+app.use("/api/email/crm", adminAuth, emailCRM);
 
 // Handle unsubscribe at root level for Mailgun redirects
 app.get("/unsubscribe", async (req, res) => {
@@ -305,11 +306,145 @@ app.get("/unsubscribe", async (req, res) => {
 });
 app.use("/api/stripe", stripeRoutes);
 
+// Block direct access to email-admin.html
+app.use('/email-admin.html', (req, res) => {
+  res.status(404).send('Not found');
+});
+
 // Serve static files from public directory
 app.use(express.static('public'));
 
-// Serve email marketing admin interface
-app.get("/admin/email", (req, res) => {
+// Admin email login page (public)
+app.get("/admin/email/login", (req, res) => {
+  res.send(`
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>Email Admin Login - EduNode</title>
+      <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: Arial, sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; display: flex; justify-content: center; align-items: center; }
+        .login-card { background: white; border-radius: 16px; padding: 40px; width: 100%; max-width: 420px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); }
+        .login-card h1 { text-align: center; color: #333; margin-bottom: 8px; font-size: 24px; }
+        .login-card .subtitle { text-align: center; color: #666; margin-bottom: 30px; font-size: 14px; }
+        .form-group { margin-bottom: 20px; }
+        .form-group label { display: block; margin-bottom: 6px; font-weight: bold; color: #333; font-size: 14px; }
+        .form-group input { width: 100%; padding: 12px 16px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 16px; transition: border-color 0.3s; }
+        .form-group input:focus { outline: none; border-color: #667eea; }
+        .btn { width: 100%; padding: 14px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; transition: opacity 0.3s; }
+        .btn:hover { opacity: 0.9; }
+        .btn:disabled { opacity: 0.6; cursor: not-allowed; }
+        .error { background: #fee; color: #c00; padding: 12px; border-radius: 8px; margin-bottom: 20px; font-size: 14px; display: none; }
+        .info { text-align: center; margin-top: 20px; font-size: 12px; color: #999; }
+      </style>
+    </head>
+    <body>
+      <div class="login-card">
+        <h1>Email Marketing Admin</h1>
+        <p class="subtitle">Sign in with your @edunode.org email</p>
+        <div id="error" class="error"></div>
+        <form id="loginForm">
+          <div class="form-group">
+            <label for="email">Email</label>
+            <input type="email" id="email" placeholder="you@edunode.org" required>
+          </div>
+          <div class="form-group">
+            <label for="password">Password</label>
+            <input type="password" id="password" placeholder="Your password" required>
+          </div>
+          <button type="submit" class="btn" id="loginBtn">Sign In</button>
+        </form>
+        <p class="info">Only @edunode.org email addresses are authorized.</p>
+      </div>
+      <script>
+        document.getElementById('loginForm').addEventListener('submit', async (e) => {
+          e.preventDefault();
+          const email = document.getElementById('email').value;
+          const password = document.getElementById('password').value;
+          const errorEl = document.getElementById('error');
+          const btn = document.getElementById('loginBtn');
+          
+          errorEl.style.display = 'none';
+          btn.disabled = true;
+          btn.textContent = 'Signing in...';
+          
+          try {
+            const response = await fetch('/admin/email/auth', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ email, password })
+            });
+            
+            const data = await response.json();
+            
+            if (response.ok && data.token) {
+              localStorage.setItem('adminToken', data.token);
+              window.location.href = '/admin/email?token=' + data.token;
+            } else {
+              errorEl.textContent = data.error || 'Login failed';
+              errorEl.style.display = 'block';
+            }
+          } catch (err) {
+            errorEl.textContent = 'Network error. Please try again.';
+            errorEl.style.display = 'block';
+          }
+          
+          btn.disabled = false;
+          btn.textContent = 'Sign In';
+        });
+      </script>
+    </body>
+    </html>
+  `);
+});
+
+// Admin email login API
+app.post("/admin/email/auth", async (req, res) => {
+  try {
+    const { email, password } = req.body;
+    
+    if (!email || !password) {
+      return res.status(400).json({ error: 'Email and password are required' });
+    }
+    
+    // Only allow @edunode.org emails
+    if (!email.toLowerCase().endsWith('@edunode.org')) {
+      return res.status(403).json({ error: 'Only @edunode.org email addresses are authorized' });
+    }
+    
+    // Find user and verify password
+    const User = require('./models/User');
+    const bcrypt = require('bcryptjs');
+    const jwt = require('jsonwebtoken');
+    
+    const user = await User.findOne({ email: email.toLowerCase() });
+    if (!user) {
+      return res.status(401).json({ error: 'Invalid credentials' });
+    }
+    
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) {
+      return res.status(401).json({ error: 'Invalid credentials' });
+    }
+    
+    // Issue admin token (24h expiry)
+    const token = jwt.sign(
+      { id: user._id, email: user.email, isEmailAdmin: true },
+      process.env.JWT_SECRET,
+      { expiresIn: '24h' }
+    );
+    
+    res.json({ token });
+  } catch (error) {
+    console.error('Admin login error:', error);
+    res.status(500).json({ error: 'Login failed' });
+  }
+});
+
+// Serve email marketing admin interface (admin only)
+app.get("/admin/email", adminAuth, (req, res) => {
   res.sendFile(__dirname + '/public/email-admin.html');
 });
 

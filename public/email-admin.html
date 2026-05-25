@@ -372,9 +372,10 @@
 </head>
 <body>
     <div class="container">
-        <div class="header">
+        <div class="header" style="position: relative;">
             <h1>Email Marketing Admin</h1>
             <p>Manage campaigns, templates, and analytics for EduNode</p>
+            <button onclick="adminLogout()" style="position: absolute; top: 20px; right: 20px; background: rgba(255,255,255,0.2); color: white; border: 1px solid rgba(255,255,255,0.4); padding: 8px 16px; border-radius: 6px; cursor: pointer; font-size: 13px;">Logout</button>
         </div>
 
         <div class="tabs">
@@ -576,6 +577,40 @@
                 return '';
             })();
             const API_BASE = `${API_ORIGIN}/api/email`;
+            
+            // Extract admin token from URL or localStorage
+            const urlParams = new URLSearchParams(window.location.search);
+            const ADMIN_TOKEN = urlParams.get('token') || localStorage.getItem('adminToken') || '';
+            if (urlParams.get('token')) {
+                localStorage.setItem('adminToken', urlParams.get('token'));
+                // Clean URL
+                window.history.replaceState({}, document.title, window.location.pathname);
+            }
+            
+            if (!ADMIN_TOKEN) {
+                window.location.href = '/admin/email/login';
+            }
+            
+            // Authenticated fetch helper
+            async function authFetch(url, options = {}) {
+                options.headers = options.headers || {};
+                if (ADMIN_TOKEN) {
+                    options.headers['x-auth-token'] = ADMIN_TOKEN;
+                }
+                const response = await fetch(url, options);
+                if (response.status === 401 || response.status === 403) {
+                    localStorage.removeItem('adminToken');
+                    window.location.href = '/admin/email/login';
+                }
+                return response;
+            }
+            
+            // Logout
+            window.adminLogout = function() {
+                localStorage.removeItem('adminToken');
+                window.location.href = '/admin/email/login';
+            }
+            
             let currentTab = 'overview';
 
         // Tab switching
@@ -624,7 +659,7 @@
             try {
                 // Load overall stats
                 console.log('Fetching overview from:', `${API_BASE}/analytics/overview`);
-                const statsResponse = await fetch(`${API_BASE}/analytics/overview`);
+                const statsResponse = await authFetch(`${API_BASE}/analytics/overview`);
                 console.log('Stats response status:', statsResponse.status);
                 
                 if (!statsResponse.ok) {
@@ -656,7 +691,7 @@
                 `;
 
                 // Load recent campaigns
-                const campaignsResponse = await fetch(`${API_BASE}/campaigns?limit=5`);
+                const campaignsResponse = await authFetch(`${API_BASE}/campaigns?limit=5`);
                 const campaignsData = await campaignsResponse.json();
                 
                 document.getElementById('recentCampaigns').innerHTML = campaignsData.campaigns.map(campaign => `
@@ -679,7 +714,7 @@
         // Load campaigns
         async function loadCampaigns() {
             try {
-                const response = await fetch(`${API_BASE}/campaigns`);
+                const response = await authFetch(`${API_BASE}/campaigns`);
                 const data = await response.json();
                 
                 document.getElementById('campaignsList').innerHTML = data.campaigns.map(campaign => `
@@ -705,7 +740,7 @@
         // Load templates
         async function loadTemplates() {
             try {
-                const response = await fetch(`${API_BASE}/templates`);
+                const response = await authFetch(`${API_BASE}/templates`);
                 const data = await response.json();
                 
                 // Update template dropdown
@@ -740,7 +775,7 @@
         async function loadAnalytics() {
             try {
                 // Load overall analytics
-                const overallResponse = await fetch(`${API_BASE}/analytics/overview`);
+                const overallResponse = await authFetch(`${API_BASE}/analytics/overview`);
                 const overall = await overallResponse.json();
                 
                 document.getElementById('overallAnalytics').innerHTML = `
@@ -765,7 +800,7 @@
                 `;
 
                 // Load campaign email status
-                const statusResponse = await fetch(`${API_BASE}/analytics/campaigns-status`);
+                const statusResponse = await authFetch(`${API_BASE}/analytics/campaigns-status`);
                 const statusData = await statusResponse.json();
                 
                 const statusColors = {
@@ -809,7 +844,7 @@
                 `}).join('');
 
                 // Load top campaigns
-                const topResponse = await fetch(`${API_BASE}/analytics/top-campaigns?limit=5`);
+                const topResponse = await authFetch(`${API_BASE}/analytics/top-campaigns?limit=5`);
                 const topData = await topResponse.json();
                 
                 document.getElementById('topCampaigns').innerHTML = topData.campaigns.map(campaign => `
@@ -836,7 +871,7 @@
                 console.log('Loading CRM data...');
                 
                 // Load CRM statistics
-                const statsResponse = await fetch(`${API_BASE}/crm/stats`);
+                const statsResponse = await authFetch(`${API_BASE}/crm/stats`);
                 const stats = await statsResponse.json();
                 
                 document.getElementById('crmStatsGrid').innerHTML = `
@@ -859,7 +894,7 @@
                 `;
 
                 // Load lead pipeline
-                const pipelineResponse = await fetch(`${API_BASE}/crm/pipeline`);
+                const pipelineResponse = await authFetch(`${API_BASE}/crm/pipeline`);
                 const pipeline = await pipelineResponse.json();
                 
                 document.getElementById('leadPipeline').innerHTML = `
@@ -879,7 +914,7 @@
                 `;
 
                 // Load recent activities
-                const activitiesResponse = await fetch(`${API_BASE}/crm/activities?limit=10`);
+                const activitiesResponse = await authFetch(`${API_BASE}/crm/activities?limit=10`);
                 const activities = await activitiesResponse.json();
                 
                 document.getElementById('recentActivities').innerHTML = activities.map(activity => `
@@ -926,7 +961,7 @@
             };
 
             try {
-                const response = await fetch(`${API_BASE}/campaigns`, {
+                const response = await authFetch(`${API_BASE}/campaigns`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -961,7 +996,7 @@
             };
 
             try {
-                const response = await fetch(`${API_BASE}/templates`, {
+                const response = await authFetch(`${API_BASE}/templates`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -1012,7 +1047,7 @@
             modal.classList.add('show');
             
             // Fetch campaign details from the server
-            fetch(`${API_BASE}/campaigns/${campaignId}`)
+            authFetch(`${API_BASE}/campaigns/${campaignId}`)
                 .then(response => {
                     if (!response.ok) {
                         throw new Error(`Failed to fetch campaign: ${response.status}`);
@@ -1196,7 +1231,7 @@
             }
             
             try {
-                const response = await fetch(`${API_BASE}/templates/${templateId}`);
+                const response = await authFetch(`${API_BASE}/templates/${templateId}`);
                 if (!response.ok) throw new Error('Failed to load template');
                 
                 currentTemplateData = await response.json();
@@ -1331,7 +1366,7 @@
 
         async function loadCampaignForEditing(campaignId) {
             try {
-                const response = await fetch(`${API_BASE}/campaigns/${campaignId}`);
+                const response = await authFetch(`${API_BASE}/campaigns/${campaignId}`);
                 
                 if (!response.ok) {
                     const errorText = await response.text();
@@ -1383,7 +1418,7 @@
                 }
                 
                 // Load templates for dropdown
-                const templatesResponse = await fetch(`${API_BASE}/templates`);
+                const templatesResponse = await authFetch(`${API_BASE}/templates`);
                 const templatesData = await templatesResponse.json();
                 
                 const templateSelect = document.getElementById('editCampaignTemplate');
@@ -1437,7 +1472,7 @@
                         
                         try {
                             console.log('Sending PUT request to:', `${API_BASE}/campaigns/${campaignId}`);
-                            const response = await fetch(`${API_BASE}/campaigns/${campaignId}`, {
+                            const response = await authFetch(`${API_BASE}/campaigns/${campaignId}`, {
                                 method: 'PUT',
                                 headers: {
                                     'Content-Type': 'application/json',
@@ -1533,7 +1568,7 @@
 
         window.loadContactsForSend = async function() {
             try {
-                const response = await fetch(`${API_BASE}/crm/contacts?limit=1000`);
+                const response = await authFetch(`${API_BASE}/crm/contacts?limit=1000`);
                 const data = await response.json();
                 
                 const container = document.getElementById('contactsListForSend');
@@ -1625,7 +1660,7 @@
             }
             
             try {
-                const response = await fetch(`${API_BASE}/campaigns/${currentSendCampaignId}/send`, {
+                const response = await authFetch(`${API_BASE}/campaigns/${currentSendCampaignId}/send`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ contactIds: Array.from(selectedContacts) })
@@ -1648,7 +1683,7 @@
         window.deleteCampaign = async function(campaignId) {
             if (confirm('Are you sure you want to delete this campaign?')) {
                 try {
-                    const response = await fetch(`${API_BASE}/campaigns/${campaignId}`, {
+                    const response = await authFetch(`${API_BASE}/campaigns/${campaignId}`, {
                         method: 'DELETE'
                     });
 
@@ -1668,7 +1703,7 @@
 
         window.previewTemplate = async function(templateId) {
             try {
-                const response = await fetch(`${API_BASE}/templates/${templateId}/preview`, {
+                const response = await authFetch(`${API_BASE}/templates/${templateId}/preview`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -1823,7 +1858,7 @@
                 const page = loadMore ? currentContactsPage : 1;
                 
                 const searchParam = currentSearchQuery ? `&search=${encodeURIComponent(currentSearchQuery)}` : '';
-                const response = await fetch(`${API_BASE}/crm/contacts?limit=${limit}&page=${page}${searchParam}`);
+                const response = await authFetch(`${API_BASE}/crm/contacts?limit=${limit}&page=${page}${searchParam}`);
                 const data = await response.json();
                 
                 if (!loadMore) {
@@ -1895,7 +1930,7 @@
 
         window.viewContact = async function(contactId) {
             try {
-                const response = await fetch(`${API_BASE}/crm/contacts/${contactId}`);
+                const response = await authFetch(`${API_BASE}/crm/contacts/${contactId}`);
                 if (!response.ok) throw new Error('Failed to fetch contact');
                 const contact = await response.json();
                 
@@ -1978,12 +2013,12 @@
             
             try {
                 // Get contact details
-                const contactResponse = await fetch(`${API_BASE}/crm/contacts/${contactId}`);
+                const contactResponse = await authFetch(`${API_BASE}/crm/contacts/${contactId}`);
                 if (!contactResponse.ok) throw new Error('Failed to fetch contact');
                 const contact = await contactResponse.json();
                 
                 // Get templates list
-                const templatesResponse = await fetch(`${API_BASE}/templates?limit=100`);
+                const templatesResponse = await authFetch(`${API_BASE}/templates?limit=100`);
                 const templatesData = await templatesResponse.json();
                 
                 const modal = document.createElement('div');
@@ -2050,7 +2085,7 @@
             }
             
             try {
-                const response = await fetch(`${API_BASE}/templates/${templateId}`);
+                const response = await authFetch(`${API_BASE}/templates/${templateId}`);
                 if (!response.ok) throw new Error('Failed to fetch template');
                 emailTemplateData = await response.json();
                 
@@ -2073,7 +2108,7 @@
             }
             
             try {
-                const response = await fetch(`${API_BASE}/campaigns/send-single`, {
+                const response = await authFetch(`${API_BASE}/campaigns/send-single`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
@@ -2105,7 +2140,7 @@
 
         window.deleteContactFromServer = async function(contactId) {
             try {
-                const response = await fetch(`${API_BASE}/crm/contacts/${contactId}`, {
+                const response = await authFetch(`${API_BASE}/crm/contacts/${contactId}`, {
                     method: 'DELETE'
                 });
 
@@ -2125,7 +2160,7 @@
         window.resubscribeContact = async function(contactId) {
             if (!confirm('Re-subscribe this contact to email communications?')) return;
             try {
-                const response = await fetch(`${API_BASE}/crm/contacts/${contactId}/resubscribe`, {
+                const response = await authFetch(`${API_BASE}/crm/contacts/${contactId}/resubscribe`, {
                     method: 'POST'
                 });
 
