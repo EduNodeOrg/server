@@ -169,11 +169,14 @@ router.delete('/:id', async (req, res) => {
 // Reactivate campaign
 router.post('/:id/reactivate', async (req, res) => {
   try {
+    console.log('Reactivate campaign request:', req.params.id);
     const campaign = await Campaign.findById(req.params.id);
 
     if (!campaign) {
       return res.status(404).json({ error: 'Campaign not found' });
     }
+
+    console.log('Campaign current status:', campaign.status);
 
     if (campaign.status !== 'sent') {
       return res.status(400).json({ error: 'Can only reactivate sent campaigns' });
@@ -194,6 +197,7 @@ router.post('/:id/reactivate', async (req, res) => {
     };
 
     await campaign.save();
+    console.log('Campaign reactivated, new status:', campaign.status);
 
     const updatedCampaign = await Campaign.findById(campaign._id)
       .populate('templateId')
