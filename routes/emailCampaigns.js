@@ -429,7 +429,7 @@ router.post('/send-single', async (req, res) => {
       to: to,
       subject: renderedSubject,
       html: renderedHtml,
-      from: process.env.FROM_EMAIL || 'noreply@edunode.org',
+      from: 'EduNode <hi@edunode.org>',
       userId: contactId  // Pass contactId as userId for email logging
     });
     

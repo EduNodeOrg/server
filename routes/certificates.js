@@ -292,7 +292,7 @@ const sendCertificateEmail = async (email, name, cid, course) => {
     });
 
     const data = {
-      from: `EduNode <noreply@${process.env.MAILGUN_DOMAIN}>`,
+      from: 'EduNode <hi@edunode.org>',
       to: email,
       subject: `Your ${course} Certificate is Ready!`,
       text: `Hello ${name},\n\nYour certificate for ${course} is ready!\n\nView it here: https://ipfs.io/ipfs/${cid}\n\nBest regards,\nEduNode Team`,
