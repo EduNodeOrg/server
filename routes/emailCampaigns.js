@@ -166,6 +166,35 @@ router.delete('/:id', async (req, res) => {
   }
 });
 
+// Reactivate campaign
+router.post('/:id/reactivate', async (req, res) => {
+  try {
+    const campaign = await Campaign.findById(req.params.id);
+    
+    if (!campaign) {
+      return res.status(404).json({ error: 'Campaign not found' });
+    }
+
+    if (campaign.status !== 'sent') {
+      return res.status(400).json({ error: 'Can only reactivate sent campaigns' });
+    }
+
+    campaign.status = 'draft';
+    campaign.sentAt = undefined;
+    campaign.completedAt = undefined;
+    await campaign.save();
+
+    const updatedCampaign = await Campaign.findById(campaign._id)
+      .populate('templateId')
+      .populate('createdBy', 'name email');
+
+    res.json(updatedCampaign);
+  } catch (error) {
+    console.error('Error reactivating campaign:', error);
+    res.status(500).json({ error: 'Failed to reactivate campaign' });
+  }
+});
+
 // Send campaign
 router.post('/:id/send', async (req, res) => {
   try {

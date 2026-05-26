@@ -65,7 +65,16 @@ class EmailService {
         name: user.name || user.userName || `${user.firstName || ''} ${user.lastName || ''}`.trim() || user.email || 'Valued User'
       };
       
-      const renderedEmail = await this.renderTemplate(campaign.templateId, {
+      // Use custom template content if available, otherwise use the original template
+      let templateToUse = campaign.templateId;
+      if (campaign.customTemplateContent) {
+        templateToUse = {
+          ...campaign.templateId.toObject(),
+          htmlContent: campaign.customTemplateContent
+        };
+      }
+      
+      const renderedEmail = await this.renderTemplate(templateToUse, {
         user: userWithFallback,
         campaign,
         unsubscribeUrl,

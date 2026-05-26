@@ -727,6 +727,7 @@
                         <div class="campaign-actions">
                             <button class="btn" onclick="editCampaign('${campaign._id}')">View</button>
                             ${campaign.status === 'draft' ? `<button class="btn btn-success" onclick="sendCampaign('${campaign._id}')">Send</button>` : ''}
+                            ${campaign.status === 'sent' ? `<button class="btn btn-warning" onclick="reactivateCampaign('${campaign._id}')">Reactivate</button>` : ''}
                             ${campaign.status === 'draft' ? `<button class="btn btn-danger" onclick="deleteCampaign('${campaign._id}')">Delete</button>` : ''}
                         </div>
                     </div>
@@ -1527,6 +1528,26 @@
         }
 
         window.showSendCampaignModal = async function(campaignId) {
+            // Fetch already sent contacts for this campaign
+            try {
+                const logsResponse = await authFetch(`${API_BASE}/campaigns/${campaignId}/logs?limit=1000`);
+                const logsData = await logsResponse.json();
+                
+                // Populate individuallySentContacts with userIds from logs
+                individuallySentContacts.clear();
+                if (logsData.logs && logsData.logs.length > 0) {
+                    logsData.logs.forEach(log => {
+                        if (log.userId && log.status === 'sent') {
+                            individuallySentContacts.add(log.userId.toString());
+                        }
+                    });
+                }
+                console.log('Already sent contacts:', individuallySentContacts.size);
+            } catch (error) {
+                console.error('Error fetching sent contacts:', error);
+                // Continue even if we can't fetch logs
+            }
+            
             // Create modal
             const modal = document.createElement('div');
             modal.className = 'modal';
@@ -1748,6 +1769,27 @@
                 } catch (error) {
                     console.error('Error deleting campaign:', error);
                     showError('Failed to delete campaign');
+                }
+            }
+        }
+
+        window.reactivateCampaign = async function(campaignId) {
+            if (confirm('Reactivate this campaign? It will be changed back to draft status and can be edited and sent again.')) {
+                try {
+                    const response = await authFetch(`${API_BASE}/campaigns/${campaignId}/reactivate`, {
+                        method: 'POST'
+                    });
+
+                    if (response.ok) {
+                        showSuccess('Campaign reactivated successfully!');
+                        loadCampaigns();
+                    } else {
+                        const error = await response.json();
+                        showError(error.error || 'Failed to reactivate campaign');
+                    }
+                } catch (error) {
+                    console.error('Error reactivating campaign:', error);
+                    showError('Failed to reactivate campaign');
                 }
             }
         }
