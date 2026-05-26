@@ -61,10 +61,13 @@ class EmailService {
       // Use custom template content if available, otherwise use the original template
       let templateToUse = campaign.templateId;
       if (campaign.customTemplateContent) {
+        console.log(`Using customTemplateContent for campaign ${campaignId}`);
         templateToUse = {
           ...campaign.templateId.toObject(),
           htmlContent: campaign.customTemplateContent
         };
+      } else {
+        console.log(`Using original template for campaign ${campaignId}`);
       }
       
       const renderedEmail = await this.renderTemplate(templateToUse, {

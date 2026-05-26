@@ -125,13 +125,16 @@ router.put('/:id', async (req, res) => {
     }
 
     const updates = req.body;
-    
-    // Handle customTemplateContent - set to null if undefined to clear any previous custom content
-    if (updates.customTemplateContent === undefined) {
-      updates.customTemplateContent = null;
+
+    // Only update customTemplateContent if explicitly provided
+    // Don't clear it when undefined (allows partial updates)
+    if (updates.customTemplateContent !== undefined) {
+      campaign.customTemplateContent = updates.customTemplateContent;
     }
-    
-    Object.assign(campaign, updates);
+
+    // Apply other updates
+    const { customTemplateContent, ...otherUpdates } = updates;
+    Object.assign(campaign, otherUpdates);
     await campaign.save();
 
     const updatedCampaign = await Campaign.findById(campaign._id)
