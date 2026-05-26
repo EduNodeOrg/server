@@ -61,7 +61,8 @@ class EmailService {
       
       // Add name fallback to user object for template rendering
       const userWithFallback = {
-        ...user,
+        ...user.toObject(),
+        email: user.email,
         name: user.name || user.userName || `${user.firstName || ''} ${user.lastName || ''}`.trim() || user.email || 'Valued User'
       };
       
