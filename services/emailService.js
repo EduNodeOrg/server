@@ -228,7 +228,8 @@ class EmailService {
     });
   }
 
-  async processCampaignBatch(campaignId, userIds, batchSize = 100) {
+  async processCampaignBatch(campaignId, userIds, batchSize = 100, options = {}) {
+    const { skipStatusUpdate = false } = options;
     const campaign = await Campaign.findById(campaignId);
     if (!campaign) {
       throw new Error('Campaign not found');
@@ -242,11 +243,13 @@ class EmailService {
       errors: []
     };
 
-    // Update campaign status to sending
-    await Campaign.findByIdAndUpdate(campaignId, { 
-      status: 'sending',
-      sentAt: new Date()
-    });
+    // Update campaign status to sending (skip for individual sends)
+    if (!skipStatusUpdate) {
+      await Campaign.findByIdAndUpdate(campaignId, { 
+        status: 'sending',
+        sentAt: new Date()
+      });
+    }
 
     try {
       for (let i = 0; i < userIds.length; i += batchSize) {
@@ -284,23 +287,35 @@ class EmailService {
       }
 
       // Update campaign status and analytics
-      await Campaign.findByIdAndUpdate(campaignId, {
-        status: 'sent',
-        completedAt: new Date(),
-        $inc: {
-          'analytics.sent': results.sent,
-          'analytics.delivered': results.sent
-        }
-      });
+      if (!skipStatusUpdate) {
+        await Campaign.findByIdAndUpdate(campaignId, {
+          status: 'sent',
+          completedAt: new Date(),
+          $inc: {
+            'analytics.sent': results.sent,
+            'analytics.delivered': results.sent
+          }
+        });
+      } else {
+        // For individual sends, only increment analytics
+        await Campaign.findByIdAndUpdate(campaignId, {
+          $inc: {
+            'analytics.sent': results.sent,
+            'analytics.delivered': results.sent
+          }
+        });
+      }
 
       return results;
 
     } catch (error) {
-      // Update campaign status to failed
-      await Campaign.findByIdAndUpdate(campaignId, { 
-        status: 'draft',
-        $push: { 'errors': error.message }
-      });
+      // Update campaign status to failed (only for bulk sends)
+      if (!skipStatusUpdate) {
+        await Campaign.findByIdAndUpdate(campaignId, { 
+          status: 'draft',
+          $push: { 'errors': error.message }
+        });
+      }
       throw error;
     }
   }

@@ -222,8 +222,11 @@ router.post('/:id/send', async (req, res) => {
 
     console.log('Campaign status:', campaign.status);
 
-    // Don't allow sending already sent campaigns
-    if (campaign.status === 'sent' || campaign.status === 'sending') {
+    const hasSpecificContacts = req.body.contactIds && Array.isArray(req.body.contactIds) && req.body.contactIds.length > 0;
+
+    // Only block bulk sends (no specific contacts) for sent/sending campaigns
+    // Allow individual/targeted sends regardless of status
+    if (!hasSpecificContacts && (campaign.status === 'sent' || campaign.status === 'sending')) {
       return res.status(400).json({ error: 'Campaign already sent or currently sending' });
     }
 
@@ -231,7 +234,7 @@ router.post('/:id/send', async (req, res) => {
     let totalRecipients = 0;
 
     // If specific contactIds are provided, use those
-    if (req.body.contactIds && Array.isArray(req.body.contactIds) && req.body.contactIds.length > 0) {
+    if (hasSpecificContacts) {
       console.log('Contact IDs provided:', req.body.contactIds);
       // Validate and convert contactIds to ObjectIds
       const mongoose = require('mongoose');
@@ -262,7 +265,8 @@ router.post('/:id/send', async (req, res) => {
     await campaign.save();
 
     // Start sending campaign in background
-    emailService.processCampaignBatch(campaign._id, userIds, campaign.settings.batchSize)
+    // Skip status update for individual/targeted sends to allow further sends
+    emailService.processCampaignBatch(campaign._id, userIds, campaign.settings.batchSize, { skipStatusUpdate: hasSpecificContacts })
       .then(results => {
         console.log(`Campaign ${campaign._id} sent:`, results);
       })
