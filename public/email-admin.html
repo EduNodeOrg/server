@@ -1518,6 +1518,7 @@
 
         let currentSendCampaignId = null;
         let selectedContacts = new Set();
+        let individuallySentContacts = new Set();
 
         window.sendCampaign = async function(campaignId) {
             currentSendCampaignId = campaignId;
@@ -1547,7 +1548,7 @@
                         </div>
                         <div style="margin-top: 20px; display: flex; gap: 10px; justify-content: flex-end;">
                             <button class="btn" onclick="closeSendCampaignModal()">Cancel</button>
-                            <button class="btn btn-success" onclick="confirmSendCampaign()">Send Campaign</button>
+                            <button class="btn btn-success" id="sendCampaignBtn" onclick="confirmSendCampaign()">Send Campaign</button>
                         </div>
                     </div>
                 </div>
@@ -1566,6 +1567,7 @@
             if (modal) modal.remove();
             currentSendCampaignId = null;
             selectedContacts.clear();
+            individuallySentContacts.clear();
         }
 
         window.loadContactsForSend = async function() {
@@ -1581,13 +1583,14 @@
                 }
                 
                 container.innerHTML = data.contacts.map(contact => `
-                    <div class="contact-item-for-send" style="padding: 12px 15px; border-bottom: 1px solid #eee; display: flex; align-items: center; gap: 12px; cursor: pointer; hover: background: #f5f5f5;" onclick="toggleContactSelection('${contact._id}', this)">
+                    <div class="contact-item-for-send" data-contact-id="${contact._id}" style="padding: 12px 15px; border-bottom: 1px solid #eee; display: flex; align-items: center; gap: 12px; cursor: pointer; hover: background: #f5f5f5; ${individuallySentContacts.has(contact._id) ? 'background: #d4edda;' : ''}" onclick="toggleContactSelection('${contact._id}', this)">
                         <input type="checkbox" class="contact-checkbox" data-contact-id="${contact._id}" style="cursor: pointer;" onclick="event.stopPropagation(); toggleContactSelection('${contact._id}', this.parentElement)">
                         <div style="flex: 1;">
-                            <div style="font-weight: 500;">${contact.name || 'No Name'}</div>
+                            <div style="font-weight: 500;">${contact.name || 'No Name'} ${individuallySentContacts.has(contact._id) ? '<span style="color: #28a745; font-size: 11px; margin-left: 8px;">(sent)</span>' : ''}</div>
                             <div style="font-size: 13px; color: #666;">${contact.email}</div>
                         </div>
                         <div style="font-size: 12px; color: #999;">${contact.role || 'User'}</div>
+                        <button class="btn" style="padding: 6px 12px; font-size: 13px;" onclick="event.stopPropagation(); sendIndividualEmail('${contact._id}', this)">Email</button>
                     </div>
                 `).join('');
                 
@@ -1661,6 +1664,11 @@
                 return;
             }
             
+            const sendBtn = document.getElementById('sendCampaignBtn');
+            const originalText = sendBtn.textContent;
+            sendBtn.disabled = true;
+            sendBtn.innerHTML = '<span style="display: inline-block; animation: spin 1s linear infinite;">⏳</span> Sending...';
+            
             try {
                 const response = await authFetch(`${API_BASE}/campaigns/${currentSendCampaignId}/send`, {
                     method: 'POST',
@@ -1679,6 +1687,47 @@
             } catch (error) {
                 console.error('Error sending campaign:', error);
                 showError('Failed to send campaign');
+            } finally {
+                sendBtn.disabled = false;
+                sendBtn.textContent = originalText;
+            }
+        }
+        
+        window.sendIndividualEmail = async function(contactId, buttonElement) {
+            const originalText = buttonElement.textContent;
+            buttonElement.disabled = true;
+            buttonElement.innerHTML = '<span style="display: inline-block; animation: spin 1s linear infinite;">⏳</span>';
+            
+            try {
+                const response = await authFetch(`${API_BASE}/campaigns/${currentSendCampaignId}/send`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ contactIds: [contactId] })
+                });
+
+                if (response.ok) {
+                    showSuccess(`Email sent to contact!`);
+                    individuallySentContacts.add(contactId);
+                    
+                    // Update the contact row to show sent status
+                    const contactRow = document.querySelector(`.contact-item-for-send[data-contact-id="${contactId}"]`);
+                    if (contactRow) {
+                        contactRow.style.background = '#d4edda';
+                        const nameDiv = contactRow.querySelector('div:first-child div:first-child');
+                        if (nameDiv && !nameDiv.innerHTML.includes('(sent)')) {
+                            nameDiv.innerHTML += ' <span style="color: #28a745; font-size: 11px; margin-left: 8px;">(sent)</span>';
+                        }
+                    }
+                } else {
+                    const error = await response.json();
+                    showError(error.error || 'Failed to send email');
+                }
+            } catch (error) {
+                console.error('Error sending individual email:', error);
+                showError('Failed to send email');
+            } finally {
+                buttonElement.disabled = false;
+                buttonElement.textContent = originalText;
             }
         }
 
