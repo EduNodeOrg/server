@@ -119,11 +119,6 @@ router.put('/:id', async (req, res) => {
       return res.status(404).json({ error: 'Campaign not found' });
     }
 
-    // Don't allow editing sent campaigns
-    if (campaign.status === 'sent') {
-      return res.status(400).json({ error: 'Cannot edit sent campaign' });
-    }
-
     const updates = req.body;
 
     // Only update customTemplateContent if explicitly provided

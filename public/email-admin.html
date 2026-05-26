@@ -1449,17 +1449,10 @@
                     form.addEventListener('submit', async (e) => {
                         console.log('Form submitted');
                         e.preventDefault();
-                        
+
                         const currentStatus = document.getElementById('editCampaignStatus').value;
                         console.log('Current status:', currentStatus);
-                        
-                        // Prevent editing sent campaigns
-                        if (currentStatus === 'sent') {
-                            console.log('Campaign is sent, blocking edit');
-                            showError('Cannot edit sent campaigns. Please create a new campaign instead.');
-                            return;
-                        }
-                        
+
                         console.log('Building updated data');
                         const templateContentEl = document.getElementById('editTemplateContent');
                         const updatedData = {
