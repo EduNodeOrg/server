@@ -170,7 +170,7 @@ router.delete('/:id', async (req, res) => {
 router.post('/:id/reactivate', async (req, res) => {
   try {
     const campaign = await Campaign.findById(req.params.id);
-    
+
     if (!campaign) {
       return res.status(404).json({ error: 'Campaign not found' });
     }
@@ -182,6 +182,17 @@ router.post('/:id/reactivate', async (req, res) => {
     campaign.status = 'draft';
     campaign.sentAt = undefined;
     campaign.completedAt = undefined;
+
+    // Reset analytics for clean state when reactivating
+    campaign.analytics = {
+      sent: 0,
+      delivered: 0,
+      opened: 0,
+      clicked: 0,
+      bounced: 0,
+      unsubscribed: 0
+    };
+
     await campaign.save();
 
     const updatedCampaign = await Campaign.findById(campaign._id)
