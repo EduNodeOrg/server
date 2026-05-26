@@ -209,11 +209,14 @@ router.post('/:id/reactivate', async (req, res) => {
 // Send campaign
 router.post('/:id/send', async (req, res) => {
   try {
+    console.log('Send campaign request:', req.params.id, req.body);
     const campaign = await Campaign.findById(req.params.id).populate('templateId');
-    
+
     if (!campaign) {
       return res.status(404).json({ error: 'Campaign not found' });
     }
+
+    console.log('Campaign status:', campaign.status);
 
     // Don't allow sending already sent campaigns
     if (campaign.status === 'sent' || campaign.status === 'sending') {
@@ -225,14 +228,17 @@ router.post('/:id/send', async (req, res) => {
 
     // If specific contactIds are provided, use those
     if (req.body.contactIds && Array.isArray(req.body.contactIds) && req.body.contactIds.length > 0) {
+      console.log('Contact IDs provided:', req.body.contactIds);
       // Validate and convert contactIds to ObjectIds
       const mongoose = require('mongoose');
       userIds = req.body.contactIds
         .filter(id => mongoose.Types.ObjectId.isValid(id))
         .map(id => new mongoose.Types.ObjectId(id));
-      
+
+      console.log('Valid user IDs:', userIds.length);
+
       totalRecipients = userIds.length;
-      
+
       if (userIds.length === 0) {
         return res.status(400).json({ error: 'No valid contacts provided' });
       }
