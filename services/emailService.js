@@ -31,27 +31,31 @@ class EmailService {
       // Check if user is unsubscribed
       const unsubscribe = await Unsubscribe.findOne({ email: user.email });
       if (unsubscribe) {
+        console.log(`Email blocked for user ${userId}: User has unsubscribed`);
         return { status: 'unsubscribed', message: 'User has unsubscribed' };
       }
 
       // Check user email preferences
       if (!user.emailPreferences?.marketing) {
+        console.log(`Email blocked for user ${userId}: User has opted out of marketing emails. emailPreferences:`, user.emailPreferences);
         return { status: 'blocked', message: 'User has opted out of marketing emails' };
       }
 
       // Check email frequency
       if (user.emailFrequency === 'never') {
+        console.log(`Email blocked for user ${userId}: User has disabled emails. emailFrequency:`, user.emailFrequency);
         return { status: 'blocked', message: 'User has disabled emails' };
       }
 
       // Check if recently sent
       if (user.lastEmailSent) {
         const daysSinceLastEmail = (Date.now() - user.lastEmailSent) / (1000 * 60 * 60 * 24);
-        const minDays = user.emailFrequency === 'daily' ? 1 : 
-                       user.emailFrequency === 'weekly' ? 7 : 
+        const minDays = user.emailFrequency === 'daily' ? 1 :
+                       user.emailFrequency === 'weekly' ? 7 :
                        user.emailFrequency === 'monthly' ? 30 : 0;
-        
+
         if (daysSinceLastEmail < minDays) {
+          console.log(`Email blocked for user ${userId}: Email frequency limit reached. daysSinceLastEmail: ${daysSinceLastEmail}, minDays: ${minDays}, emailFrequency: ${user.emailFrequency}`);
           return { status: 'blocked', message: 'Email frequency limit reached' };
         }
       }
