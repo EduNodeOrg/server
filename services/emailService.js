@@ -81,7 +81,7 @@ class EmailService {
       const emailData = {
         from: 'EduNode <hi@edunode.org>',
         to: user.email,
-        subject: this.renderSubject(campaign.templateId.subject, { user, campaign, ...templateData }),
+        subject: this.renderSubject(campaign.subject, { user, campaign, ...templateData }),
         html: renderedEmail.html,
         text: renderedEmail.text,
         'o:tracking': campaign.settings.trackOpens,
