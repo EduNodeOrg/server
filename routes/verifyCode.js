@@ -4,7 +4,6 @@ const User = require("../models/User");
 
 router.post("/", async (req, res, next) => {
   console.log(req.body)
-  res.setHeader("Access-Control-Allow-Origin", '*');
   res.setHeader('Content-Type', 'application/json');
 // , {sparse: true }
 await User.findOne({ email: req.body.email }) 

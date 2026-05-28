@@ -5,8 +5,6 @@ const MozartUser = require('../models/MozartUser');
 router.post("/", async (req, res, next) => {
 
   // console.log("newUser")
-
-    res.setHeader('Access-Control-Allow-Origin', '*');
     // validation 1
    const { pkey } = req.body;
 

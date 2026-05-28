@@ -1,17 +1,11 @@
 const formData = require('form-data');
-const Mailgun = require('mailgun.js');
+const mg = require('../utils/mailgunClient');
 const EmailLog = require('../models/EmailLog');
 const Unsubscribe = require('../models/Unsubscribe');
 const Campaign = require('../models/Campaign');
 const User = require('../models/User');
 
-const mailgun = new Mailgun(formData);
-const domain = "edunode.org";
-const mg = mailgun.client({
-  username: 'api', 
-  key: process.env.MAILGUN_API_KEY || "key-c8d12b7428fbe666e074108aaa0820bc",
-  url: 'https://api.eu.mailgun.net'
-});
+const domain = process.env.MAILGUN_DOMAIN || 'edunode.org';
 
 class EmailService {
   constructor() {

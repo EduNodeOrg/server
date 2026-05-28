@@ -4,7 +4,6 @@ const WebThreeUser = require('../models/WebThreeAuth');
 
 router.post("/", async (req, res, next) => {
   console.log(req.body)
-    res.setHeader('Access-Control-Allow-Origin', '*');
     // validation 1
    const { id, className } = req.body;
 

@@ -5,7 +5,6 @@ const User = require("../models/User");
 const dotenv = require("dotenv");
 
 router.post("/", (req, res, next) => {
-  res.setHeader("Access-Control-Allow-Origin", "*");
   User.findOne({ email: req.body.email })
 
     .then((user) => {

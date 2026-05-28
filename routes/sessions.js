@@ -6,7 +6,6 @@ const Session = require('../models/Session');
 // Register and login google user
 
 router.post("/", async (req, res) => {
-    res.setHeader('Access-Control-Allow-Origin', '*');
     // validation 1
     const { email, googleId, pubkey } = req.body;
     const newSession = {

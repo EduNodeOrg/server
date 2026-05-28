@@ -14,7 +14,6 @@ router.get('/logout', (req, res) => {
 
 //@route POST  api/auth
 router.post("/", async (req, res) => {  
-  res.header('Access-Control-Allow-Origin', '*');
   res.header('Content-Type', 'application/json');
   // res.header("Access-Control-Allow-Credentials", true);
   // res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS');
@@ -35,11 +34,7 @@ await User.findOne({ email })
   try {
     if(!user) return res.status(400).json({ msg: "E-mail is not registered"});
     if (user.email && user.password) {
-      console.log(user.password)
-      console.log(req.body.password)
-      // const salt = await bcrypt.genSalt(10)
-      // const hashPassword =  await bcrypt.hash(req.body.password, salt)
-      // console.log(hashPassword)
+      // [SECURITY] Sensitive value logging removed
       await bcrypt.compare(req.body.password, user.password).then(isMatch => {
 
         console.log(isMatch)

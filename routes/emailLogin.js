@@ -7,11 +7,7 @@ const cors = require('cors');
 //const sgMail = require('@sendgrid/mail');
 //const crypto = require('crypto');
 //sgMail.setApiKey('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');
-const formData = require('form-data');
-const Mailgun = require('mailgun.js');
-const mailgun = new Mailgun(formData);
-const domain = "edunode.org"
-const mg = mailgun.client({ username: 'api', key: "key-c8d12b7428fbe666e074108aaa0820bc" || 'key-yourkeyhere', url: 'https://api.eu.mailgun.net' });
+const mg = require('../utils/mailgunClient');
 const session = require('express-session');
 
 // Removed CORS setup from this file. It will be handled in server.js
@@ -78,8 +74,7 @@ router.post('/', function (req, res) {
                 { expiresIn: 3600 },
                 (err, token) => {
                   if (err) throw err;
-                  console.log('[emailLogin] issuing token for user id:', user._id);
-                  console.log('[emailLogin] token payload being signed:', { id: user._id });
+                  // [SECURITY] Token payload logging removed
                   res.json({
                     token,
                     user

@@ -11,7 +11,6 @@ const { GoogleGenAI } = require('@google/genai');
 // Define a route for handling POST requests to the OpenAI API
 router.post('/openai', async (req, res) => {
   // Extract the prompt text from the request body
-  res.setHeader('Access-Control-Allow-Origin', '*');
   const { input, email } = req.body;
   console.log("log", email)
   console.log(input)
@@ -87,7 +86,6 @@ router.post('/openai/plugin', async (req, res) => {
 
 // Define a route for handling POST requests to the Google GenAI API
 router.post('/genai', async (req, res) => {
-  res.setHeader('Access-Control-Allow-Origin', '*');
   const { prompt } = req.body;
   if (!prompt) {
     return res.status(400).json({ error: 'Prompt is required' });

@@ -3,6 +3,8 @@ const router = express.Router();
 const dotenv = require('dotenv');
 const mongoose = require("mongoose");
 const cors = require("cors");
+const helmet = require('helmet');
+const rateLimit = require('express-rate-limit');
 dotenv.config({ path: './config/config.env' });
 const fs = require('fs');
 const authRoute = require("./routes/oauth");
@@ -13,8 +15,33 @@ const http = require('http');
 // const socketIo = require('socket.io');
 const app = express();
 
-// Trust proxy for rate limiting behind Heroku
+// Trust proxy for rate limiting behind Heroku/reverse proxy
 app.set('trust proxy', 1);
+
+// ── Global Security Headers (Helmet) ────────────────────────────────────────
+app.use(helmet({
+  contentSecurityPolicy: false, // CSP managed at CDN/proxy layer
+  crossOriginEmbedderPolicy: false,
+}));
+
+// ── Global Rate Limiter ──────────────────────────────────────────────────────
+const globalLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 300,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: 'Too many requests, please try again later.' },
+});
+app.use(globalLimiter);
+
+// ── Auth-specific Rate Limiter ───────────────────────────────────────────────
+const authLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 20,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: 'Too many login attempts, please try again in 15 minutes.' },
+});
 
 // const Message = require('./models/Messages');
 const server = http.createServer(app);
@@ -41,13 +68,19 @@ app.use(bodyParser.json({ limit: '20mb' }));
 
 
 app.use(session({
-  secret: 'cceb95c4de4ece0427c3fd2ac73bbde6bffb85ce827620a1b2edecb78a360634',
+  secret: process.env.SESSION_SECRET,
   resave: false,
   saveUninitialized: false,
   store: new MongoDBStore({
-    uri: process.env.MONGO_URI, // Replace with your MongoDB connection URI
+    uri: process.env.MONGO_URI,
     collection: 'sessions',
   }),
+  cookie: {
+    secure: process.env.NODE_ENV === 'production',
+    httpOnly: true,
+    sameSite: 'lax',
+    maxAge: 24 * 60 * 60 * 1000, // 24 hours
+  },
 }));
 console.log('session set successfully');
 
@@ -68,7 +101,7 @@ app.use(cors({
   },
   credentials: true,
   methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
-  allowedHeaders: '*',
+  allowedHeaders: ['Content-Type', 'Authorization', 'x-auth-token', 'x-requested-with'],
   exposedHeaders: ['set-cookie'],
   optionsSuccessStatus: 200
 }));
@@ -183,10 +216,10 @@ app.use('/api/gcallback', gcallback);
 app.use('/api/search', search);
 app.use('/api/users', users);
 app.use('/api/badge', badge);
-app.use('/api/auth', auth);
-app.use('/api/emailauth', emailAuth);
-app.use('/api/emaillogin', emailLogin);
-app.use('/api/metamasklogin', metamaskLogin);
+app.use('/api/auth', authLimiter, auth);
+app.use('/api/emailauth', authLimiter, emailAuth);
+app.use('/api/emaillogin', authLimiter, emailLogin);
+app.use('/api/metamasklogin', authLimiter, metamaskLogin);
 app.use('/api/confirm', confirm);
 app.use('/api/resend', resend);
 app.use('/api/verifycode', verifyCode);
@@ -401,7 +434,7 @@ app.get("/admin/email/login", (req, res) => {
 });
 
 // Admin email login API
-app.post("/admin/email/auth", async (req, res) => {
+app.post("/admin/email/auth", authLimiter, async (req, res) => {
   try {
     const { email, password } = req.body;
     

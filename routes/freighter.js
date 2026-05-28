@@ -6,9 +6,6 @@ const { use } = require("passport");
 router.post("/", async (req, res, next) => {
 
    console.log("newUser")
-
-    res.setHeader('Access-Control-Allow-Origin', '*');
-    
    const { pkey } = req.body;
    // Generate a random email
   const pkeyEmail = pkey + '@edunode.org'

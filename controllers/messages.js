@@ -1,10 +1,6 @@
 const Message = require('../models/Messages');
 const MessageNotif = require('../models/MessageNotif');
-const formData = require('form-data');
-const Mailgun = require('mailgun.js');
-const mailgun = new Mailgun(formData);
-const domain = "edunode.org"
-const mg = mailgun.client({ username: 'api', key: "key-c8d12b7428fbe666e074108aaa0820bc" || 'key-yourkeyhere', url: 'https://api.eu.mailgun.net' });
+const mg = require('../utils/mailgunClient');
 
 
 exports.getMessages = async (req, res) => {

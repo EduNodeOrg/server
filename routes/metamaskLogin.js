@@ -4,7 +4,6 @@ const MetamaskUser = require('../models/MetamaskUser');
 
 
 router.post('/', async (req, res, next) => {
-res.header("Access-Control-Allow-Origin", '*');
 res.header('Content-Type', 'application/json');
 const accounts = req.body.accounts
 const pubkey = req.body.accounts[0]

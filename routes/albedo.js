@@ -3,10 +3,6 @@ const router = express.Router();
 const AlbedoUser = require('../models/Albedo');
 
 router.post("/", async (req, res, next) => {
-    res.setHeader('Access-Control-Allow-Origin', '*');
-    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE');
-    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, application/json');
-
     // validation 1
    const { intent, pubkey, signature, signed_message } = req.body;
 
@@ -60,9 +56,6 @@ router.post("/", async (req, res, next) => {
   // put albedo userName
 
   router.put("/username", async (req, res, next) => {
-    res.setHeader('Access-Control-Allow-Origin', '*');
-    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE');
-    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, application/json');
     // validation 1
    const { pubkey, userName } = req.body;
 

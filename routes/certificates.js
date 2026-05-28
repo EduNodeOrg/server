@@ -13,7 +13,6 @@ const Jimp = require('jimp');
 const retry = require('async-retry');
 const bcrypt = require('bcryptjs');
 const User = require('../models/User');
-const Mailgun = require('mailgun.js');
 const rateLimit = require('express-rate-limit');
 // Removed validator dependency - using built-in validation functions
 const helmet = require('helmet');
@@ -32,14 +31,9 @@ const certificateLimit = rateLimit({
   legacyHeaders: false,
 });
 
-// Mailgun setup
-const mailgun = new Mailgun(FormData);
-const domain = process.env.MAILGUN_DOMAIN;
-const mg = mailgun.client({
-  username: 'api', 
-  key: process.env.MAILGUN_API_KEY || 'key-c8d12b7428fbe666e074108aaa0820bc',
-  url: 'https://api.mailgun.net'
-});
+// Mailgun setup — uses shared client (key from MAILGUN_API_KEY env var)
+const mg = require('../utils/mailgunClient');
+const domain = process.env.MAILGUN_DOMAIN || 'edunode.org';
 
 // CORS configuration
 const corsOptions = {
@@ -284,12 +278,7 @@ const sendCertificateEmail = async (email, name, cid, course) => {
       return;
     }
 
-    const mailgun = new Mailgun(FormData);
-    const mg = mailgun.client({
-      username: 'api',
-      key: process.env.MAILGUN_API_KEY,
-      url: process.env.MAILGUN_API_URL || 'https://api.mailgun.net'
-    });
+    const mgLocal = require('../utils/mailgunClient');
 
     const data = {
       from: 'EduNode <hi@edunode.org>',
@@ -299,7 +288,7 @@ const sendCertificateEmail = async (email, name, cid, course) => {
       'h:Reply-To': 'support@edunode.org'
     };
 
-    await mg.messages.create(process.env.MAILGUN_DOMAIN, data);
+    await mgLocal.messages.create(process.env.MAILGUN_DOMAIN || 'edunode.org', data);
     console.log(`Certificate email sent to ${email}`);
   } catch (emailError) {
     console.warn('Failed to send email:', emailError.message);

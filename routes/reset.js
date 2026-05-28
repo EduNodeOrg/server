@@ -4,8 +4,6 @@ const User = require("../models/User");
 const bcrypt = require("bcryptjs");
 
 router.patch("/", async (req, res) => {
-    res.setHeader('Access-Control-Allow-Origin', '*');
-    
     try {
         const user = await User.findById(req.body.id);
         

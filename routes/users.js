@@ -13,11 +13,7 @@ const GoogleUser = require('../models/GoogleUser');
 const TwitterUser = require('../models/TwitterUser');
 dotenv.config({ path: './config/config.env' });
 const Notification = require("../models/Notification");
-const formData = require('form-data');
-const Mailgun = require('mailgun.js');
-const mailgun = new Mailgun(formData);
-const domain = "edunode.org"
-const mg = mailgun.client({ username: 'api', key: "key-c8d12b7428fbe666e074108aaa0820bc" || 'key-yourkeyhere', url: 'https://api.eu.mailgun.net' });
+const mg = require('../utils/mailgunClient');
 
 
 
@@ -25,10 +21,6 @@ const mg = mailgun.client({ username: 'api', key: "key-c8d12b7428fbe666e074108aa
 
 router.post("/", async (req, res, next) => {
   res.header('Access-Control-Allow-Origin', '*')
-  res.header("Access-Control-Allow-Origin", '*');
-  res.header("Access-Control-Allow-Credentials", true);
-  res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS');
-  res.header("Access-Control-Allow-Headers", 'Origin,X-Requested-With,Content-Type,Accept,content-type,application/json');
   // validation 1
   const { email, password } = req.body;
   if (!email) {
@@ -63,10 +55,9 @@ router.post("/", async (req, res, next) => {
 
         bcrypt.genSalt(10, (err, salt) => {
           bcrypt.hash(newUser.password, salt, (err, hash) => {
-            console.log(newUser.password)
+            // [SECURITY] Sensitive value logging removed
             if (err) throw err;
             newUser.password = hash;
-            console.log(hash)
 
             // store to mongodb .then(console.log("saved to mongodb"))
             EmailUser.create(newUser).then(console.log("saved to mongodb"))
@@ -106,7 +97,6 @@ router.post("/", async (req, res, next) => {
 
 // get users
 router.get('/user', (req, res) => {
-  res.setHeader('Access-Control-Allow-Origin', '*');
   const email = req.query.email; // Access the email value from query parameters
   User.findOne({ email })
     .then(users => res.json(users))
@@ -149,7 +139,6 @@ router.get('/userByid/:id', async (req, res) => {
 });
 // get users
 router.get("/googleusers", (req, res) => {
-  res.setHeader('Access-Control-Allow-Origin', '*');
   GoogleUser.findOne({ id: "_id" })
     .then(users => res.json(users))
     .catch(err => res.status(400).json("Error: " + err));
@@ -286,7 +275,6 @@ router.put("/googlepk", async (req, res) => {
 // Register and login google user
 
 router.post("/google", async (req, res, next) => {
-  res.setHeader('Access-Control-Allow-Origin', '*');
   // const courseOneDone = false
   // validation 1
   const { email, lastName, fistName, googleId, googleProfilePic, userName, pkey } = req.body;
@@ -347,7 +335,6 @@ router.post("/google", async (req, res, next) => {
 // Register and login twitter user
 
 router.post("/twitter", async (req, res, next) => {
-  res.setHeader('Access-Control-Allow-Origin', '*');
   // const courseOneDone = false
 
 
@@ -713,10 +700,6 @@ router.get('/rating', async (req, res) => {
 
 
 router.post('/create', function (req, res) {
-  res.header("Access-Control-Allow-Origin", '*');
-  res.header("Access-Control-Allow-Credentials", true);
-  res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS');
-  res.header("Access-Control-Allow-Headers", 'Origin,X-Requested-With,Content-Type,Accept,content-type,application/json');
   res.header('Content-Type', 'application/json');
   
   const email = req.body.email;
