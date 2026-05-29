@@ -53,13 +53,12 @@ exports.createMessage = async (req, res) => {
       subject: 'New Message!',
       text: `Hello! Your have a new message from ${senderEmail} on Edunode`
     };
-    mg.messages.create(domain, data, function (error, body) {
+    mg.messages.create(process.env.MAILGUN_DOMAIN || 'edunode.org', data, function (error, body) {
       if (error) {
-        console.log('Error sending email:', error);
-        res.status(500).json({ error: 'Error sending email' });
+        console.log('Error sending email:', error.message || error);
+        // Don't crash the server, just log the error
       } else {
         console.log('Email sent successfully:', body);
-        res.json({ msg: 'Email sent' });
       }
     });
 

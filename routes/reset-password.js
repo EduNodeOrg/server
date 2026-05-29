@@ -26,7 +26,7 @@ function sendResetPasswordEmail(email, resetToken) {
     `,
     };
 
-    return mg.messages.create(domain, data);
+    return mg.messages.create(process.env.MAILGUN_DOMAIN || 'edunode.org', data);
 }
 
 router.post('/reset-password', async (req, res) => {

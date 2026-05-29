@@ -18,11 +18,12 @@ router.post("/", async (req, res) => {
         subject: 'Edunode Confirmation Code',
         text: `Hello! Your confirmation code is: ${confirmationCode}`
       };
-      
-      
-      mg.messages.create(domain, data, function (error, body) {
+
+
+      mg.messages.create(process.env.MAILGUN_DOMAIN || 'edunode.org', data, function (error, body) {
         if (error) {
-          console.log('Error sending email:', error);
+          console.log('Error sending email:', error.message || error);
+          // Don't crash the server, just log the error
           res.status(500).json({ error: 'Error sending email' });
         } else {
           console.log('Email sent successfully:', body);

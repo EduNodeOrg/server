@@ -57,13 +57,12 @@ router.post('/', function (req, res) {
               };
 
 
-              mg.messages.create(domain, data, function (error, body) {
+              mg.messages.create(process.env.MAILGUN_DOMAIN || 'edunode.org', data, function (error, body) {
                 if (error) {
-                  console.log('Error sending email:', error);
-                  res.status(500).json({ error: 'Error sending email' });
+                  console.log('Error sending email:', error.message || error);
+                  // Don't crash the server, just log the error
                 } else {
                   console.log('Email sent successfully:', body);
-                  res.json({ msg: 'Email sent' });
                 }
               });
 

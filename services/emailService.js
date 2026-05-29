@@ -155,7 +155,7 @@ class EmailService {
       };
 
       const result = await mg.messages.create(domain, emailData);
-      
+
       // Create email log entry for analytics tracking
       const emailLogData = {
         userId: userId,
@@ -168,21 +168,47 @@ class EmailService {
           timestamp: new Date()
         }]
       };
-      
+
       if (campaignId) {
         emailLogData.campaignId = campaignId;
       }
-      
+
       const emailLog = new EmailLog(emailLogData);
       await emailLog.save();
-      
+
       return {
         messageId: result.id,
         status: 'sent'
       };
     } catch (error) {
-      console.error('Error sending email:', error);
-      throw error;
+      console.error('Error sending email:', error.message || error);
+
+      // Log failed attempt
+      const emailLog = new EmailLog({
+        userId: userId,
+        email: to,
+        status: 'failed',
+        sentAt: new Date(),
+        events: [{
+          eventType: 'failed',
+          timestamp: new Date(),
+          details: error.message || 'Unknown error'
+        }]
+      });
+
+      if (campaignId) {
+        emailLog.campaignId = campaignId;
+      }
+
+      await emailLog.save().catch(logError => {
+        console.error('Failed to save email log:', logError);
+      });
+
+      // Return error instead of throwing to prevent server crash
+      return {
+        status: 'failed',
+        error: error.message || 'Failed to send email'
+      };
     }
   }
 
