@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Discover our Memberships & New Platform Features</title>
+    <style>
+        /* Base mobile-first styles */
+        * {
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            line-height: 1.6;
+            color: #1e2a3e;
+            background-color: #eef2f5;
+            margin: 0;
+            padding: 12px;
+            font-size: 16px;
+        }
+        
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: #ffffff;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #0f2b3d 0%, #1b4f6e 100%);
+            color: white;
+            padding: 28px 20px;
+            text-align: center;
+            border-bottom: 4px solid #3bc9db;
+        }
+        
+        .header h1 {
+            margin: 0 0 8px;
+            font-size: 24px;
+            letter-spacing: -0.3px;
+            font-weight: 700;
+            line-height: 1.2;
+        }
+        
+        .header p {
+            margin: 0;
+            font-size: 14px;
+            opacity: 0.9;
+        }
+        
+        .content {
+            padding: 24px 18px;
+            background: #ffffff;
+        }
+        
+        .highlight-badge {
+            background: #e6f7fb;
+            color: #0c6b7e;
+            font-size: 12px;
+            font-weight: 600;
+            padding: 6px 12px;
+            border-radius: 40px;
+            display: inline-block;
+            margin-bottom: 14px;
+        }
+        
+        .feature-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            margin: 24px 0;
+        }
+        
+        .feature-card {
+            background: #f8fafc;
+            border-radius: 16px;
+            padding: 18px;
+            border: 1px solid #e2edf2;
+        }
+        
+        .feature-card h3 {
+            margin: 0 0 8px;
+            font-size: 16px;
+            font-weight: 700;
+            color: #0f2b3d;
+        }
+        
+        .feature-card p {
+            margin: 0 0 14px;
+            font-size: 14px;
+            color: #2c4e6e;
+            line-height: 1.5;
+        }
+        
+        .btn {
+            display: inline-block;
+            background: #1e7e8c;
+            color: white;
+            padding: 12px 20px;
+            border-radius: 40px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 14px;
+            transition: background 0.2s;
+            border: none;
+            text-align: center;
+            min-height: 44px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .btn-small {
+            background: #2c8b9e;
+            font-size: 13px;
+            padding: 10px 18px;
+        }
+        
+        .btn-outline {
+            background: transparent;
+            border: 1.5px solid #2c8b9e;
+            color: #1e6f7e;
+        }
+        
+        .btn-primary {
+            background: #0f2b3d;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+        }
+        
+        .callout-box {
+            background: #fef9e3;
+            border-left: 4px solid #f4b942;
+            padding: 16px 18px;
+            border-radius: 12px;
+            margin: 24px 0;
+            font-size: 14px;
+        }
+        
+        .membership-teaser {
+            background: linear-gradient(120deg, #eefafd, #ffffff);
+            border-radius: 16px;
+            padding: 18px;
+            text-align: center;
+            border: 1px solid #cde9f0;
+            margin: 18px 0;
+        }
+        
+        .membership-teaser h3 {
+            margin-top: 0;
+            color: #145c74;
+            font-size: 16px;
+        }
+        
+        .membership-teaser p {
+            font-size: 14px;
+            margin-bottom: 12px;
+        }
+        
+        .button-group {
+            margin: 24px 0 16px;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        
+        .button-group .btn {
+            width: 100%;
+            margin: 0;
+        }
+        
+        hr {
+            margin: 24px 0 16px;
+            border: none;
+            height: 1px;
+            background: #e0edf2;
+        }
+        
+        .footer {
+            padding: 20px 18px;
+            text-align: center;
+            font-size: 12px;
+            color: #5a7a92;
+            background: #f9fbfd;
+            border-top: 1px solid #e2edf2;
+        }
+        
+        .footer a {
+            color: #1c6f82;
+            text-decoration: none;
+        }
+        
+        .unsubscribe {
+            margin-top: 12px;
+        }
+        
+        .unsubscribe a {
+            margin: 0 4px;
+        }
+        
+        /* Desktop enhancements */
+        @media (min-width: 551px) {
+            body {
+                padding: 20px;
+            }
+            
+            .content {
+                padding: 32px 28px;
+            }
+            
+            .feature-grid {
+                flex-direction: row;
+                gap: 20px;
+            }
+            
+            .feature-card {
+                flex: 1;
+                min-width: 200px;
+            }
+            
+            .header h1 {
+                font-size: 28px;
+            }
+            
+            .header p {
+                font-size: 16px;
+            }
+            
+            .header {
+                padding: 32px 24px;
+            }
+            
+            .highlight-badge {
+                font-size: 13px;
+                margin-bottom: 16px;
+            }
+            
+            .feature-card h3 {
+                font-size: 18px;
+            }
+            
+            .feature-card p {
+                font-size: 14px;
+            }
+            
+            .callout-box {
+                padding: 18px 20px;
+                border-radius: 16px;
+                margin: 28px 0 24px;
+                font-size: 14px;
+            }
+            
+            .membership-teaser {
+                padding: 20px;
+                border-radius: 20px;
+                margin: 20px 0 16px;
+            }
+            
+            .membership-teaser h3 {
+                font-size: 18px;
+            }
+            
+            .button-group {
+                flex-direction: row;
+                flex-wrap: wrap;
+                justify-content: center;
+                gap: 8px;
+            }
+            
+            .button-group .btn {
+                width: auto;
+                margin: 4px;
+            }
+            
+            .footer {
+                padding: 24px 28px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>✨ New Era of Learning</h1>
+            <p>Fresh UI/UX • AI Assistant • Creator Hub</p>
+        </div>
+        <div class="content">
+            <!-- Personal greeting + announcement -->
+            <span class="highlight-badge">🎉 WHAT'S NEW AT EDUNODE</span>
+            <p>Hello <strong>{{user.name}}</strong>,</p>
+            <p>We've completely reimagined the EduNode experience. From a sleek, intuitive interface to powerful AI tools — plus brand new ways for educators to shine. Here's everything waiting for you:</p>
+
+            <!-- Feature highlights: UI/UX + AI Assistant -->
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <h3>🎨 Modern UI/UX</h3>
+                    <p>Smoother navigation, personalized dashboards, and a fresh design that makes learning effortless.</p>
+                    <a href="https://edunode.org/" class="btn btn-small">Explore new look →</a>
+                </div>
+                <div class="feature-card">
+                    <h3>🤖 AI Learning Assistant</h3>
+                    <p>Your 24/7 study companion. Ask questions, get summaries, and receive real-time guidance.</p>
+                    <a href="https://edunode.org/chat" class="btn btn-small">Chat with AI →</a>
+                </div>
+            </div>
+
+            <!-- Teachers & content creator callout -->
+            <div class="callout-box">
+                <strong>📢 We're looking for passionate teachers & Web3 educators!</strong><br>
+                Do you have expertise in blockchain, DeFi, smart contracts, or crypto literacy? Join our instructor community and shape the future of web3 education.<br><br>
+                <div style="display: flex; flex-direction: column; gap: 10px;">
+                    <a href="https://edunode.org/for-teachers" class="btn btn-outline">📖 Become a teacher</a>
+                    <a href="https://edunode.org/post" class="btn btn-outline">✍️ Share Web3 content</a>
+                </div>
+            </div>
+
+            <!-- Invite to share web3 content & display on feed -->
+            <div style="background: #f0f6fa; border-radius: 16px; padding: 16px 18px; margin: 18px 0;">
+                <p style="margin: 0 0 12px; font-weight: 500; font-size: 14px;">🌐 <strong>Share your Web3 educational content</strong> — articles, tutorials, video lessons or interactive quizzes. Get featured on our community feed and reach thousands of learners.</p>
+                <div style="display: flex; flex-direction: column; gap: 10px;">
+                    <a href="https://edunode.org/post" class="btn btn-small" style="background: #1b6b7c;">➕ Create a post</a>
+                    <a href="https://edunode.org/feed" class="btn btn-small" style="background: #eef2f5; color: #1d5f73;">🌿 Discover the feed →</a>
+                </div>
+            </div>
+
+            <!-- Memberships highlight -->
+            <div class="membership-teaser">
+                <h3>⭐ Unlock premium features — choose your membership</h3>
+                <p>Get unlimited access to expert-led courses, advanced AI tools, priority support, and exclusive web3 workshops. Whether you're a beginner or pro, we have a plan for you.</p>
+                <div style="margin-top: 14px;">
+                    <a href="https://edunode.org/pricing" class="btn btn-primary" style="width: 100%;">✨ Check memberships & pricing</a>
+                </div>
+                <p style="font-size: 12px; margin-top: 14px; margin-bottom: 0;">✔️ Monthly & annual plans • Cancel anytime • Early access to Web3 modules</p>
+            </div>
+
+            <!-- Optional short note about courses (keeping respectful legacy) -->
+            <hr>
+            <p style="font-size: 14px; margin-bottom: 6px;"><strong>📚 Still love structured courses?</strong> Our library is now upgraded — interactive labs, AI tutor integration, and project-based learning.</p>
+            <div style="text-align: center; margin: 16px 0 8px;">
+                <a href="https://edunode.org/courses" class="btn" style="background: #2c6e7e; width: 100%;">Browse all courses</a>
+            </div>
+
+            <!-- CTA + gratitude -->
+            <div class="button-group">
+                <a href="https://edunode.org/chat" class="btn btn-small">💬 Try AI Assistant</a>
+                <a href="https://edunode.org/pricing" class="btn btn-small">🏷️ Membership plans</a>
+            </div>
+
+            <p>We can't wait to see you inside the new EduNode — learn smarter, teach bigger, and connect with a global web3 community.</p>
+            <p>Happy learning & creating!<br><strong>The EduNode Team</strong></p>
+        </div>
+        <div class="footer">
+            <p>This email was sent to <strong>{{user.email}}</strong> based on your profile and interests.</p>
+            <p>You are receiving updates about platform improvements, AI features, and membership opportunities.</p>
+            <p class="unsubscribe">
+                <a href="https://edunode.org/api/email/unsubscribe?email={{user.email}}">Unsubscribe</a> | 
+                <a href="https://edunode.org/privacy">Privacy policy</a> | 
+                <a href="https://edunode.org/account">Email preferences</a>
+            </p>
+            <p style="margin-top: 12px;">© 2025 EduNode – empowering web3 education</p>
+        </div>
+    </div>
+</body>
+</html>

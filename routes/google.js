@@ -7,7 +7,7 @@ const session = require('express-session');
 
 // Removed CORS setup from this file. It will be handled in server.js
 
-router.post('/', function (req, res) {
+router.post('/', async function (req, res) {
  // res.header("Access-Control-Allow-Origin", '*');
  // res.header("Access-Control-Allow-Credentials", true);
  // res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS');
@@ -37,13 +37,8 @@ router.post('/', function (req, res) {
           subject: 'Welcome to Edunode ',
           text: `Hello! Your have logged in to edunode!`
         };
-        mg.messages.create(process.env.MAILGUN_DOMAIN || 'edunode.org', data, function (error, body) {
-          if (error) {
-            console.log('Error sending email:', error.message || error);
-            // Don't crash the server, just log the error
-          } else {
-            console.log('Email sent successfully:', body);
-          }
+        mg.messages.create(process.env.MAILGUN_DOMAIN || 'edunode.org', data).catch(error => {
+          console.log('Error sending email:', error.message || error);
         });
 
         // Generate JWT token for existing user
@@ -84,13 +79,8 @@ router.post('/', function (req, res) {
               subject: 'Welcome to Edunode ',
               text: `Hello! Your have logged in to edunode!`
             };
-            mg.messages.create(process.env.MAILGUN_DOMAIN || 'edunode.org', data, function (error, body) {
-              if (error) {
-                console.log('Error sending email:', error.message || error);
-                // Don't crash the server, just log the error
-              } else {
-                console.log('Email sent successfully:', body);
-              }
+            mg.messages.create(process.env.MAILGUN_DOMAIN || 'edunode.org', data).catch(error => {
+              console.log('Error sending email:', error.message || error);
             });
 
             // Generate JWT token and send it in response
