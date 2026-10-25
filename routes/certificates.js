@@ -481,6 +481,16 @@ router.get('/certificateNumber/:email', async (req, res) => {
   }
 });
 
+router.get('/valid', async (req, res) => {
+  try {
+    const certificates = await ValidCertificates.find().lean();
+    res.json(certificates);
+  } catch (error) {
+    console.error('Error fetching valid certificates:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
 router.get('/:email', async (req, res) => {
   try {
     const email = req.params.email;
@@ -628,16 +638,6 @@ router.post('/validCertificate', async (req, res) => {
     res.status(201).json({ success: true, certificate: validCertificate });
   } catch (error) {
     console.error('Error creating valid certificate:', error);
-    res.status(500).json({ error: 'Internal server error' });
-  }
-});
-
-router.get('/valid', async (req, res) => {
-  try {
-    const certificates = await ValidCertificates.find().lean();
-    res.json(certificates);
-  } catch (error) {
-    console.error('Error fetching valid certificates:', error);
     res.status(500).json({ error: 'Internal server error' });
   }
 });
